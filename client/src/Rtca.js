@@ -60,13 +60,13 @@ export const Rtca = () => {
 
   return (
     <>
-      <form onSubmit={msgSubmit}>
-        <h1 className="text-center">SKYCHAT</h1>
+      <form onSubmit={msgSubmit} className='form'>
+        <h1 className="text-center">...</h1>
 
-        <div className="d-flex flex-column w-50">
-          <input type='text' name="name" onChange={e => onTextChange(e)} value={response.name} label='name' />
+        <div className="d-flex flex-column ">
+          <input type='text' name="name" onChange={e => onTextChange(e)} value={response.name} placeholder='name' />
 
-          <input type='text' name="msg" onChange={e => onTextChange(e)} value={response.msg} label='msg' />
+          <input type='text' name="msg" onChange={e => onTextChange(e)} value={response.msg} placeholder='msg' className="my-1"  />
 
           <input type='submit' value='run' />
         </div>
