@@ -9,3 +9,16 @@ body{
   left: 50%;
   transform: translate(-50%,-50%);
 }
+
+
+.msg{
+  display: block;
+  width:fit-content;
+
+}
+.me{
+background-color: green;
+}
+.other{
+  background-color: rgb(39, 161, 151);
+}

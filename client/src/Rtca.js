@@ -65,9 +65,7 @@ export const Rtca = () => {
 
         <div className="d-flex flex-column ">
           <input type='text' name="name" onChange={e => onTextChange(e)} value={response.name} placeholder='name' />
-
           <input type='text' name="msg" onChange={e => onTextChange(e)} value={response.msg} placeholder='msg' className="my-1"  />
-
           <input type='submit' value='run' />
         </div>
 

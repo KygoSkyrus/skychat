@@ -16,6 +16,7 @@ import Form from "./Form";
 import Home from "./Home";
 import Start from "./Start";
 import { Rtca } from "./Rtca";
+import { NewRTCA } from "./NewRTCA";
 
 function App() {
   const firebaseConfig = {
@@ -146,7 +147,7 @@ function App() {
       <>
         <Routes>
           {/* <Route path="/" element={<Start />} /> */}
-          <Route path="/" element={<Rtca />} />
+          <Route path="/" element={<NewRTCA />} />
           <Route
             path="/login"
             element={
