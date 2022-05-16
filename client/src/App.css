@@ -1,24 +1,163 @@
-body{
+body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-.form{
+
+.outer {
+  width: 350px;
+
+  height: 400px;
+
   position: absolute;
+
   top: 50%;
+
   left: 50%;
-  transform: translate(-50%,-50%);
+
+  transform: translate(-50%, -50%);
+
+  background-color: #111;
+
+  border-radius: 4px;
+
+  padding: 10px;
+
+  overflow: hidden;
 }
 
+.chat-head {
+  height: 60px;
 
-.msg{
+  background-color: rgb(75, 75, 75);
+}
+
+.chat-body {
+  height: 320px;
+  background-color: rgb(218, 218, 218);
+}
+
+.chat-body .chat-box {
+  height: 290px;
+
+  background-color: rgb(141, 141, 141);
+
+  padding: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-body .chat-box .msg-block {
+  width: fit-content;
+
+  max-width: 200px;
+
+  position: relative;
+
+  padding: 6px 8px;
+
+  margin: 4px;
+}
+
+.chat-body .chat-box .msg-block .msg {
+  line-height: 1.3;
+
+  font-size: 14px;
+}
+
+.chat-body .chat-box .msg-block .msg-date {
   display: block;
-  width:fit-content;
 
+  font-size: 10px;
+
+  position: relative;
+
+  bottom: -2px;
 }
-.me{
-background-color: green;
+
+.chat-body .chat-box .msg-block.me {
+  background-color: #e7e7e7;
+
+  border-radius: 6px 6px 6px 0;
 }
-.other{
-  background-color: rgb(39, 161, 151);
+
+.chat-body .chat-box .msg-block.me .msg-arrow {
+  position: absolute;
+
+  bottom: 0;
+
+  left: -6px;
+
+  border-left: 5px solid transparent;
+
+  border-bottom: 5px solid #e7e7ee;
+
+  border-width: 6px;
+}
+
+.chat-body .chat-box .msg-block.other {
+  background-color: #5c5b5b;
+
+  color: #f0f0f0;
+
+  border-radius: 6px 6px 0 6px;
+
+  /* float: right; */
+  align-self: flex-end;
+}
+
+.chat-body .chat-box .msg-block.other .msg-arrow {
+  position: absolute;
+
+  bottom: 0;
+
+  right: -6px;
+
+  border-right: 5px solid transparent;
+
+  border-bottom: 5px solid #5c5b5b;
+
+  border-width: 6px;
+}
+
+.msg-input {
+
+  display: flex;
+
+  padding: 0;
+}
+
+.msg-input input {
+  width: 100%;
+
+  border: none;
+
+  padding: 4px 10px;
+
+  font-size: 14px;
+}
+
+.msg-input input:focus {
+  outline: none;
+}
+
+.msg-input button {
+  background-color: #a4a4a4;
+
+  border: none;
+
+  color: white;
+}
+
+/*sidebar*/
+
+.closeButton {
+  background-color: white;
+
+  border: none;
+}
+
+.hamburger {
+  cursor: pointer;
 }
