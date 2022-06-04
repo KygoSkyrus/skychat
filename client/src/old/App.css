@@ -43,7 +43,7 @@ body {
   transform: translate(-50%, -50%);
   background-color: #111;
   border-radius: 4px;
-  box-shadow: 0 0 3px #b5b5b5;
+  /* box-shadow: 0 0 3px #b5b5b5; */
   overflow: hidden;
 }
 
@@ -80,12 +80,7 @@ body {
   flex-direction: column;
 }
 .chat-body .chat-box::-webkit-scrollbar{
-  /* display: none; */
-  width: 8px;
-}
-.chat-body .chat-box::-webkit-scrollbar-thumb{
-  background-color: rgb(92, 92, 92);
-  border-radius: 4px;
+  display: none;
 }
 
 .chat-body .chat-box .msg-block {
@@ -190,6 +185,10 @@ body {
 }
 
 /*sidebar*/
+#mySidebar{
+  border: 1px solid rgb(217, 217, 217);
+  border-radius: 4px 0px 0px 4px;
+}
 .sidebar-head{
   display: flex;
   justify-content: space-between;

@@ -8,6 +8,7 @@ const Chat = ({ socket, user}) => {
   const [currentMsg, setcurrentMsg] = useState("");
   const [msgList, setmsgList] = useState([]);
 
+  const [userlist,setuserlist] = useState([]);
 
   const [wlcmMsg, setwlcmMsg] = useState();
 
@@ -52,15 +53,9 @@ const Chat = ({ socket, user}) => {
 
     socket.on('roomUsers',data=>{
       console.log('msg',data)
-      //this data in future might have info about all the rooms available
-
-
-let userString='';
-      data.users.map(x=>
-        userString+=`<li className='userString'>${x.username}</li>`
-      )
-console.log('str',userString)
-document.getElementById('userString').innerHTML=userString;
+      data.users.map(y=> setuserlist((x)=>[...x,y.username]))
+      
+      console.log('mru',userlist)
     })
     
 
@@ -113,7 +108,9 @@ document.getElementById('userString').innerHTML=userString;
             </span>
           </div>
 
-          <ul id='userString' className="w3-bar-item w3-button"></ul>
+          <a href="abc.com" className="w3-bar-item w3-button">
+           U
+          </a>
 
           <a href="abc.com" className="w3-bar-item w3-button">
             Link 2
@@ -138,6 +135,7 @@ document.getElementById('userString').innerHTML=userString;
           <div className="chat-box">
  {wlcmMsg?<p className="wlcmMsg">{wlcmMsg}</p>:null}
 
+ {userlist?.map(x=> <p key={x}>{x}</p> )} 
 
             {msgList.map((mesgContent) => {
               //bcz u r using username to distinguish the two clients if both the username are same thgen it will not be able to  differnetiate

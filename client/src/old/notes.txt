@@ -9,7 +9,3 @@
 
 
 //for development there is temporry route rtca to develop all the new eatures. when everything will be done then merge this route with home route
-
-
-problems:::
--the user is being create at the join page which is too early(may or may not be problem)

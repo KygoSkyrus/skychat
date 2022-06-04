@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server",
-    "dev":"nodemon server"
+    "dev": "nodemon server"
   },
   "author": "dg",
   "license": "ISC",
@@ -14,6 +14,7 @@
     "express": "^4.17.3",
     "moment": "^2.29.2",
     "nodemon": "^2.0.15",
+    "react-scroll-to-bottom": "^4.2.0",
     "socket.io": "^4.4.1"
   }
 }

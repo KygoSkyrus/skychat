@@ -4,18 +4,28 @@ import ScrollToBottom from 'react-scroll-to-bottom';
 import hamburger from './assets/menu.png'
 import notification from './assets/discord.mp3'
 
-const Chat = ({ socket, user}) => {
+const Chat = ({ socket, username, room }) => {
   const [currentMsg, setcurrentMsg] = useState("");
   const [msgList, setmsgList] = useState([]);
 
+  const [userlist, setuserlist] = useState([]);
 
   const [wlcmMsg, setwlcmMsg] = useState();
+
+  const [room, setroom] = useState('');
+  const joinRoom = () => {
+    if (username !== "" && room !== "") {
+      socket.emit('joinroom', room)//here we sending room as the second arguimenmt which will go the backend where the join room is declared
+      setshowchat(true)
+    }
+
+  }
 
   const sendMsg = async () => {
     if (currentMsg !== "") {
       const msgData = {
-        room: user.room,
-        author: user.username,
+        room: room,
+        author: username,
         message: currentMsg,
         time:
           new Date(Date.now()).getHours() +
@@ -23,6 +33,7 @@ const Chat = ({ socket, user}) => {
           new Date(Date.now()).getMinutes(),
       };
       await socket.emit("sendMessage", msgData);
+      //setuserlist((list)=>[...list,msgData.author])
       setmsgList((list) => [...list, msgData]); //for seeting the msg we send in our screen too,,without this the mesg will be not shown in our screen
       const chatBox=document.querySelector('.chat-box');
       chatBox.scrollTop=chatBox.scrollHeight;
@@ -37,6 +48,7 @@ const Chat = ({ socket, user}) => {
   useEffect(() => {
     socket.on("recieveMsg", (data) => {
       console.log(data.author);
+      //setuserlist((list)=>[...list,data.author])
       setmsgList((list) => [...list, data]); //for adding the mesg in list(the list parameter is what whicxh have all the previous msgs and the the new msg whhich is 'data' will be added )
       const chatBox=document.querySelector('.chat-box');
       chatBox.scrollTop=chatBox.scrollHeight;
@@ -47,20 +59,14 @@ const Chat = ({ socket, user}) => {
     
     //welcome msg
     socket.on('msg',msg=>{
+     // console.log('msg',msg)
       setwlcmMsg(msg);
     })
 
-    socket.on('roomUsers',data=>{
-      console.log('msg',data)
-      //this data in future might have info about all the rooms available
-
-
-let userString='';
-      data.users.map(x=>
-        userString+=`<li className='userString'>${x.username}</li>`
-      )
-console.log('str',userString)
-document.getElementById('userString').innerHTML=userString;
+    socket.on('roomUsers',msg=>{
+      console.log('msg',msg)
+      //\setuserlist((list)=>[...list,msg])
+      console.log('mru',userlist)
     })
     
 
@@ -113,7 +119,9 @@ document.getElementById('userString').innerHTML=userString;
             </span>
           </div>
 
-          <ul id='userString' className="w3-bar-item w3-button"></ul>
+          <a href="abc.com" className="w3-bar-item w3-button">
+           U
+          </a>
 
           <a href="abc.com" className="w3-bar-item w3-button">
             Link 2
@@ -122,6 +130,8 @@ document.getElementById('userString').innerHTML=userString;
           <a href="abc.com" className="w3-bar-item w3-button">
             Link 3
           </a>
+          <input type='text' name="room" onChange={e => setroom(e.target.value)} value={room} placeholder='room' className="my-1" />
+          <button onClick={joinRoom} >JOIN</button>
         </div>
 
         <div className="chat-head">
@@ -129,8 +139,8 @@ document.getElementById('userString').innerHTML=userString;
             <img src={hamburger} alt='.' />
           </div>
           <div>
-          <section>room:{user.room}</section>
-          <section>uname:{user.username}</section>
+          <section>room:{room}</section>
+          <section>uname:{username}</section>
           </div>
         </div>
 
@@ -138,13 +148,14 @@ document.getElementById('userString').innerHTML=userString;
           <div className="chat-box">
  {wlcmMsg?<p className="wlcmMsg">{wlcmMsg}</p>:null}
 
+{/* {userlist?.map(x=><h2>{x}</h2>)} */}
 
             {msgList.map((mesgContent) => {
-              //bcz u r using username to distinguish the two clients if both the username are same thgen it will not be able to  differnetiate
+              //bcz u r using username to distinguis the two clients if both the username are same thgen it will not be able to  differnetiate
               return (
                 <div
                   className={
-                    user.username === mesgContent.author
+                    username === mesgContent.author
                       ? "msg-block me"
                       : "msg-block other"
                   }
