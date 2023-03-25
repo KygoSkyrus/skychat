@@ -22,14 +22,21 @@ problems:::
 
 
 added this in css
-.chat-body .chat-box .authorName{
-  font-size: 10px;
-  margin: -2px 0 4px 4px;
-  color: #141414;
-}
+
+
+
+//IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in fiirestore
+
+
+
+### TODO
+- add feature where when the chat is from didfrent day,,put the date in between chats
+- convert the time to standard time like 17 shpuld be 5
 
 
 
 
+### structure
+- hide the author name if its private chat,,,only show when its group
 
 

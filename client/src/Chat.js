@@ -1,10 +1,12 @@
-import React, { useState, useEffect, } from "react";
+import React, { useState, useEffect,useRef, useReducer } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 
 import hamburger from "./assets/menu.png";
 import notification from "./assets/discord.mp3";
 
-import { getFirestore, collection, query, where, doc,orderBy, getDocs, getDoc, addDoc, setDoc ,serverTimestamp,toDate} from "firebase/firestore";
+import { getFirestore, collection, query, where, doc,orderBy, getDocs, getDoc, addDoc, setDoc ,serverTimestamp,toDate, limit,} from "firebase/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 
 const Chat = ({ socket, user, firebaseApp }) => {
@@ -15,7 +17,7 @@ const Chat = ({ socket, user, firebaseApp }) => {
   const [userlist, setuserlist] = useState([]);
 
   const [wlcmMsg, setwlcmMsg] = useState();
-  
+  const dummy=useRef();
 
   const sendMsg = async () => {
     if (currentMsg !== "") {
@@ -28,11 +30,12 @@ const Chat = ({ socket, user, firebaseApp }) => {
 
       await socket.emit("sendMessage", msgData);
       readWriteDb(msgData);
-      setmsgList((list) => [...list, msgData]); //for setting the msg we send in our screen too,,without this the mesg will be not shown in our screen
+      //setmsgList((list) => [...list, msgData]); //for setting the msg we send in our screen too,,without this the mesg will be not shown in our screen
       const chatBox = document.querySelector(".chat-box");
-      chatBox.scrollTop = chatBox.scrollHeight;
+      //chatBox.scrollTop = chatBox.scrollHeight+10;
 
       setcurrentMsg(""); //clearing msg from input field
+      dummy.current?.scrollIntoView({behaviour:'smooth'})//have to move it to right place bcz its not fulfilling it purpose correctly:when the db query on every input defect is fixed this might work fine,that is the root
     }
   };
 
@@ -53,11 +56,15 @@ const Chat = ({ socket, user, firebaseApp }) => {
 
     socket.on("roomUsers", (data) => {
       console.log("msg", data);
-      data.users.map((y) => setuserlist((x) => [...x, y.username]));
-
-      console.log("mru", userlist);
+      // data.users.map((y) => setuserlist((x) => [...x, y.username]));
+      let arr=[]
+      data.users.map((x) => {
+         arr.push({username:x.username,uid:x.uid})
+      });
+      setuserlist(arr)
     });
   }, [socket]);
+  console.log("mru", userlist);
 
   const sidebarVisibility = (tf) => {
     let sidebar = document.getElementById("mySidebar");
@@ -79,43 +86,24 @@ const Chat = ({ socket, user, firebaseApp }) => {
   };
 
 
+
+//fireship try----------------
+//have to check why its calling db one evry leter typed
+const firestore = getFirestore(firebaseApp);
+const dbQuery = query(collection(firestore, "v1"), where("room", "==", user.room),orderBy("time","asc"));
+const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
+console.log('firship-----------',allMessages)
+//fireship try-------------
+
   
   async function readWriteDb(msgObj){
-    const db1 = getFirestore(firebaseApp);
-
     //to write data in db
     try {
-      const docRef = await addDoc(collection(db1, "v1"), msgObj);
+      const docRef = await addDoc(collection(firestore, "v1"), msgObj);
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
-
-    //IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in fiirestore
-//time is seeting in descenting irder now,,have to comvert it asecding ..and also,,there's some difference in time calculated..by 2 min...happening when time is converted by  todate function from timestamp returned by firestore
-//-use arrayUnion function to get unique value from db only. this will solve the same messages displaying twice in chat problems
-
-    //to read data from db
-    const q = query(collection(db1, "v1"), where("room", "==", user.room),orderBy("time","asc"));
-    const querySnapshotNew = await getDocs(q);
-    querySnapshotNew.forEach((doc) => {
-      //console.log(doc.id, " => ", doc.data());//use doc.id as key everwhere.this will be very usefull and will eliminate all the key error
-      // console.log(doc.data().time.seconds+" "+doc.data().time.nanoseconds);
-      
-       let timeFromFS=doc.data().time.toDate();
-       let finalDate=timeFromFS.getHours()+":"+timeFromFS.getMinutes()+":"+timeFromFS.getSeconds()+":"+timeFromFS.getMilliseconds();
-       console.log(finalDate)
-      let textData={
-        author:doc.data().author,
-        message:doc.data().message,
-        room:doc.data().room,
-        time:finalDate,
-        
-      }
-      setmsgList2((list) => [...list, textData]);
-
-    });
-    
   }
   //test
 
@@ -165,12 +153,12 @@ const Chat = ({ socket, user, firebaseApp }) => {
           <div className="chat-box">
             {wlcmMsg ? <p className="wlcmMsg">{wlcmMsg}</p> : null}
 
-            {userlist?.map((x) => (
-              <p key={x}>{x+"."}</p>
-            ))}
+            {userlist?.map((x) => {
+              return(<p key={x.uid}>{x.username}</p>)}
+            )}
 
-            {msgList2.map((mesgContent) => {
-              //bcz u r using username to distinguish the two clients if both the username are same thgen it will not be able to  differnetiate
+            {allMessages?.map((mesgContent) => {
+              //the key problem is in here 
               return (
                 <>
                 <div
@@ -179,11 +167,11 @@ const Chat = ({ socket, user, firebaseApp }) => {
                       ? "msg-block me"
                       : "msg-block other"
                   }
-                  key={mesgContent.time}
+                  key={mesgContent.id}
                 >
                   <section className="msg">{mesgContent.message}</section>
 
-                  <span className="msg-date">{mesgContent.time}</span>
+                  <span className="msg-date">{mesgContent.time?.toDate().getHours()+':'+mesgContent.time?.toDate().getMinutes()}</span>
 
                   <section className="msg-arrow"></section>
                 </div>
@@ -195,6 +183,7 @@ const Chat = ({ socket, user, firebaseApp }) => {
                 </>
               );
             })}
+            <div ref={dummy}></div>
           </div>
 
           <div className="msg-input form-control">

@@ -81,7 +81,7 @@ body {
 }
 .chat-body .chat-box::-webkit-scrollbar{
   /* display: none; */
-  width: 8px;
+  width: 6px;
 }
 .chat-body .chat-box::-webkit-scrollbar-thumb{
   background-color: rgb(92, 92, 92);

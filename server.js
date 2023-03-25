@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
 
 
 
-    const userData = { username: user.username, room: user.room };
+    const userData = { username: user.username, room: user.room, uid:socket.id };
     mainUser.push(userData);
 
     // socket.emit('msg',` welcome to ...`);//as soon as someone connects it will send this message(will send msg to a single client)
