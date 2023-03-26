@@ -2,34 +2,38 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  /* background: #1b1b1b; */
 }
 
 
 /* join page */
 .outer-join  {
   width: 350px;
-
   height: 400px;
-
   position: absolute;
-
   top: 50%;
-
   left: 50%;
-
   transform: translate(-50%, -50%);
-
   background-color: rgb(211, 211, 211);
-
   border-radius: 4px;
-
   padding:0 30px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
 }
+
+/******before chat page,,,users option*******/
+.usersList{
+  display: flex;
+}
+.usersList span{
+  background-color: grey;
+  margin: 2px;
+  cursor: pointer;
+}
+
+/******before chat page,,,users option*******/
 
 
 
@@ -64,7 +68,19 @@ body {
 }
 
 
-
+.noOneToChat{
+  height: 320px;
+  background-color: #1b1b1b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fcdb9c;
+  font-size: 12px;
+}
+.noOneToChat section{
+  width: 172px;
+  text-align: center;
+}
 
 .chat-body {
   height: 320px;
@@ -90,13 +106,9 @@ body {
 
 .chat-body .chat-box .msg-block {
   width: fit-content;
-
   max-width: 200px;
-
   position: relative;
-
   padding: 6px 8px;
-
   margin: 4px;
 }
 
@@ -114,8 +126,6 @@ body {
 }
 
 .chat-body .chat-box .msg-block.me {
-  
-
   background-color: #5c5b5b;
   border-radius: 6px 6px 0 6px;
   color: #f0f0f0;
@@ -124,38 +134,24 @@ body {
 
 .chat-body .chat-box .msg-block.me .msg-arrow {
   position: absolute;
-
   bottom: 0;
-
   right: -5px;
-
   border-right: 5px solid transparent;
-
   border-bottom: 5px solid #5c5b5b;
-
   border-width: 6px;
 }
 
 .chat-body .chat-box .msg-block.other {
   background-color: #e7e7e7;
-
   border-radius: 6px 6px 6px 0;
 }
 
 .chat-body .chat-box .msg-block.other .msg-arrow {
- 
-
-
   position: absolute;
-
   bottom: 0;
-
   left: -5px;
-
   border-left: 5px solid transparent;
-
   border-bottom: 5px solid #e7e7ee;
-
   border-width: 6px;
 }
 .chat-body .chat-box .msg-block.me .msg-date{
@@ -174,6 +170,28 @@ body {
   width: 100%;
   text-align: right;
 }
+
+
+/*********** my profile*************/
+.myProfile{
+  background-color: #1b1b1b;
+color: white;  
+height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.chatWithProfile{
+  border-radius: 50%;
+  background-color: #1b1b1b;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/*********** my profile*************/
+
 
 .msg-input {
   display: flex;
@@ -198,6 +216,11 @@ body {
 }
 
 /*sidebar*/
+#mySidebar{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .sidebar-head{
   display: flex;
   justify-content: space-between;

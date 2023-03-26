@@ -51,24 +51,51 @@ function getRoomUsers(room) {
 let mainUser = [];
 
 
+io.use((socket, next) => {
+  const username = socket.handshake.auth.username;
+  console.log('usss',username)
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
+  socket.username = username;
+  next();
+});
 
 io.on('connection', (socket) => {
 
   console.log('a user connected', socket.id);
 
+  //new TRYYYYYYYY------------------STARTS_____________________________
 
 
 
+
+//----------
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: id,
+      username: socket.username,
+    });
+  }
+  socket.emit("users", users);//send all existing users to the client:
+  //--------------
+  
+// notify existing users
+socket.broadcast.emit("user connected", {
+  userID: socket.id,
+  username: socket.username,
+},users);
+
+  //new TRYYYYYYYY------------------STARTS_____________________________
 
   //the user arguement is passed from the fronend
   socket.on('joinroom', (user) => {
+    //to join a user to a room
 
     console.log('user=====================', user)
 
     socket.join(user.room)
-
-
-
 
     const userData = { username: user.username, room: user.room, uid:socket.id };
     mainUser.push(userData);
@@ -78,9 +105,6 @@ io.on('connection', (socket) => {
     //console.log('+++++++++',user)
 
     //socket.emit('roomUsers',username)
-
-
-
     // Convert map into 2D list:
     // ==> [['4ziBKG9XFS06NdtVAAAH', Set(1)], ['room1', Set(2)], ...]
     const arr = Array.from(socket.adapter.rooms);
@@ -95,13 +119,8 @@ io.on('connection', (socket) => {
 
     console.log('user with id ', socket.id, ' connected in room-', user.room);
 
-
-
     //for send the room and use details
-
     console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', mainUser,mainUser.room)
-
-    
 
     io.to(user.room).emit('roomUsers', {
       room: user.room,
@@ -112,11 +131,11 @@ io.on('connection', (socket) => {
       return mainUser.filter(user => user.room === room);
     }
 
-
   })
 
 
 
+  //when msg is sent
   socket.on('sendMessage', (data) => {
     //io.emit('message',{data})//to sent to all
     socket.to(data.room).emit('recieveMsg', data);//to send the data to only that specific room's users

@@ -40,3 +40,8 @@ added this in css
 - hide the author name if its private chat,,,only show when its group
 
 
+
+
+
+### forever notes
+- setU(u=>[...u,user]);,,,,use spread operator to append in exisiting array,,and while using setter function,,use it this way

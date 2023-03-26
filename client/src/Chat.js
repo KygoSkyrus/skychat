@@ -9,13 +9,10 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 
-const Chat = ({ socket, user, firebaseApp }) => {
+const Chat = ({ socket, user, firebaseApp, allUser }) => {
   const [currentMsg, setcurrentMsg] = useState("");
-  const [msgList, setmsgList] = useState([]);
-  const [msgList2, setmsgList2] = useState([]);
-
-  const [userlist, setuserlist] = useState([]);
-
+  const [roomUsersList, setRoomUsersList] = useState([]);//room users list
+  const [toChatWithSelected, setToChatWithSelected]=useState(false);
   const [wlcmMsg, setwlcmMsg] = useState();
   const dummy=useRef();
 
@@ -41,35 +38,34 @@ const Chat = ({ socket, user, firebaseApp }) => {
 
   useEffect(() => {
     socket.on("recieveMsg", (data) => {
-      console.log(data.author);
-      setmsgList((list) => [...list, data]); //for adding the mesg in list(the list parameter is what whicxh have all the previous msgs and the the new msg whhich is 'data' will be added )
+      //console.log(data.author);
       const chatBox = document.querySelector(".chat-box");
       chatBox.scrollTop = chatBox.scrollHeight;
       const audio = new Audio(notification);
       audio.play();
     });
 
-    //welcome msg
+    //welcome msg for new user///yet to implement
     socket.on("msg", (msg) => {
       setwlcmMsg(msg);
     });
 
     socket.on("roomUsers", (data) => {
       console.log("msg", data);
-      // data.users.map((y) => setuserlist((x) => [...x, y.username]));
+      // data.users.map((y) => setRoomUsersList((x) => [...x, y.username]));
       let arr=[]
       data.users.map((x) => {
          arr.push({username:x.username,uid:x.uid})
       });
-      setuserlist(arr)
+      setRoomUsersList(arr)
     });
-  }, [socket]);
-  console.log("mru", userlist);
+  }, []);//it had socket as the dependency earlier
+  //console.log("mru", userlist);
 
   const sidebarVisibility = (tf) => {
     let sidebar = document.getElementById("mySidebar");
 
-    tf ? (sidebar.style.display = "block") : (sidebar.style.display = "none");
+    tf ? (sidebar.style.display = "flex") : (sidebar.style.display = "none");
   };
   
   window.onload = function abc() {
@@ -92,7 +88,7 @@ const Chat = ({ socket, user, firebaseApp }) => {
 const firestore = getFirestore(firebaseApp);
 const dbQuery = query(collection(firestore, "v1"), where("room", "==", user.room),orderBy("time","asc"));
 const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
-console.log('firship-----------',allMessages)
+//console.log('firship-----------',allMessages)
 //fireship try-------------
 
   
@@ -100,12 +96,19 @@ console.log('firship-----------',allMessages)
     //to write data in db
     try {
       const docRef = await addDoc(collection(firestore, "v1"), msgObj);
-      console.log("Document written with ID: ", docRef.id);
+      //console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   }
-  //test
+  
+
+  async function chatThis(e){
+    console.log('chatthis',e.target.dataset.uid,e.target.innerText)
+    document.querySelectorAll('.closeButton')[0].click();//hiding sidebar when selected
+    await setToChatWithSelected(true)//showimg the chat window
+    document.getElementById('chatWith').innerHTML=e.target.innerText;//setting name of selectd person
+  }
 
   return (
     <>
@@ -115,6 +118,7 @@ console.log('firship-----------',allMessages)
           style={{ display: "none" }}
           id="mySidebar"
         >
+          <div>
           <div className="sidebar-head">
             <span>close</span>
 
@@ -126,34 +130,32 @@ console.log('firship-----------',allMessages)
             </span>
           </div>
 
-          <a href="abc.com" className="w3-bar-item w3-button">
-            U
-          </a>
+         <div>
+          {allUser?.map(x=>{return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThis(e)} >{x.username}</span>)})}
+          </div>
+          </div>
+          <section className="myProfile">{user.username}</section>
 
-          <a href="abc.com" className="w3-bar-item w3-button">
-            Link 2
-          </a>
-
-          <a href="abc.com" className="w3-bar-item w3-button">
-            Link 3
-          </a>
         </div>
 
         <div className="chat-head">
           <div className="hamburger" onClick={() => sidebarVisibility(true)}>
             <img src={hamburger} alt="." />
           </div>
-          <div>
-            <section>room:{user.room}</section>
-            <section>uname:{user.username}</section>
-          </div>
+          {toChatWithSelected?
+          (<div className="chatWithProfile">
+            <section id="chatWith"></section>
+          </div>):""
+          }
         </div>
 
-        <div className="chat-body">
+        { toChatWithSelected ?
+        (<div className="chat-body">
           <div className="chat-box">
             {wlcmMsg ? <p className="wlcmMsg">{wlcmMsg}</p> : null}
 
-            {userlist?.map((x) => {
+            {/* //for setting room users name */}
+            {roomUsersList?.map((x) => {
               return(<p key={x.uid}>{x.username}</p>)}
             )}
 
@@ -200,7 +202,12 @@ console.log('firship-----------',allMessages)
 
             <button onClick={sendMsg}>send</button>
           </div>
+        </div>)
+        :
+        <div className="noOneToChat">
+          <section>Select someone to chat with or Join a room</section>
         </div>
+        }
       </div>
     </>
   );
