@@ -87,7 +87,15 @@ socket.broadcast.emit("user connected", {
   username: socket.username,
 },users);
 
-  //new TRYYYYYYYY------------------STARTS_____________________________
+socket.on("private message", ({ content, to }) => {
+  console.log('pm',content ,to)
+  socket.to(to).emit("private message", {
+    content,
+    from: socket.id,
+  });
+});
+
+  //new TRYYYYYYYY------------------ENDS--_____________________________
 
   //the user arguement is passed from the fronend
   socket.on('joinroom', (user) => {

@@ -9,6 +9,7 @@ export const NewRTCA = ({firebaseApp}) => {
 
   // const socket = socketIOClient('http://localhost:3000');
   const socket = io('http://localhost:3000',{ autoConnect: false });
+
    //So that any event received by the client will be printed in the console.
    socket.onAny((event, ...args) => {
     console.log('on any',event, args);
@@ -21,10 +22,10 @@ export const NewRTCA = ({firebaseApp}) => {
   
 
   //new states
-const [me,setMe]=useState()
-const [allUser,setAllUser]=useState()
+  const [me,setMe]=useState()
+  const [allUser,setAllUser]=useState()
   
- // console.log(user)
+  // console.log(user)
 
   const joinRoom =()=>{
       if(user.username!==""){
@@ -48,7 +49,7 @@ const [allUser,setAllUser]=useState()
   socket.on("users", (users) => {
     users.forEach((user) => {
       user.self = user.userID === socket.id;
-      //setMe(user);
+      setMe(user);
     });
     // put the current user first, and then sort by username
     users = users.sort((a, b) => {
@@ -88,12 +89,7 @@ const [allUser,setAllUser]=useState()
       :
       (
         <>
-
-  
-      {/* <div>list: {allUser?.map(x=>{return(<span data-uid={x.userID} >{x.username}</span>)})}</div> */}
-
-
-       <Chat socket={socket} user={user} firebaseApp={firebaseApp} allUser={allUser} />
+          <Chat socket={socket} user={user} firebaseApp={firebaseApp} allUser={allUser} me={me} />
         </>
       )}
 

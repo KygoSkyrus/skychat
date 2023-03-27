@@ -9,32 +9,87 @@ import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 
-const Chat = ({ socket, user, firebaseApp, allUser }) => {
-  const [currentMsg, setcurrentMsg] = useState("");
-  const [roomUsersList, setRoomUsersList] = useState([]);//room users list
+const Chat = ({ socket, user, firebaseApp, allUser, me }) => {
+  const [currentMsg, setcurrentMsg] = useState("");//typed text
+  const [roomUsersList, setRoomUsersList] = useState([]);//room users list[will be used when room feature will be implemented]
   const [toChatWithSelected, setToChatWithSelected]=useState(false);
-  const [wlcmMsg, setwlcmMsg] = useState();
+  const [toChatWithID, setToChatWithID]=useState();//has the id of the othe person who is selected to have chat with
+  const [wlcmMsg, setwlcmMsg] = useState();//yet to implement [only for rooms]
   const dummy=useRef();
 
+console.log('allUser',allUser,me)
+
+  //fsp try----------------
+  //have to check why its calling db one evry leter typed
+  let dbQuery ;
+  const firestore = getFirestore(firebaseApp);
+  if(toChatWithID){
+    //the reason why hen where is set to to is now returning any result bcz thers is order by and we havent indesx time with to,,,have to create a composite index ot time and to
+    //dbQuery = query(collection(firestore, "v1"), where("to", "==", toChatWithID),orderBy("time","desc"), limit(20));//if you limit the record then they will give you the first few records..but we want records from below,,,so set the order to descending,,also set indexed in firebase
+  }
+  const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
+  allMessages?.reverse()//here reversed the returned msgs list array,,so that we have latest at first
+  console.log('allmessages-----------',allMessages)
+  //fsp try-------------
+
+
+
   const sendMsg = async () => {
-    if (currentMsg !== "") {
+    if (currentMsg !== "" && toChatWithID) {
+      // const msgData = {
+        //   room: user.room,
+      //   author: user.username,
+      //   message: currentMsg,
+      //   time: serverTimestamp(),
+      // };
+
       const msgData = {
-        room: user.room,
-        author: user.username,
+        to: toChatWithID,
+        from: me.userID,
         message: currentMsg,
+        isPrivate : true,
         time: serverTimestamp(),
       };
 
+
+      //sender client
+      socket.emit("private message", {
+          msgData,
+          to: toChatWithID,
+        });
+        // this.selectedUser.messages.push({
+        //   content,
+        //   fromSelf: true,
+        // });
+  
       await socket.emit("sendMessage", msgData);
       readWriteDb(msgData);
-      //setmsgList((list) => [...list, msgData]); //for setting the msg we send in our screen too,,without this the mesg will be not shown in our screen
-      const chatBox = document.querySelector(".chat-box");
-      //chatBox.scrollTop = chatBox.scrollHeight+10;
+
+      // const chatBox = document.querySelector(".chat-box");
+      //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
 
       setcurrentMsg(""); //clearing msg from input field
       dummy.current?.scrollIntoView({behaviour:'smooth'})//have to move it to right place bcz its not fulfilling it purpose correctly:when the db query on every input defect is fixed this might work fine,that is the root
     }
   };
+
+  //for client recipient
+  socket.on("private message", ({ content, from }) => {
+    for (let i = 0; i < this.users.length; i++) {
+      const user = this.users[i];
+      if (user.userID === from) {
+        user.messages.push({
+          content,
+          fromSelf: false,
+        });
+        if (user !== this.selectedUser) {
+          user.hasNewMessages = true;
+        }
+        break;
+      }
+    }
+  });
+
 
   useEffect(() => {
     socket.on("recieveMsg", (data) => {
@@ -69,6 +124,7 @@ const Chat = ({ socket, user, firebaseApp, allUser }) => {
   };
   
   window.onload = function abc() {
+    //i dont things is necessary/remove it
     let body = document.getElementsByTagName("body")[0];
 
     body.addEventListener("click", function (e) {
@@ -83,31 +139,27 @@ const Chat = ({ socket, user, firebaseApp, allUser }) => {
 
 
 
-//fireship try----------------
-//have to check why its calling db one evry leter typed
-const firestore = getFirestore(firebaseApp);
-const dbQuery = query(collection(firestore, "v1"), where("room", "==", user.room),orderBy("time","asc"));
-const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
-//console.log('firship-----------',allMessages)
-//fireship try-------------
 
   
   async function readWriteDb(msgObj){
     //to write data in db
     try {
       const docRef = await addDoc(collection(firestore, "v1"), msgObj);
-      //console.log("Document written with ID: ", docRef.id);
+      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   }
   
 
-  async function chatThis(e){
+  async function chatThisGuy(e){
     console.log('chatthis',e.target.dataset.uid,e.target.innerText)
+
     document.querySelectorAll('.closeButton')[0].click();//hiding sidebar when selected
     await setToChatWithSelected(true)//showimg the chat window
     document.getElementById('chatWith').innerHTML=e.target.innerText;//setting name of selectd person
+
+    await setToChatWithID(e.target.dataset.uid)//setting the id of the other user//here we have to writ eth code to get ths chats witn this selected guy
   }
 
   return (
@@ -131,7 +183,8 @@ const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
           </div>
 
          <div>
-          {allUser?.map(x=>{return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThis(e)} >{x.username}</span>)})}
+          {allUser?.map(x=>{if(x.userID!==me.userID){
+            return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThisGuy(e)} >{x.username}</span>)}})}
           </div>
           </div>
           <section className="myProfile">{user.username}</section>
@@ -165,7 +218,7 @@ const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
                 <>
                 <div
                   className={
-                    user.username === mesgContent.author
+                    me.userID === mesgContent.from
                       ? "msg-block me"
                       : "msg-block other"
                   }
@@ -178,7 +231,7 @@ const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
                   <section className="msg-arrow"></section>
                 </div>
                 <section className={
-                    user.username === mesgContent.author
+                     me.userID === mesgContent.from
                       ? "authorName me"
                       : "authorName other"
                   }>{mesgContent.author}</section>

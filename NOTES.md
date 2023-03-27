@@ -28,6 +28,9 @@ added this in css
 //IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in fiirestore
 
 
+### WHYYY
+- firebase if for storing msgs..,,,but cuould have working with firebase only bcz we are using its realtime feature to show msgs then why useee SOCKET.IO
+
 
 ### TODO
 - add feature where when the chat is from didfrent day,,put the date in between chats
