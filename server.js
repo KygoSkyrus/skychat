@@ -53,7 +53,7 @@ let mainUser = [];
 
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
-  console.log('usss',username)
+  console.log('usss', username)
   if (!username) {
     return next(new Error("invalid username"));
   }
@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
 
 
 
-//----------
+  //----------
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
@@ -80,20 +80,21 @@ io.on('connection', (socket) => {
   }
   socket.emit("users", users);//send all existing users to the client:
   //--------------
-  
-// notify existing users
-socket.broadcast.emit("user connected", {
-  userID: socket.id,
-  username: socket.username,
-},users);
 
-socket.on("private message", ({ content, to }) => {
-  console.log('pm',content ,to)
-  socket.to(to).emit("private message", {
-    content,
-    from: socket.id,
+  // notify existing users
+  socket.broadcast.emit("user connected", {
+    userID: socket.id,
+    username: socket.username,
+  }, users);
+
+  socket.on("private", ({ msgData, to }) => {
+    console.log('pm', msgData, to)
+    socket.to(to).emit("private", {
+      msgData,
+      from: socket.id,
+    });
   });
-});
+
 
   //new TRYYYYYYYY------------------ENDS--_____________________________
 
@@ -105,7 +106,7 @@ socket.on("private message", ({ content, to }) => {
 
     socket.join(user.room)
 
-    const userData = { username: user.username, room: user.room, uid:socket.id };
+    const userData = { username: user.username, room: user.room, uid: socket.id };
     mainUser.push(userData);
 
     // socket.emit('msg',` welcome to ...`);//as soon as someone connects it will send this message(will send msg to a single client)
@@ -128,14 +129,14 @@ socket.on("private message", ({ content, to }) => {
     console.log('user with id ', socket.id, ' connected in room-', user.room);
 
     //for send the room and use details
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', mainUser,mainUser.room)
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>', mainUser, mainUser.room)
 
     io.to(user.room).emit('roomUsers', {
       room: user.room,
       users: getRoomUsers(user.room)
     });
 
-   function getRoomUsers(room) {
+    function getRoomUsers(room) {
       return mainUser.filter(user => user.room === room);
     }
 

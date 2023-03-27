@@ -7,6 +7,7 @@ import notification from "./assets/discord.mp3";
 import { getFirestore, collection, query, where, doc,orderBy, getDocs, getDoc, addDoc, setDoc ,serverTimestamp,toDate, limit,} from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { Socket } from "socket.io-client";
 
 
 const Chat = ({ socket, user, firebaseApp, allUser, me }) => {
@@ -17,25 +18,25 @@ const Chat = ({ socket, user, firebaseApp, allUser, me }) => {
   const [wlcmMsg, setwlcmMsg] = useState();//yet to implement [only for rooms]
   const dummy=useRef();
 
-console.log('allUser',allUser,me)
-
+  //console.log('allUser',allUser,me)
   //fsp try----------------
   //have to check why its calling db one evry leter typed
   let dbQuery ;
   const firestore = getFirestore(firebaseApp);
   if(toChatWithID){
     //the reason why hen where is set to to is now returning any result bcz thers is order by and we havent indesx time with to,,,have to create a composite index ot time and to
-    //dbQuery = query(collection(firestore, "v1"), where("to", "==", toChatWithID),orderBy("time","desc"), limit(20));//if you limit the record then they will give you the first few records..but we want records from below,,,so set the order to descending,,also set indexed in firebase
+    dbQuery = query(collection(firestore, "v1"), where("to", "==", toChatWithID),orderBy("time","desc"), limit(20));//if you limit the record then they will give you the first few records..but we want records from below,,,so set the order to descending,,also set indexed in firebase
   }
   const [allMessages]=useCollectionData(dbQuery,{idField:'id'})
   allMessages?.reverse()//here reversed the returned msgs list array,,so that we have latest at first
-  console.log('allmessages-----------',allMessages)
+  //console.log('allmessages-----------',allMessages)
   //fsp try-------------
 
 
 
   const sendMsg = async () => {
-    if (currentMsg !== "" && toChatWithID) {
+    let currentMessage=document.getElementById('theText')
+    if (currentMessage.value !== "" && toChatWithID) {
       // const msgData = {
         //   room: user.room,
       //   author: user.username,
@@ -46,48 +47,51 @@ console.log('allUser',allUser,me)
       const msgData = {
         to: toChatWithID,
         from: me.userID,
-        message: currentMsg,
+        message: currentMessage.value,
         isPrivate : true,
         time: serverTimestamp(),
       };
-
-
+      console.log('msgdata',msgData)
+      console.log('tochatwithid',toChatWithID)
       //sender client
-      socket.emit("private message", {
-          msgData,
+
+      let xx=await socket.emit("private", {
+          msgData:msgData,
           to: toChatWithID,
         });
+        console.log('xx',xx)
         // this.selectedUser.messages.push({
         //   content,
         //   fromSelf: true,
         // });
   
-      await socket.emit("sendMessage", msgData);
+      // await socket.emit("sendMessage", msgData);
       readWriteDb(msgData);
 
       // const chatBox = document.querySelector(".chat-box");
       //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
 
-      setcurrentMsg(""); //clearing msg from input field
+      currentMessage.value=""; //clearing msg from input field
       dummy.current?.scrollIntoView({behaviour:'smooth'})//have to move it to right place bcz its not fulfilling it purpose correctly:when the db query on every input defect is fixed this might work fine,that is the root
     }
   };
 
   //for client recipient
-  socket.on("private message", ({ content, from }) => {
-    for (let i = 0; i < this.users.length; i++) {
-      const user = this.users[i];
-      if (user.userID === from) {
-        user.messages.push({
-          content,
-          fromSelf: false,
-        });
-        if (user !== this.selectedUser) {
-          user.hasNewMessages = true;
-        }
-        break;
-      }
-    }
+  socket.on("private", ({ msgData, from }) => {
+    console.log('pm recepient',msgData,from)
+    // for (let i = 0; i < this.users.length; i++) {
+    //   const user = this.users[i];
+    //   if (user.userID === from) {
+    //     user.messages.push({
+    //       content,
+    //       fromSelf: false,
+    //     });
+    //     if (user !== this.selectedUser) {
+    //       user.hasNewMessages = true;
+    //     }
+    //     break;
+    //   }
+    // }
   });
 
 
@@ -161,6 +165,8 @@ console.log('allUser',allUser,me)
 
     await setToChatWithID(e.target.dataset.uid)//setting the id of the other user//here we have to writ eth code to get ths chats witn this selected guy
   }
+  
+ 
 
   return (
     <>
@@ -184,7 +190,7 @@ console.log('allUser',allUser,me)
 
          <div>
           {allUser?.map(x=>{if(x.userID!==me.userID){
-            return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThisGuy(e)} >{x.username}</span>)}})}
+            return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThisGuy(e)} key={x.userID} >{x.username}</span>)}})}
           </div>
           </div>
           <section className="myProfile">{user.username}</section>
@@ -245,8 +251,7 @@ console.log('allUser',allUser,me)
             <input
               type="text"
               name="msg"
-              onChange={(e) => setcurrentMsg(e.target.value)}
-              value={currentMsg}
+              id="theText"
               placeholder="type..."
               className="my-1"
               onKeyPress={(e) => e.key === "Enter" && sendMsg()}

@@ -12,7 +12,7 @@ export const NewRTCA = ({firebaseApp}) => {
 
    //So that any event received by the client will be printed in the console.
    socket.onAny((event, ...args) => {
-    console.log('on any',event, args);
+    console.log('triggered event :- ',event, args);
   });
 
 
@@ -35,6 +35,7 @@ export const NewRTCA = ({firebaseApp}) => {
         socket.auth = {username} ;
         socket.connect(); 
       }
+      dont('e')
   }
 
   socket.on("connect_error", (err) => {
@@ -45,6 +46,14 @@ export const NewRTCA = ({firebaseApp}) => {
     }
   });
 
+  function dont(e){
+    console.log('eee  dont')
+  let cc=socket.emit("private", {
+    msgData:"msgData",
+    to: "toChatWithID",
+  });
+  console.log('cc',cc)
+}
   
   socket.on("users", (users) => {
     users.forEach((user) => {
@@ -60,21 +69,21 @@ export const NewRTCA = ({firebaseApp}) => {
     });
     
      setAllUser(users);//[this is in case there are already joined before me]
-    console.log('usersssssssssssssssssssssss-',users)
+    //console.log('usersssssssssssssssssssssss-',users)
     // console.log('uuuuuuuuu',u)
   });
 
 
   socket.on("user connected", (user,users) => {
-    console.log('new user',user)
-    console.log('--updated list',users)//list of all users
+   // console.log('new user',user)
+    //console.log('--updated list',users)//list of all users
     setAllUser(users)//updating the userslist[this is in case for user joining after]
   });
 
   // socket.off("connect_error");
   return (
     <>
-    <p style={{fontSize:"8px"}}>here we will have a login page,,or maybe ther eis already,,from here the username will be take,,either from ggogle login or user create a accoundt,,,only the let user move forward..with that username the connection will be created in socket</p>
+    <p style={{fontSize:"8px"}} onClick={e=>dont(e)}>here we will have a login page,,or maybe ther eis already,,from here the username will be take,,either from ggogle login or user create a accoundt,,,only the let user move forward..with that username the connection will be created in socket</p>
      {!letMeIn? (<div className='outer-join'>
         <h1 className="text-center">...</h1>
 
