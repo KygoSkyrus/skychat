@@ -32,13 +32,17 @@ export const NewRTCA = ({firebaseApp}) => {
   const [allUser,setAllUser]=useState()
 
 
-  //-------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-----from chat.js file--------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------
+  //-------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-----from chat.js file --------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------
   const [currentMsg, setcurrentMsg] = useState("");//typed text
   const [roomUsersList, setRoomUsersList] = useState([]);//room users list[will be used when room feature will be implemented]
   const [toChatWithSelected, setToChatWithSelected]=useState(false);
   const [toChatWithID, setToChatWithID]=useState();//has the id of the othe person who is selected to have chat with
   const [wlcmMsg, setwlcmMsg] = useState();//yet to implement [only for rooms]
   const dummy=useRef();
+
+
+  const sessionID = localStorage.getItem("sessionID");
+  console.log('sessionid',sessionID)
 
   //fsp try----------------
   //have to check why its calling db one evry leter typed
@@ -108,6 +112,7 @@ export const NewRTCA = ({firebaseApp}) => {
   //for client recipient
   socket.on("private", ({ msgData, from }) => {
     console.log('pm recepient',msgData,from)
+    // i dont think we need this below code,as its only seeeting msgs in the list
     // for (let i = 0; i < this.users.length; i++) {
     //   const user = this.users[i];
     //   if (user.userID === from) {
@@ -123,6 +128,30 @@ export const NewRTCA = ({firebaseApp}) => {
     // }
   });
 
+  socket.on("connect", () => {
+    this?.users.forEach((user) => {
+      if (user.self) {
+        user.connected = true;
+      }
+    });
+  });
+  socket.on("disconnect", () => {
+    this?.users.forEach((user) => {
+      if (user.self) {
+        user.connected = false;
+      }
+    });
+  });
+
+  socket.on("session", ({ sessionID, userID }) => {
+    console.log('...',sessionID,userID)
+    // attach the session ID to the next reconnection attempts
+    socket.auth = { sessionID };
+    // store it in the localStorage
+    localStorage.setItem("sessionID", sessionID);
+    // save the ID of the user
+    socket.userID = userID;
+  });
 
   useEffect(() => {
     socket.on("recieveMsg", (data) => {
@@ -171,7 +200,12 @@ export const NewRTCA = ({firebaseApp}) => {
   
 
   const joinRoom =()=>{
-      if(user.username!==""){
+    if (sessionID) {
+      // this.usernameAlreadySelected = true;
+      setLetMeIn(true)
+      socket.auth = { sessionID };
+      socket.connect();
+    }else if(user.username!==""){
         //socket.emit('joinroom',user)//here we sending room as the second arguimenmt which will go the backend where the join room is declared
         setLetMeIn(true)
         let username=user.username
