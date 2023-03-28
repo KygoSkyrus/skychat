@@ -25,6 +25,7 @@ import firebase from "firebase/compat/app";
 //for firestore
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {useCollectionData} from 'react-firebase-hooks/firestore';
+import Temp from "./Temp";
 
 
 
