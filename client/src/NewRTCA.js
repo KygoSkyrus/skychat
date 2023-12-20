@@ -15,7 +15,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 
   // const socket = socketIOClient('http://localhost:3000');
-  const socket = io('http://localhost:3000',{ autoConnect: false });//getting this out of the compoments bvcz when it as in,,it used to creata a new seocket on every rerender
+  const socket = io('http://localhost:3000',{ autoConnect: false });//getting this out of the compoments bvcz when it was in,,it used to creata a new seocket on every rerender
 
   //So that any event received by the client will be printed in the console.
   socket.onAny((event, ...args) => {
@@ -57,7 +57,7 @@ export const NewRTCA = ({firebaseApp}) => {
   //console.log('allmessages-----------',allMessages)
   //fsp try-------------
 
-  const sendMsg = async () => {
+  async function sendMsg()  {
     let currentMessage=document.getElementById('theText')
     if (currentMessage.value !== "" && toChatWithID) {
       // const msgData = {
@@ -200,13 +200,16 @@ export const NewRTCA = ({firebaseApp}) => {
   
 
   const joinRoom =()=>{
+    console.log('before sesssionid',sessionID)
     if (sessionID) {
+      console.log('sesssionid',sessionID)
       // this.usernameAlreadySelected = true;
       setLetMeIn(true)
       socket.auth = { sessionID };
       socket.connect();
     }else if(user.username!==""){
-        //socket.emit('joinroom',user)//here we sending room as the second arguimenmt which will go the backend where the join room is declared
+      console.log('elsee',socket)
+        socket.emit('joinroom',user)//here we sending room as the second arguimenmt which will go the backend where the join room is declared
         setLetMeIn(true)
         let username=user.username
         socket.auth = {username} ;
@@ -252,7 +255,7 @@ export const NewRTCA = ({firebaseApp}) => {
 
 
   socket.on("user connected", (user,users) => {
-   // console.log('new user',user)
+   console.log('new user',user)
     //console.log('--updated list',users)//list of all users
     setAllUser(users)//updating the userslist[this is in case for user joining after]
   });
@@ -266,8 +269,8 @@ export const NewRTCA = ({firebaseApp}) => {
 
         <div className="d-flex flex-column ">
           <input type='text' name="username" onChange={e => setuser(user=>({...user,username:e.target.value}))} value={user.username} placeholder='username' />
-          {/* <input type='text' name="room" onChange={e => setuser(user=>({...user,room:e.target.value}))} value={user.room} placeholder='room' className="my-1"  /> */}
-          <button onClick={joinRoom} >JOIN</button>
+          <input type='text' name="room" onChange={e => setuser(user=>({...user,room:e.target.value}))} value={user.room} placeholder='room' className="my-1"  />
+          <button onClick={()=>joinRoom()} >JOIN</button>
 
         </div>
 
@@ -340,7 +343,7 @@ export const NewRTCA = ({firebaseApp}) => {
               autoComplete="off"
             />
 
-            <button onClick={sendMsg}>send</button>
+            <button onClick={()=>sendMsg()}>send</button>
           </div>
         </div>)
         :

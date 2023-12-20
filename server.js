@@ -51,29 +51,29 @@ function getRoomUsers(room) {
 let mainUser = [];
 
 
-io.use((socket, next) => {
-  const sessionID = socket.handshake.auth.sessionID;
-  console.log('usss', username,sessionID)
-  if (sessionID) {
-    // find existing session
-    const session = sessionStore.findSession(sessionID);
-    if (session) {
-      socket.sessionID = sessionID;
-      socket.userID = session.userID;
-      socket.username = session.username;
-      return next();
-    }
-  }
-  const username = socket.handshake.auth.username;
-  if (!username) {
-    return next(new Error("invalid username"));
-  }
-  // create new session
-  socket.sessionID = randomId();
-  socket.userID = randomId();
-  socket.username = username;
-  next();
-});
+// io.use((socket, next) => {
+//   const sessionID = socket.handshake.auth.sessionID;
+//   console.log('usss', username,sessionID)
+//   if (sessionID) {
+//     // find existing session
+//     const session = sessionStore.findSession(sessionID);
+//     if (session) {
+//       socket.sessionID = sessionID;
+//       socket.userID = session.userID;
+//       socket.username = session.username;
+//       return next();
+//     }
+//   }
+//   const username = socket.handshake.auth.username;
+//   if (!username) {
+//     return next(new Error("invalid username"));
+//   }
+//   // create new session
+//   socket.sessionID = randomId();
+//   socket.userID = randomId();
+//   socket.username = username;
+//   next();
+// });
 
 io.on('connection', (socket) => {
 
@@ -82,6 +82,7 @@ io.on('connection', (socket) => {
   //new TRYYYYYYYY------------------STARTS_____________________________
 
 
+  // socket.join(socket.userID);
 
 
   //----------
@@ -107,6 +108,11 @@ io.on('connection', (socket) => {
       msgData,
       from: socket.id,
     });
+    // socket.to(to).to(socket.userID).emit("private", {
+    //   msgData,
+    //   from: socket.userID,
+    //   to,
+    // });
   });
 
   socket.emit("session", {
@@ -114,8 +120,25 @@ io.on('connection', (socket) => {
     userID: socket.userID,
   });
 
-  //new TRYYYYYYYY------------------ENDS--_____________________________
 
+  // socket.on("disconnect", async () => {
+  //   const matchingSockets = await io.in(socket.userID).allSockets();
+  //   const isDisconnected = matchingSockets.size === 0;
+  //   if (isDisconnected) {
+  //     // notify other users
+  //     socket.broadcast.emit("user disconnected", socket.userID);
+  //     // update the connection status of the session
+  //     sessionStore.saveSession(socket.sessionID, {
+  //       userID: socket.userID,
+  //       username: socket.username,
+  //       connected: false,
+  //     });
+  //   }
+  // });
+
+
+  //new TRYYYYYYYY------------------ENDS--__ __ _ __ __ _ _ __ _ __ _ __ _ ___ __ __ __
+ 
   //the user arguement is passed from the fronend
   socket.on('joinroom', (user) => {
     //to join a user to a room
@@ -170,7 +193,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', ({ name, msg }) => {
-    console.log('a user disconnected', socket.id);
+  console.log('a user disconnected', socket.id);
   })
 
 

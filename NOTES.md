@@ -1,4 +1,4 @@
-#you can register a new user with a unique email ad then later login with that email and password,,,
+#you can register a new user with a unique email id then later login with that email and password,,,
 
 -while login the displayname and email will be save in cookies which will later used to terminate session,,,set the expiry time around 4-5hours..
 
