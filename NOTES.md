@@ -1,3 +1,51 @@
+# solution to config file security
+- you expose keys with no problem. To make it safe, you can restrict it with specific domain in production so that no one else can make call API call from any random domain name. To make it more safe remove localhost from production app
+
+
+- Q. So it means that other people would be able to access all the data in my firebase database? – 
+- Answer is Yes and No. Yes, if you allow or want the other people to access all the data in the database. And No, if you don't want them to. Firebase database has rules, rules that you control
+
+
+-- CONCLUSION: if you r going with client than set rules for every user like the user can get and modify his own data only,
+
+
+
+# Defects
+- firebase is keeeping user logged in forever(can be good , like if user wants out than he can logout , or elese he will be logged in always)
+- u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
+
+
+
+# Todo 
+- encrypt messages/passwords
+- add vc
+- user can search other users by therir username and send them msgs
+- the receipient will have to accet the msg rqst to see the msgs and then he can start with sender
+- option to create a group and add members 
+- webrtc
+- check db security using other domain
+- remove localhost and add app's real domain to authorized domain from firebase in production 
+- create a text like hovered toast if toasts are ever neeeded
+- set the users usernsme in displayname of firebase and avatar in photourl
+
+
+
+
+# wouldnt hurt to have
+- add msgs copy and reply feature (least pripority)
+
+
+
+
+
+
+
+
+
+
+
+##### OLD STUFF-------------------------------
+
 #you can register a new user with a unique email id then later login with that email and password,,,
 
 -while login the displayname and email will be save in cookies which will later used to terminate session,,,set the expiry time around 4-5hours..

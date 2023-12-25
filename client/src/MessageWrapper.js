@@ -1,8 +1,7 @@
 import React from 'react'
 
-const MessageWrapper = (props) => {
+const MessageWrapper = ({mesgContent,me}) => {
 
-    const [mesgContent,me]=props
 
 
     return (

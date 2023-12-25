@@ -3,11 +3,10 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 
-import Form from "./Form";
 import Home from "./Home";
-import Start from "./Start";
 import { Rtca } from "./Rtca";
 import { NewRTCA } from "./NewRTCA";
+import Error from "./components/Error"
 
 
 import {
@@ -26,6 +25,7 @@ import firebase from "firebase/compat/app";
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {useCollectionData} from 'react-firebase-hooks/firestore';
 import Temp from "./Temp";
+import Authenticate from "./components/Authenticate";
 
 
 
@@ -168,56 +168,18 @@ function App() {
     <div className="App">
       <>
         <Routes>
-          {/* <Route path="/" element={<Start />} /> */}
-          <Route path="/" element={<NewRTCA firebaseApp={firebaseApp}/>} />
-          <Route
-            path="/login"
-            element={
-              <Form
-                title="Login"
-                setEmail={setEmail}
-                setPassword={setPassword}
-                handleAction={() => handleAction(1)}
-              />
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <Form
-                title="Register"
-                setEmail={setEmail}
-                setPassword={setPassword}
-                setdisplayName={setdisplayName}
-                handleAction={() => handleAction(2)}
-              />
-            }
-          />
-          <Route
-            path="/google"
-            element={
-              <Ggl
-                title="ggogle"
-                setEmail={setEmail}
-                setPassword={setPassword}
-                handleAction={() => handleAction(3)}
-              />
-            }
-          />
+          <Route path="/" exact element={<Authenticate firebaseApp={firebaseApp} />} />
+          
+          <Route path="/chat" exact element={<NewRTCA firebaseApp={firebaseApp}/>} />
+
+
           <Route path="/home" element={<Home user={user} />} />
+          <Route path="*" exact element={<Error />} />
         </Routes>
       </>
     </div>
   );
 }
 
-const Ggl = ({ title, setPassword, setEmail, handleAction }) => {
-  return (
-    <>
-      <h2>{title}</h2>
-      <button onClick={handleAction}>GOOGLE</button>
-    </>
-  );
-};
 
 export default App;

@@ -11,7 +11,11 @@ import notification from "./assets/discord.mp3";
 import { getFirestore, collection, query, where, doc,orderBy, getDocs, getDoc, addDoc, setDoc ,serverTimestamp,toDate, limit,} from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { getAuth} from "firebase/auth";
 
+import { LogOut } from 'lucide-react';
+import {useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 
 
   // const socket = socketIOClient('http://localhost:3000');
@@ -31,6 +35,16 @@ export const NewRTCA = ({firebaseApp}) => {
   const [me,setMe]=useState()
   const [allUser,setAllUser]=useState()
 
+
+const dispatch=useDispatch()
+  const state= useSelector(state=>state)
+  // const user= useSelector(state=>state.user)
+  console.log('state,state',state)
+
+
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  console.log('currentuser',currentUser)
 
   //-------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-----from chat.js file --------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------
   const [currentMsg, setcurrentMsg] = useState("");//typed text
@@ -128,30 +142,32 @@ export const NewRTCA = ({firebaseApp}) => {
     // }
   });
 
-  socket.on("connect", () => {
-    this?.users.forEach((user) => {
-      if (user.self) {
-        user.connected = true;
-      }
-    });
-  });
-  socket.on("disconnect", () => {
-    this?.users.forEach((user) => {
-      if (user.self) {
-        user.connected = false;
-      }
-    });
-  });
+  //rolling back to previous commit
+  // socket.on("connect", () => {
+  //   this?.users.forEach((user) => {
+  //     if (user.self) {
+  //       user.connected = true;
+  //     }
+  //   });
+  // });
+  // socket.on("disconnect", () => {
+  //   this?.users.forEach((user) => {
+  //     if (user.self) {
+  //       user.connected = false;
+  //     }
+  //   });
+  // });
 
-  socket.on("session", ({ sessionID, userID }) => {
-    console.log('...',sessionID,userID)
-    // attach the session ID to the next reconnection attempts
-    socket.auth = { sessionID };
-    // store it in the localStorage
-    localStorage.setItem("sessionID", sessionID);
-    // save the ID of the user
-    socket.userID = userID;
-  });
+  //will try later
+  // socket.on("session", ({ sessionID, userID }) => {
+  //   console.log('...',sessionID,userID)
+  //   // attach the session ID to the next reconnection attempts
+  //   socket.auth = { sessionID };
+  //   // store it in the localStorage
+  //   localStorage.setItem("sessionID", sessionID);
+  //   // save the ID of the user
+  //   socket.userID = userID;
+  // });
 
   useEffect(() => {
     socket.on("recieveMsg", (data) => {
@@ -261,22 +277,33 @@ export const NewRTCA = ({firebaseApp}) => {
   });
 
   // socket.off("connect_error");
+
+
+            // Sign out function
+            const signOut = () => {
+              auth.signOut()
+              .catch((error) => {
+                console.error(error);
+              });
+            };
+
   return (
     <>
     <p style={{fontSize:"8px"}} >here we will have a login page,,or maybe there is already,,from here the username will be take,,either from ggogle login or user create a accoundt,,,only the let user move forward..with that username the connection will be created in socket</p>
-     {!letMeIn? (<div className='outer-join'>
-        <h1 className="text-center">...</h1>
+     
+    {/* //  (<div >
+    //     <h1 className="text-center">...</h1>
 
-        <div className="d-flex flex-column ">
-          <input type='text' name="username" onChange={e => setuser(user=>({...user,username:e.target.value}))} value={user.username} placeholder='username' />
-          <input type='text' name="room" onChange={e => setuser(user=>({...user,room:e.target.value}))} value={user.room} placeholder='room' className="my-1"  />
-          <button onClick={()=>joinRoom()} >JOIN</button>
+    //     <div className="d-flex flex-column ">
+    //       <input type='text' name="username" onChange={e => setuser(user=>({...user,username:e.target.value}))} value={user.username} placeholder='username' />
+    //       <input type='text' name="room" onChange={e => setuser(user=>({...user,room:e.target.value}))} value={user.room} placeholder='room' className="my-1"  />
+    //       <button onClick={()=>joinRoom()} >JOIN</button>
 
-        </div>
+    //     </div>
 
-      </div>)
-      :
-      (
+    //   </div>) */}
+      
+      
         <div className="outer">
         <div
           className="w3-sidebar  w3-animate-left w3-bar-block w3-border-right"
@@ -300,7 +327,12 @@ export const NewRTCA = ({firebaseApp}) => {
             return(<span data-uid={x.userID} className="w3-bar-item w3-button"onClick={e=>chatThisGuy(e)} key={x.userID} >{x.username}</span>)}})}
           </div>
           </div>
-          <section className="myProfile">{user.username}</section>
+          <section className="myProfile">
+            <span>
+              {state?.user?.user?.email}
+            </span>
+            <LogOut />
+          </section>
 
         </div>
 
@@ -326,8 +358,7 @@ export const NewRTCA = ({firebaseApp}) => {
             )} */}
 
             {allMessages?.map((mesgContent) => {
-              //the key problem is in here 
-              <MessageWrapper mesgContent={mesgContent} me={me} />
+              return <MessageWrapper mesgContent={mesgContent} me={me} />
             })}
             <div ref={dummy}></div>
           </div>
@@ -348,12 +379,13 @@ export const NewRTCA = ({firebaseApp}) => {
         </div>)
         :
         <div className="noOneToChat">
-          <section>Select someone to chat with or Join a room</section>
+          <section onClick={()=>dispatch({type:"MESSAGE",payload:4})}>Select someone to chat with or Join a room</section>
         </div>
         }
       </div>
-      )}
+    
 
+<section id="user-info"></section>
 
     </>
   )

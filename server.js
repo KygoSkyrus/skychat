@@ -14,6 +14,32 @@ app.use(express.static(path.join(__dirname, "public")));
 const port = process.env.PORT || 5000;
 
 
+// FIREBASE ADMIN
+// var admin = require("firebase-admin");
+// var serviceAccount = require("path/to/serviceAccountKey.json");
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   databaseURL: "https://skyrus-3416b-default-rtdb.firebaseio.com"
+// });
+// Middleware to check user authentication
+// const checkAuth = (req, res, next) => {
+//   const idToken = req.headers.authorization;
+
+//   admin
+//     .auth()
+//     .verifyIdToken(idToken)
+//     .then((decodedToken) => {
+//       req.user = decodedToken;
+//       next();
+//     })
+//     .catch((error) => {
+//       res.status(401).json({ error: 'Unauthorized' });
+//     });
+// };
+// Example route that requires authentication
+// app.get('/secure-route', checkAuth, (req, res) => {
+//   res.json({ message: 'Authenticated User', user: req.user });
+// });
 
 
 const users = [];
@@ -51,29 +77,30 @@ function getRoomUsers(room) {
 let mainUser = [];
 
 
-// io.use((socket, next) => {
-//   const sessionID = socket.handshake.auth.sessionID;
-//   console.log('usss', username,sessionID)
-//   if (sessionID) {
-//     // find existing session
-//     const session = sessionStore.findSession(sessionID);
-//     if (session) {
-//       socket.sessionID = sessionID;
-//       socket.userID = session.userID;
-//       socket.username = session.username;
-//       return next();
-//     }
-//   }
-//   const username = socket.handshake.auth.username;
-//   if (!username) {
-//     return next(new Error("invalid username"));
-//   }
-//   // create new session
-//   socket.sessionID = randomId();
-//   socket.userID = randomId();
-//   socket.username = username;
-//   next();
-// });
+io.use((socket, next) => {
+  //thie below commented code was causing issue and now working as expected
+  // const sessionID = socket.handshake.auth.sessionID;
+  // console.log('usss', username,sessionID)
+  // if (sessionID) {
+  //   // find existing session
+  //   const session = sessionStore.findSession(sessionID);
+  //   if (session) {
+  //     socket.sessionID = sessionID;
+  //     socket.userID = session.userID;
+  //     socket.username = session.username;
+  //     return next();
+  //   }
+  // }
+  // create new session
+  // socket.sessionID = randomId();
+  // socket.userID = randomId();
+  const username = socket.handshake.auth.username;
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
+  socket.username = username;
+  next();
+});
 
 io.on('connection', (socket) => {
 
@@ -108,6 +135,7 @@ io.on('connection', (socket) => {
       msgData,
       from: socket.id,
     });
+    //try for one to one connection
     // socket.to(to).to(socket.userID).emit("private", {
     //   msgData,
     //   from: socket.userID,
@@ -115,10 +143,6 @@ io.on('connection', (socket) => {
     // });
   });
 
-  socket.emit("session", {
-    sessionID: socket.sessionID,
-    userID: socket.userID,
-  });
 
 
   // socket.on("disconnect", async () => {
