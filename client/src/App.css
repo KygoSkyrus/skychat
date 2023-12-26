@@ -5,6 +5,12 @@ body {
   /* background: #1b1b1b; */
 }
 
+/* BASICS */
+.pointer{
+  cursor: pointer !important;
+}
+
+
 
 /* join page */
 .outer-join  {
@@ -178,7 +184,7 @@ body {
 color: white;  
 height: 38px;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 .chatWithProfile{
@@ -220,6 +226,7 @@ height: 38px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: unset !important;
 }
 .sidebar-head{
   display: flex;

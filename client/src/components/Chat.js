@@ -1,8 +1,8 @@
 import React, { useState, useEffect,useRef, useReducer } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 
-import hamburger from "./assets/menu.png";
-import notification from "./assets/discord.mp3";
+import hamburger from "./../assets/menu.png";
+import notification from "./../assets/discord.mp3";
 
 import { getFirestore, collection, query, where, doc,orderBy, getDocs, getDoc, addDoc, setDoc ,serverTimestamp,toDate, limit,} from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";

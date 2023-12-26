@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-// import { useDispatch } from 'react-redux';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 import { useDispatch } from 'react-redux';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
+
 import { UPDATE_USER_INFO } from '../redux/actionTypes';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
@@ -12,27 +12,27 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     const auth = getAuth();
     const navigate = useNavigate()
-    // const dispatch = useDispatch()
+    const dispatch = useDispatch()
     const [userCredentials, setUserCredentials] = useState({ email: '', password: '', username: '' });
 
     const firestore = getFirestore(firebaseApp);
-    const dispatch = useDispatch()
-    useEffect(() => {
-
-        auth.onAuthStateChanged((user) => {
-            const userInfo = document.getElementById('user-info');
-            console.log('authstate changed', user)
-            //set user in redux
-            if (user) {
-                dispatch({ type: UPDATE_USER_INFO, payload:user })
-                navigate('/chat')
-            } else {
-                console.log('')
-            }
-        });
-    }, [])
 
 
+    // useEffect(() => {
+
+    //     auth.onAuthStateChanged((user) => {
+    //         const userInfo = document.getElementById('user-info');
+    //         console.log('authstate changed', user)
+    //         //set user in redux
+    //         if (user) {
+    //             dispatch({ type: UPDATE_USER_INFO, payload:user })
+    //             navigate('/chat')
+    //         } else {
+    //             dispatch({ type: UPDATE_USER_INFO, payload:null })
+    //             console.log('')
+    //         }
+    //     });
+    // }, [])
 
 
 
@@ -44,8 +44,9 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         }
     }
 
-    function createUserAccountFirebase() {
+    async function createUserAccountFirebase() {
         /*
+        // for breaking firstname and lastname from username
         //to trim firstname and username from a single input field
         let name = userCredentials?.username?.trim();
         if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
@@ -67,15 +68,26 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         }
         */
 
-        createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
+        //for validating username
+        let name = userCredentials?.username?.trim();
+        if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
+            alert('please fill out all required fields')
+            //setUserCredentials({ ...userCredentials, username: '' })
+            return;
+        }
+
+        if(name.includes(" ")){
+            alert('user name can not contain blank spaces')
+        }
+
+
+        await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
             .then((response) => {
-                // Signed up 
                 const user = response.user;
                 console.log('signup user', user)
-                signinAPI(user?.email, userCredentials?.username, 'avatar 1')
+                registerUserInDB(user?.email, userCredentials?.username, 'avatar 1')
                 // inProgressLoader(dispatch, false)
                 //navigate('/user');//sending user to user page for filling out other details
-                setUserCredentials({ email: '', password: '', username: '' })
             })
             .catch((error) => {
                 // inProgressLoader(dispatch, false)
@@ -85,6 +97,19 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 if (error.code === 'auth/email-already-in-use') errMsg = "User already exists!!! Try Signing in instead"
                 // dispatch(invokeToast({ isSuccess: false, message: errMsg }))
             });
+
+        await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+            .catch(
+                (err) => console.log('err', err)
+            );
+
+
+        setUserCredentials({ email: '', password: '', username: '' })
+
+        //setting user and redirecting to chats
+        dispatch({ type: UPDATE_USER_INFO, payload: auth.currentUser })
+        navigate('/chat')
+
     }
 
     function loginUserFirebase() {
@@ -94,9 +119,11 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 (response) => {
                     const user = response.user;
                     console.log('signin user', user)
-                    // signinAPI(user?.email, "", "", user?.photoURL, dispatch)
+                    dispatch({ type: UPDATE_USER_INFO, payload: auth.currentUser })
+                    // signinAPI(user?.email, "", "", user?.photoURL, dispatch)//not needed 
                     // inProgressLoader(dispatch, false)
                     setUserCredentials({ email: '', password: '', username: '' })
+                    navigate('/chat')
                 }
             )
             .catch((error) => {
@@ -133,7 +160,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         setUserCredentials({ email: '', password: '', username: '' })
     }
 
-    async function signinAPI(email, username, photo, dispatch, navigate, route, isAdminLogin = false) {
+    async function registerUserInDB(email, username, photo) {
         const userData = {
             // firstname: firstname,
             // lastname: lastname,
