@@ -14,7 +14,7 @@ import { UPDATE_USER_INFO } from "../redux/actionTypes";
 import { LogOut, X } from 'lucide-react';
 
 
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
@@ -156,7 +156,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   async function readWriteDb(msgObj) {
     //to write data in db
     try {
-      const docRef = await addDoc(collection(firestore, "v1"), msgObj);
+      const docRef = await addDoc(collection(firestore, "v2"), msgObj);
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -236,9 +236,18 @@ export const NewRTCA = ({ firebaseApp }) => {
 
 
 
-  const sidebarVisibility = (tf) => {
+  const sidebarVisibility = (val) => {
     let sidebar = document.getElementById("mySidebar");
-    tf ? (sidebar.style.display = "flex") : (sidebar.style.display = "none");
+  
+    if(val){
+      sidebar.style.display = "flex";
+    }else{
+      sidebar.style.display = "none";
+      //these 3 lines are repeating below
+      setSearchedUserList(undefined)  //clearing all records
+      document.querySelector('[type="search"]').value = "";//clearing the input on focus out
+      document.getElementById('userSearchDropdown').classList.add('d-none')//mnake serch result visible
+    }
   };
 
 
@@ -349,14 +358,18 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     //when the connection is not found inn cached data only then go further and query db to check if the connection is created recently
 // console.log('cucucucuucuc', currentUser)
-
+let userObj;
     const q = query(collection(firestore, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
+    //thers no need to put it on a loop , there should be only one record, isnt there any getDoc option for just one doc
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
       console.log(doc.id, " => ", doc.data());
-      setUserData(doc.data())
+      userObj=doc.data();
+      userObj.id=doc.id
+      setUserData(userObj)
     });
+    return userObj;
   }
 
 
@@ -373,7 +386,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     if (e.target.value.length === 0) {
       document.querySelector('.no-item')?.classList.remove('d-none')
       setSearchedUserList(undefined)  //clearing all records
-      document.getElementById('userSearchDropdown').classList.add('d-none')//mnake serch result visible
+      document.getElementById('userSearchDropdown').classList.add('d-none')//hide search list
     }else{
       document.querySelector('.no-item')?.classList.add('d-none')
       document.getElementById('userSearchDropdown').classList.remove('d-none')//mnake serch result visible
@@ -398,35 +411,71 @@ export const NewRTCA = ({ firebaseApp }) => {
      //dispatch an event and set the state there (may or may not be required)
 
      sidebarVisibility(false)//closing sidebar
+     setSelectedUserToChat(username);//setting selected user
 
-     setSelectedUserToChat(username);
+     //set messages
+     retrieveTexts();
+  }
+  
+  async function retrieveTexts(){
+
+    if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
+      console.log('has own property')
+      let connectionId = userData?.connections[selectedUserToChat]// this can be set as a state 
+
+      //with the connection if query the msgs collection and get all the msggs
+      dbQuery = query(collection(firestore, "v1"), where("to", "==", toChatWithID), orderBy("time", "desc"), limit(20));
+      const [allMessages] = useCollectionData(dbQuery, { idField: 'id' })///why cant i use this here
+
+    }else{
+      console.log('is not a connection')
+      //add a note that say hi, or start a chat
+    }
+    
+
 
   }
     
-    
   async function sendText(){
+    if (currentText !== "" ) {
       console.log('currentText',currentText,currentUser.displayName)
 
 
       console.log('current user data',userData)
-    
+
 
       let connectionId;
-
-      // check if userdarta has the connection already and if not than add the connection in user collection
-if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
-  console.log('has own property')
-}else{
-
-  connectionId="c2d86b3e-dece-4a96-8f8c-16adc4658a37"
-  //      uuidv4();
-}
-
-
-
-      // return ;
       
-      if (currentText !== "" && selectedUserToChat) {
+      //checks for connection id after retreiving fresh/updated data
+      async function getConnectionId(){
+        let result= await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
+        console.log('ressukt',result)
+        if(result?.connections?.hasOwnProperty(selectedUserToChat)){
+          connectionId=result?.connections[selectedUserToChat]
+          return;
+        }
+
+        connectionId = uuidv4(); // creating a new connection id
+        const userDocRef = doc(firestore, "users", userData.id);
+        //updating the user document with new connection
+        await updateDoc(userDocRef, {
+          connections: {
+            ...userData.connections,
+            [selectedUserToChat]:connectionId,
+          }
+        });
+      }
+
+      // check if userdata has the connection already and if not than add the connection in user collection
+      if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
+        console.log('has own property')
+        connectionId=userData?.connections[selectedUserToChat]
+      }else{
+        console.log('dont have property')
+        await getConnectionId(selectedUserToChat)
+      }
+      
+     
         const msgData = {
           connectionId: connectionId,
           author: currentUser.displayName,
