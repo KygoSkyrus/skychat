@@ -28,10 +28,11 @@
 - create a text like hovered toast if toasts are ever neeeded
 - set the users usernsme in displayname of firebase and avatar in photourl
 - show err msg on incorrect login
-- username can npot be changed , add reges for usernmae , set criteria
+- username can npot be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
+- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
+- try firebase push notifications
 
-
-
+- use localstoreage or some othr place to store msg,, later u can update those msgs with db,, thi sway you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
 

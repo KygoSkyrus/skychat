@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ScrollToBottom from "react-scroll-to-bottom";
 // import socketIOClient from "socket.io-client";
 import { io } from "socket.io-client";
+import { v4 as uuidv4 } from 'uuid';
 
 
 import hamburger from "./../assets/menu.png";
@@ -16,8 +17,8 @@ import { LogOut, X } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { getAuth, updateProfile } from "firebase/auth";
-
+import { getAuth } from "firebase/auth";
+import { dbUsers } from "../utils";
 
 
 // const socket = socketIOClient('http://localhost:3000');
@@ -39,7 +40,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
 
   const dispatch = useDispatch()
-  const currentUser = useSelector(state => state.user)
+  const currentUser = useSelector(state => state.user.userData)
   console.log('currentUser', currentUser)
 
 
@@ -51,24 +52,43 @@ export const NewRTCA = ({ firebaseApp }) => {
     // const currentUser = auth.currentUser;
 
     //send this function to utils as it might be called for on eor mor component
-    auth.onAuthStateChanged((user) => {
-      console.log('authstate changed NWRTC', user)
+    checkAuthStatus();
 
-      //set user in redux
+ //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
+ getAllUsersList()
+
+
+  }, [])
+
+  async function checkAuthStatus(){
+    await auth.onAuthStateChanged((user) => {
+      console.log('authstate changed NWRTC', user)
       if (user) {
         dispatch({ type: UPDATE_USER_INFO, payload: user })
+
+         //have to store the result of this query in cache 
+         getCurrentUserData(user.displayName);
       } else {
         dispatch({ type: UPDATE_USER_INFO, payload: null })
         navigate('/')
       }
     });
-  }, [])
+  }
 
 
   //-------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-----from chat.js file --------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------
   const [currentMsg, setcurrentMsg] = useState("");//typed text
   const [roomUsersList, setRoomUsersList] = useState([]);//room users list[will be used when room feature will be implemented]
-  const [allUsersList,setAllUsersList]=useState()
+
+
+  const [allUsersList, setAllUsersList] = useState()
+  const [searchedUserList, setSearchedUserList] = useState()
+  const [selectedUserToChat,setSelectedUserToChat]=useState()
+  const [messgaeList, setMessageList]=useState()
+  const [currentText,setcurrentText]=useState('')
+  const [userData,setUserData]=useState()
+
+
   const [toChatWithSelected, setToChatWithSelected] = useState(false);
   const [toChatWithID, setToChatWithID] = useState();//has the id of the othe person who is selected to have chat with
   const [wlcmMsg, setwlcmMsg] = useState();//yet to implement [only for rooms]
@@ -212,13 +232,6 @@ export const NewRTCA = ({ firebaseApp }) => {
       });
       //setRoomUsersList(arr)
     });
-
-
-    //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
-    getAllUsersList()
-
-
-
   }, []);//it had socket as the dependency earlier
 
 
@@ -306,6 +319,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   // socket.off("connect_error");
 
 
+  // NEW APPROACH______________________________________________________________
+
   // Sign out function
   const signOut = () => {
     auth.signOut()
@@ -315,23 +330,121 @@ export const NewRTCA = ({ firebaseApp }) => {
   };
 
 
-  async function getAllUsersList(){
-    await getDocs(collection(firestore, "users"))
-    .then((querySnapshot) => {
-      const newData = querySnapshot.docs
-        .map((doc) => ({ ...doc.data(), id: doc.id }));
-      setAllUsersList(newData);
-      console.log('alluserlist',newData);
-    })
+  async function getAllUsersList() {
+
+    setAllUsersList(dbUsers);
+
+    // commenting for testing
+    // await getDocs(collection(firestore, "users"))
+    // .then((querySnapshot) => {
+    //   const newData = querySnapshot.docs
+    //     .map((doc) => ({ ...doc.data(), id: doc.id }));
+    //   setAllUsersList(newData);
+    //   console.log('alluserlist',newData);
+    // })
   }
 
 
-  async function handleSearchUser(e){
-    console.log('eee',e.target.value , allUsersList)
+  async function getCurrentUserData(username){
 
-    let searchResult= allUsersList.filter(user=> user?.username?.includes(e.target.value))
-    console.log('searchedUsers',searchResult)
+    //when the connection is not found inn cached data only then go further and query db to check if the connection is created recently
+// console.log('cucucucuucuc', currentUser)
 
+    const q = query(collection(firestore, "users"), where("username", "==", username));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      setUserData(doc.data())
+    });
+  }
+
+
+
+
+
+  async function handleSearchUser(e) {
+    console.log('eee', e.target.value, allUsersList)
+
+    //add debouncing here
+    let result = allUsersList.filter(user => user?.username?.includes(e.target.value))
+    console.log('searchedUsers', result,e.target.value.length)
+
+    if (e.target.value.length === 0) {
+      document.querySelector('.no-item')?.classList.remove('d-none')
+      setSearchedUserList(undefined)  //clearing all records
+      document.getElementById('userSearchDropdown').classList.add('d-none')//mnake serch result visible
+    }else{
+      document.querySelector('.no-item')?.classList.add('d-none')
+      document.getElementById('userSearchDropdown').classList.remove('d-none')//mnake serch result visible
+    }
+
+
+    setSearchedUserList(result)
+  }
+
+  function hideSearchedUsersList(e) {
+    document.querySelector('[type="search"]').value = "";//clearing the input on focus out
+    document.getElementById('userSearchDropdown').classList.toggle('d-none')//hiding the dropdown
+    // document.querySelector('.search-overlay').classList.add('display-none')//removing the overlay
+    // const root = document.getElementById('root')
+    // root.style.height = "unset"
+    // root.style.overflow = "unset"
+    setSearchedUserList(undefined)
+    // handleNavBar(true)//to close navbar and hide overlay
+  }
+
+  function handleSelectedUserToChat(username){
+     //dispatch an event and set the state there (may or may not be required)
+
+     sidebarVisibility(false)//closing sidebar
+
+     setSelectedUserToChat(username);
+
+  }
+    
+    
+  async function sendText(){
+      console.log('currentText',currentText,currentUser.displayName)
+
+
+      console.log('current user data',userData)
+    
+
+      let connectionId;
+
+      // check if userdarta has the connection already and if not than add the connection in user collection
+if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
+  console.log('has own property')
+}else{
+
+  connectionId="c2d86b3e-dece-4a96-8f8c-16adc4658a37"
+  //      uuidv4();
+}
+
+
+
+      // return ;
+      
+      if (currentText !== "" && selectedUserToChat) {
+        const msgData = {
+          connectionId: connectionId,
+          author: currentUser.displayName,
+          message: currentText,
+          time: serverTimestamp(),
+        };
+  
+        console.log('msgdata', msgData)
+  
+  
+        readWriteDb(msgData);
+  
+        // const chatBox = document.querySelector(".chat-box");
+        //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
+  
+        setcurrentText(''); // resetting input text field
+        dummy.current?.scrollIntoView({ behaviour: 'smooth' })//have to move it to right place bcz its not fulfilling it purpose correctly:when the db query on every input defect is fixed this might work fine,that is the root
+      }
   }
 
 
@@ -351,21 +464,36 @@ export const NewRTCA = ({ firebaseApp }) => {
 
 
       <div className="outer">
+
+
+
+        {/***** SIDEBAR STARTS ******/}
         <div className="w3-sidebar  w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
           <div>
             {/* <div className="sidebar-head">
               <span>close</span>
-              <span onClick={() => sidebarVisibility(false)} className="closeButton" >
-                &times;
-              </span>
+              <span onClick={() => sidebarVisibility(false)} className="closeButton" > &times; </span>
             </div> */}
 
-            <span onClick={() => sidebarVisibility(false)} style={{position:"absolute",right:"-23px",color:"#fff"}} >
+            <span onClick={() => sidebarVisibility(false)} className="pointer" style={{ position: "absolute", right: "-23px", color: "#fff" }} >
               <X size="20" />
             </span>
-            
+
             <div className="p-2">
-              <input type="search" onChange={e=>handleSearchUser(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
+              <input type="search" onChange={e => handleSearchUser(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
+            </div>
+
+            <div className="d-none" id="userSearchDropdown">
+              {searchedUserList?.map(x => {
+                return (
+                  <section className="dropdown-item pointer" key={x.id} onClick={e => handleSelectedUserToChat(x?.username)} style={{width:"unset",margin: "0 0.5rem"}}>
+                      {/* <img className="me-3" src={x.image} alt="shoppitt" height="50px" width="55px" /> */}
+                      <span>{x?.username}</span>
+                  </section>
+                )
+              })}
+              <div className="no-item d-none">No item found</div>
+              <div className="custom-loader d-none" onClick={() => hideSearchedUsersList()} ></div>
             </div>
 
             <div>
@@ -378,33 +506,35 @@ export const NewRTCA = ({ firebaseApp }) => {
           </div>
           <section className="myProfile px-2">
             <span>
-              {currentUser?.user?.displayName}
+              {currentUser?.displayName}
             </span>
             <LogOut size="20" onClick={() => signOut()} className='pointer' />
           </section>
 
         </div>
+        {/***** SIDEBAR ENDS ******/}
 
+
+
+        {/***** CHAT HEADER STARTS ******/}
         <div className="chat-head">
           <div className="hamburger" onClick={() => sidebarVisibility(true)}>
             <img src={hamburger} alt="." />
           </div>
-          {toChatWithSelected ?
-            (<div className="chatWithProfile">
-              <section id="chatWith"></section>
-            </div>) : ""
+          {selectedUserToChat &&
+            <div className="chatWithProfile">
+              <section id="chatWith">{selectedUserToChat}</section>
+            </div>
           }
         </div>
+        {/***** CHAT HEADER ENDS ******/}
 
-        {toChatWithSelected ?
-          (<div className="chat-body">
+
+        {/***** CHAT BODY STARTS ******/}
+        {selectedUserToChat ?
+          <div className="chat-body">
             <div className="chat-box">
               {wlcmMsg ? <p className="wlcmMsg">{wlcmMsg}</p> : null}
-
-              {/* //for setting room users name */}
-              {/* {roomUsersList?.map((x) => {
-              return(<p key={x.uid}>{x.username}</p>)}
-            )} */}
 
               {allMessages?.map((msgData) => {
                 return <MessageWrapper msgData={msgData} me={me} />
@@ -419,18 +549,24 @@ export const NewRTCA = ({ firebaseApp }) => {
                 id="theText"
                 placeholder="type..."
                 className="my-1"
-                onKeyPress={(e) => e.key === "Enter" && sendMsg()}
+                value={currentText}
+                onChange={e=>setcurrentText(e.target.value)}
+                onKeyUp={(e) => e.key === "Enter" && sendText()}
                 autoComplete="off"
               />
 
-              <button onClick={() => sendMsg()}>send</button>
+              <button onClick={() => sendText()}>send</button>
             </div>
-          </div>)
+          </div>
           :
           <div className="noOneToChat">
-            <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Select someone to chat with or Join a room</section>
+            <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Select someone to chat with or start a group</section>
           </div>
         }
+        {/***** CHAT BODY ENDS ******/}
+
+
+        <div className="search-overlay display-none" onClick={() => hideSearchedUsersList()}></div>{/* when serchInput is opened */}
       </div>
 
     </>

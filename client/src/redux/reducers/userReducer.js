@@ -1,7 +1,7 @@
 import { UPDATE_USER_INFO } from "./../actionTypes";
 
 const initialState = {
-  user: null,
+  userData: null,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -10,7 +10,7 @@ export const userReducer = (state = initialState, action) => {
 console.log('action--',action)
       return {
         ...state,
-        user: action.payload,
+        userData: action.payload,
       };
     }
 

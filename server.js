@@ -94,6 +94,7 @@ io.use((socket, next) => {
   // create new session
   // socket.sessionID = randomId();
   // socket.userID = randomId();
+  console.log('socckte',socket)
   const username = socket.handshake.auth.username;
   if (!username) {
     return next(new Error("invalid username"));
