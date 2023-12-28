@@ -14,7 +14,7 @@ import { UPDATE_USER_INFO } from "../redux/actionTypes";
 import { LogOut, X } from 'lucide-react';
 
 
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, } from "firebase/firestore";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
@@ -48,45 +48,18 @@ export const NewRTCA = ({ firebaseApp }) => {
   const auth = getAuth();
 
 
-  useEffect(() => {
-    // const currentUser = auth.currentUser;
-
-    //send this function to utils as it might be called for on eor mor component
-    checkAuthStatus();
-
- //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
- getAllUsersList()
-
-
-  }, [])
-
-  async function checkAuthStatus(){
-    await auth.onAuthStateChanged((user) => {
-      console.log('authstate changed NWRTC', user)
-      if (user) {
-        dispatch({ type: UPDATE_USER_INFO, payload: user })
-
-         //have to store the result of this query in cache 
-         getCurrentUserData(user.displayName);
-      } else {
-        dispatch({ type: UPDATE_USER_INFO, payload: null })
-        navigate('/')
-      }
-    });
-  }
-
 
   //-------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX-----from chat.js file --------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------
   const [currentMsg, setcurrentMsg] = useState("");//typed text
   const [roomUsersList, setRoomUsersList] = useState([]);//room users list[will be used when room feature will be implemented]
 
 
-  const [allUsersList, setAllUsersList] = useState()
-  const [searchedUserList, setSearchedUserList] = useState()
-  const [selectedUserToChat,setSelectedUserToChat]=useState()
-  const [messgaeList, setMessageList]=useState()
-  const [currentText,setcurrentText]=useState('')
-  const [userData,setUserData]=useState()
+  const [allUsersList, setAllUsersList] = useState() // all the existing users in the db
+  const [searchedUserList, setSearchedUserList] = useState() // queries user list
+  const [selectedUserToChat,setSelectedUserToChat]=useState() 
+  const [messageList, setMessageList]=useState() //messages with the current user
+  const [currentText,setcurrentText]=useState('') // currently typed text
+  const [userData,setUserData]=useState() // user info like connection list, email
 
 
   const [toChatWithSelected, setToChatWithSelected] = useState(false);
@@ -241,8 +214,11 @@ export const NewRTCA = ({ firebaseApp }) => {
   
     if(val){
       sidebar.style.display = "flex";
+      document.querySelector('.overlay').classList.remove('d-none')//add overlay
     }else{
       sidebar.style.display = "none";
+      document.querySelector('.overlay').classList.add('d-none')//add overlay
+
       //these 3 lines are repeating below
       setSearchedUserList(undefined)  //clearing all records
       document.querySelector('[type="search"]').value = "";//clearing the input on focus out
@@ -339,6 +315,38 @@ export const NewRTCA = ({ firebaseApp }) => {
   };
 
 
+  useEffect(() => {
+    // const currentUser = auth.currentUser;
+
+    //send this function to utils as it might be called for on eor mor component
+    checkAuthStatus();
+
+ //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
+ getAllUsersList()
+
+
+  }, [])
+
+  async function checkAuthStatus(){
+    await auth.onAuthStateChanged((user) => {
+      console.log('authstate changed NWRTC', user)
+      if (user) {
+        dispatch({ type: UPDATE_USER_INFO, payload: user })
+
+         //have to store the result of this query in cache 
+         getCurrentUserData(user.displayName);
+      } else {
+        dispatch({ type: UPDATE_USER_INFO, payload: null })
+        navigate('/')
+      }
+    });
+  }
+
+
+
+
+
+
   async function getAllUsersList() {
 
     setAllUsersList(dbUsers);
@@ -356,8 +364,8 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function getCurrentUserData(username){
 
-    //when the connection is not found inn cached data only then go further and query db to check if the connection is created recently
-// console.log('cucucucuucuc', currentUser)
+    //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
+console.log('cucucucuucuc', currentUser)
 let userObj;
     const q = query(collection(firestore, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
@@ -414,21 +422,42 @@ let userObj;
      setSelectedUserToChat(username);//setting selected user
 
      //set messages
-     retrieveTexts();
+     retrieveTexts(username);
   }
   
-  async function retrieveTexts(){
+  async function retrieveTexts(userToChat){
 
-    if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
+    console.log('ud',userData?.connections,userToChat)
+    if (userData?.connections?.hasOwnProperty(userToChat)){
       console.log('has own property')
-      let connectionId = userData?.connections[selectedUserToChat]// this can be set as a state 
+      let connectionId = userData?.connections[userToChat]// this can be set as a state 
 
       //with the connection if query the msgs collection and get all the msggs
-      dbQuery = query(collection(firestore, "v1"), where("to", "==", toChatWithID), orderBy("time", "desc"), limit(20));
-      const [allMessages] = useCollectionData(dbQuery, { idField: 'id' })///why cant i use this here
+      let q = query(collection(firestore, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
+
+      //in here also there is a change that user has a connection but never chated with him so we need to run the below else part here too
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const msgs = [];
+        querySnapshot.forEach((doc) => {
+          let data =doc.data()
+          data.id=doc.id;
+            msgs.push(data);
+        });
+        msgs.reverse()
+        console.log("Current messages: ", msgs);
+        setMessageList(msgs)
+        dummy.current?.scrollIntoView({ behaviour: 'smooth' })
+      });
+
 
     }else{
       console.log('is not a connection')
+      let section=document.createElement('section')
+      section.style.margin="auto"
+      section.innerHTML="No messages yet..."
+      let chatBox=document.getElementById('chatBox')
+      chatBox.innerHTML=''
+      chatBox.append(section)
       //add a note that say hi, or start a chat
     }
     
@@ -492,7 +521,7 @@ let userObj;
         //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
   
         setcurrentText(''); // resetting input text field
-        dummy.current?.scrollIntoView({ behaviour: 'smooth' })//have to move it to right place bcz its not fulfilling it purpose correctly:when the db query on every input defect is fixed this might work fine,that is the root
+        //dummy.current?.scrollIntoView({ behaviour: 'smooth' })//moved to reterive text
       }
   }
 
@@ -582,13 +611,13 @@ let userObj;
         {/***** CHAT BODY STARTS ******/}
         {selectedUserToChat ?
           <div className="chat-body">
-            <div className="chat-box">
+            <div className="chat-box" id="chatBox">
               {wlcmMsg ? <p className="wlcmMsg">{wlcmMsg}</p> : null}
 
-              {allMessages?.map((msgData) => {
-                return <MessageWrapper msgData={msgData} me={me} />
+              {messageList?.map((msgData) => {
+                return <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
               })}
-              <div ref={dummy}></div>
+              <div ref={dummy}></div> 
             </div>
 
             <div className="msg-input form-control">
@@ -608,14 +637,23 @@ let userObj;
             </div>
           </div>
           :
+          // show connection list here if no on is selected to chat... and if no one is in the connections then change the below msgs to seach a frient and start a convo by serching a frnd
+          (userData?.connections?.length>0 ?
+            (
+              userData?.connections?map(x=>{
+                return (<div></div>)
+              })
+            )
+              :
           <div className="noOneToChat">
             <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Select someone to chat with or start a group</section>
           </div>
+            )
         }
         {/***** CHAT BODY ENDS ******/}
 
 
-        <div className="search-overlay display-none" onClick={() => hideSearchedUsersList()}></div>{/* when serchInput is opened */}
+        <div className="overlay d-none" onClick={() => sidebarVisibility(false)}></div>
       </div>
 
     </>

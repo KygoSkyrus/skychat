@@ -1,6 +1,7 @@
 import React from 'react'
+import { getExactTimeStr } from '../utils';
 
-const MessageWrapper = ({msgData,me}) => {
+const MessageWrapper = ({msgData,myself}) => {
 
 
 
@@ -8,7 +9,7 @@ const MessageWrapper = ({msgData,me}) => {
         <>
         <div
           className={
-            me.userID === msgData.from
+            myself === msgData.author
               ? "msg-block me"
               : "msg-block other"
           }
@@ -16,12 +17,14 @@ const MessageWrapper = ({msgData,me}) => {
         >
           <section className="msg">{msgData.message}</section>
 
-          <span className="msg-date">{msgData.time?.toDate().getHours()+':'+msgData.time?.toDate().getMinutes()}</span>
+          <span className="msg-date">{getExactTimeStr(msgData?.time?.toDate())}</span>
 
           <section className="msg-arrow"></section>
         </div>
+
+        {/* we can remove the sender reciever name for one to one chat */}
         <section className={
-             me.userID === msgData.from
+             myself === msgData.author
               ? "authorName me"
               : "authorName other"
           }>{msgData.author}</section>

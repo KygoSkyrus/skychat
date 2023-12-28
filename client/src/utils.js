@@ -87,3 +87,27 @@ export const dbUsers=[
     },
     
 ]
+
+export function getDateStr(date) {
+    let d = new Date(date)
+    return d.getDate() + "-" + (d.getMonth() + 1) + "-" + (d.getFullYear())
+}
+export function getFullDateStr(date) {
+    let m = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    let d = new Date(date)
+    return d.getDate() + " " + (m[d.getMonth()]) + " " + (d.getFullYear()) + ", " + (d.getHours() < 12 ? d.getHours() : d.getHours() - 12) + ":" + (d.getMinutes()) + " " + (d.getHours() < 12 ? "AM" : "PM")
+}
+
+export function getExactTimeStr(d) {
+    //let d = new Date(date)
+    return (
+          (d.getHours()===0 ? 12 : 
+           (d.getHours() <= 12 ? 
+            d.getHours() : 
+            d.getHours() - 12) )
+          + ":" + 
+          (d.getMinutes()) 
+          + " "  + 
+          (d.getHours() < 12 ? "AM" : "PM")
+        )
+}

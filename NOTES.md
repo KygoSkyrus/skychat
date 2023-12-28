@@ -13,8 +13,9 @@
 # Defects
 - firebase is keeeping user logged in forever(can be good , like if user wants out than he can logout , or elese he will be logged in always)
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
+- scroll down is not working
 
-
+# NOTE : connection are only made when user sends someone a text
 
 # Todo 
 - encrypt messages/passwords
