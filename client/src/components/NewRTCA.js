@@ -11,7 +11,7 @@ import hamburger from "./../assets/menu.png";
 import notification from "./../assets/discord.mp3";
 import MessageWrapper from "./MessageWrapper";
 import { UPDATE_USER_INFO } from "../redux/actionTypes";
-import { LogOut, X } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X } from 'lucide-react';
 
 
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, } from "firebase/firestore";
@@ -56,10 +56,11 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   const [allUsersList, setAllUsersList] = useState() // all the existing users in the db
   const [searchedUserList, setSearchedUserList] = useState() // queries user list
-  const [selectedUserToChat,setSelectedUserToChat]=useState() 
-  const [messageList, setMessageList]=useState() //messages with the current user
-  const [currentText,setcurrentText]=useState('') // currently typed text
-  const [userData,setUserData]=useState() // user info like connection list, email
+  const [selectedUserToChat, setSelectedUserToChat] = useState()
+  const [messageList, setMessageList] = useState() //messages with the current user
+  const [currentText, setcurrentText] = useState('') // currently typed text
+  const [userData, setUserData] = useState() // user info like connection list, email
+  const [connectionHeader,setConnectionHeader]=useState(true)
 
 
   const [toChatWithSelected, setToChatWithSelected] = useState(false);
@@ -211,11 +212,11 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   const sidebarVisibility = (val) => {
     let sidebar = document.getElementById("mySidebar");
-  
-    if(val){
+
+    if (val) {
       sidebar.style.display = "flex";
       document.querySelector('.overlay').classList.remove('d-none')//add overlay
-    }else{
+    } else {
       sidebar.style.display = "none";
       document.querySelector('.overlay').classList.add('d-none')//add overlay
 
@@ -321,20 +322,20 @@ export const NewRTCA = ({ firebaseApp }) => {
     //send this function to utils as it might be called for on eor mor component
     checkAuthStatus();
 
- //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
- getAllUsersList()
+    //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
+    getAllUsersList()
 
 
   }, [])
 
-  async function checkAuthStatus(){
+  async function checkAuthStatus() {
     await auth.onAuthStateChanged((user) => {
       console.log('authstate changed NWRTC', user)
       if (user) {
         dispatch({ type: UPDATE_USER_INFO, payload: user })
 
-         //have to store the result of this query in cache 
-         getCurrentUserData(user.displayName);
+        //have to store the result of this query in cache 
+        getCurrentUserData(user.displayName);
       } else {
         dispatch({ type: UPDATE_USER_INFO, payload: null })
         navigate('/')
@@ -362,19 +363,19 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  async function getCurrentUserData(username){
+  async function getCurrentUserData(username) {
 
     //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
-console.log('cucucucuucuc', currentUser)
-let userObj;
+    console.log('cucucucuucuc', currentUser)
+    let userObj;
     const q = query(collection(firestore, "users"), where("username", "==", username));
     const querySnapshot = await getDocs(q);
     //thers no need to put it on a loop , there should be only one record, isnt there any getDoc option for just one doc
     querySnapshot.forEach((doc) => {
       // doc.data() is never undefined for query doc snapshots
       console.log(doc.id, " => ", doc.data());
-      userObj=doc.data();
-      userObj.id=doc.id
+      userObj = doc.data();
+      userObj.id = doc.id
       setUserData(userObj)
     });
     return userObj;
@@ -389,13 +390,13 @@ let userObj;
 
     //add debouncing here
     let result = allUsersList.filter(user => user?.username?.includes(e.target.value))
-    console.log('searchedUsers', result,e.target.value.length)
+    console.log('searchedUsers', result, e.target.value.length)
 
     if (e.target.value.length === 0) {
       document.querySelector('.no-item')?.classList.remove('d-none')
       setSearchedUserList(undefined)  //clearing all records
       document.getElementById('userSearchDropdown').classList.add('d-none')//hide search list
-    }else{
+    } else {
       document.querySelector('.no-item')?.classList.add('d-none')
       document.getElementById('userSearchDropdown').classList.remove('d-none')//mnake serch result visible
     }
@@ -415,20 +416,20 @@ let userObj;
     // handleNavBar(true)//to close navbar and hide overlay
   }
 
-  function handleSelectedUserToChat(username){
-     //dispatch an event and set the state there (may or may not be required)
+  function handleSelectedUserToChat(username) {
+    //dispatch an event and set the state there (may or may not be required)
 
-     sidebarVisibility(false)//closing sidebar
-     setSelectedUserToChat(username);//setting selected user
+    sidebarVisibility(false)//closing sidebar
+    setSelectedUserToChat(username);//setting selected user
 
-     //set messages
-     retrieveTexts(username);
+    //set messages
+    retrieveTexts(username);
   }
-  
-  async function retrieveTexts(userToChat){
 
-    console.log('ud',userData?.connections,userToChat)
-    if (userData?.connections?.hasOwnProperty(userToChat)){
+  async function retrieveTexts(userToChat) {
+
+    console.log('ud', userData?.connections, userToChat)
+    if (userData?.connections?.hasOwnProperty(userToChat)) {
       console.log('has own property')
       let connectionId = userData?.connections[userToChat]// this can be set as a state 
 
@@ -439,9 +440,9 @@ let userObj;
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const msgs = [];
         querySnapshot.forEach((doc) => {
-          let data =doc.data()
-          data.id=doc.id;
-            msgs.push(data);
+          let data = doc.data()
+          data.id = doc.id;
+          msgs.push(data);
         });
         msgs.reverse()
         console.log("Current messages: ", msgs);
@@ -450,37 +451,37 @@ let userObj;
       });
 
 
-    }else{
+    } else {
       console.log('is not a connection')
-      let section=document.createElement('section')
-      section.style.margin="auto"
-      section.innerHTML="No messages yet..."
-      let chatBox=document.getElementById('chatBox')
-      chatBox.innerHTML=''
+      let section = document.createElement('section')
+      section.style.margin = "auto"
+      section.innerHTML = "No messages yet..."
+      let chatBox = document.getElementById('chatBox')
+      chatBox.innerHTML = ''
       chatBox.append(section)
       //add a note that say hi, or start a chat
     }
-    
+
 
 
   }
-    
-  async function sendText(){
-    if (currentText !== "" ) {
-      console.log('currentText',currentText,currentUser.displayName)
+
+  async function sendText() {
+    if (currentText !== "") {
+      console.log('currentText', currentText, currentUser.displayName)
 
 
-      console.log('current user data',userData)
+      console.log('current user data', userData)
 
 
       let connectionId;
-      
+
       //checks for connection id after retreiving fresh/updated data
-      async function getConnectionId(){
-        let result= await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
-        console.log('ressukt',result)
-        if(result?.connections?.hasOwnProperty(selectedUserToChat)){
-          connectionId=result?.connections[selectedUserToChat]
+      async function getConnectionId() {
+        let result = await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
+        console.log('ressukt', result)
+        if (result?.connections?.hasOwnProperty(selectedUserToChat)) {
+          connectionId = result?.connections[selectedUserToChat]
           return;
         }
 
@@ -490,39 +491,39 @@ let userObj;
         await updateDoc(userDocRef, {
           connections: {
             ...userData.connections,
-            [selectedUserToChat]:connectionId,
+            [selectedUserToChat]: connectionId,
           }
         });
       }
 
       // check if userdata has the connection already and if not than add the connection in user collection
-      if (userData?.connections?.hasOwnProperty(selectedUserToChat)){
+      if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
         console.log('has own property')
-        connectionId=userData?.connections[selectedUserToChat]
-      }else{
+        connectionId = userData?.connections[selectedUserToChat]
+      } else {
         console.log('dont have property')
         await getConnectionId(selectedUserToChat)
       }
-      
-     
-        const msgData = {
-          connectionId: connectionId,
-          author: currentUser.displayName,
-          message: currentText,
-          time: serverTimestamp(),
-        };
-  
-        console.log('msgdata', msgData)
-  
-  
-        readWriteDb(msgData);
-  
-        // const chatBox = document.querySelector(".chat-box");
-        //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
-  
-        setcurrentText(''); // resetting input text field
-        //dummy.current?.scrollIntoView({ behaviour: 'smooth' })//moved to reterive text
-      }
+
+
+      const msgData = {
+        connectionId: connectionId,
+        author: currentUser.displayName,
+        message: currentText,
+        time: serverTimestamp(),
+      };
+
+      console.log('msgdata', msgData)
+
+
+      readWriteDb(msgData);
+
+      // const chatBox = document.querySelector(".chat-box");
+      //chatBox.scrollTop = chatBox.scrollHeight+10;//to scroll to bottom
+
+      setcurrentText(''); // resetting input text field
+      //dummy.current?.scrollIntoView({ behaviour: 'smooth' })//moved to reterive text
+    }
   }
 
 
@@ -564,9 +565,9 @@ let userObj;
             <div className="d-none" id="userSearchDropdown">
               {searchedUserList?.map(x => {
                 return (
-                  <section className="dropdown-item pointer" key={x.id} onClick={e => handleSelectedUserToChat(x?.username)} style={{width:"unset",margin: "0 0.5rem"}}>
-                      {/* <img className="me-3" src={x.image} alt="shoppitt" height="50px" width="55px" /> */}
-                      <span>{x?.username}</span>
+                  <section className="dropdown-item pointer" key={x.id} onClick={e => handleSelectedUserToChat(x?.username)} style={{ width: "unset", margin: "0 0.5rem" }}>
+                    {/* <img className="me-3" src={x.image} alt="shoppitt" height="50px" width="55px" /> */}
+                    <span>{x?.username}</span>
                   </section>
                 )
               })}
@@ -600,8 +601,10 @@ let userObj;
             <img src={hamburger} alt="." />
           </div>
           {selectedUserToChat &&
-            <div className="chatWithProfile">
+          <div className="d-flex align-items-center">
+            <ChevronLeft className="pointer" onClick={()=>setSelectedUserToChat(undefined)} />
               <section id="chatWith">{selectedUserToChat}</section>
+              <div className="chatWithProfile ms-1"></div>
             </div>
           }
         </div>
@@ -617,45 +620,48 @@ let userObj;
               {messageList?.map((msgData) => {
                 return <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
               })}
-              <div ref={dummy}></div> 
+              <div ref={dummy}></div>
             </div>
 
-            <div className="msg-input form-control">
+            <div className="msg-input form-control border-0">
               <input
                 type="text"
                 name="msg"
                 id="theText"
-                placeholder="type..."
+                placeholder="...type"
                 className="my-1"
                 value={currentText}
-                onChange={e=>setcurrentText(e.target.value)}
+                onChange={e => setcurrentText(e.target.value)}
                 onKeyUp={(e) => e.key === "Enter" && sendText()}
                 autoComplete="off"
               />
 
-              <button onClick={() => sendText()}>send</button>
+              <button onClick={() => sendText()} className="rounded-2" style={{background:"#4b4b4b"}}><Send /></button>
             </div>
           </div>
           :
           // show connection list here if no on is selected to chat... and if no one is in the connections then change the below msgs to seach a frient and start a convo by serching a frnd
-          (userData?.connections?.length>0 ?
-            (
-              userData?.connections?map(x=>{
-                return (<div></div>)
-              })
-            )
+          userData?.connections ?
+            Object.keys(userData?.connections)?.length > 0 ?
+
+              <div className="chat_list">{
+                Object.keys(userData?.connections).map((x,i) => {
+                  return <section className="chat_list_item" key={i} onClick={() => handleSelectedUserToChat(x)} >{x}</section>
+                })}
+              </div>
               :
-          <div className="noOneToChat">
-            <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Select someone to chat with or start a group</section>
-          </div>
-            )
+              <div className="noOneToChat">
+                <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Select someone to chat with or start a group</section>
+              </div>
+            :
+            <div className="noOneToChat">Loading...</div>
         }
         {/***** CHAT BODY ENDS ******/}
 
 
         <div className="overlay d-none" onClick={() => sidebarVisibility(false)}></div>
       </div>
-
+{/* <span class="enq_btn">SKYCHAT</span> */}
     </>
   )
 }

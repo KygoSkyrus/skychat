@@ -41,7 +41,30 @@ body {
 
 /******before chat page,,,users option*******/
 
+/* chat-head */
+.chat-head {
+  height: 60px;
+  background-color: rgb(75, 75, 75);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  color: rgb(206, 206, 206);
+}
 
+.header {
+  grid-template-columns: repeat(10, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+.connection_header { 
+  grid-area: 1 / 1 / 2 / 10; 
+  text-align: center;
+}
+.request_header { 
+  grid-area: 1 / 10 / 2 / 11; 
+  text-align: center;
+}
 
 /*chat page*/
 .outer {
@@ -64,15 +87,6 @@ body {
   top: 0;
 }
 
-.chat-head {
-  height: 60px;
-  background-color: rgb(75, 75, 75);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  color: rgb(206, 206, 206);
-}
 
 .wlcmMsg{
   text-align: center;
@@ -98,7 +112,34 @@ body {
 .chat-body {
   height: 320px;
   background-color: rgb(218, 218, 218);
+  /* transform: translateX(100%); */
+  /* transition: 0.3s ease-in-out; */
+
+  animation: animateRight 0.9s  ease-in-out;
+  animation-iteration-count: 1;
+
+  /* animation-duration: 0.4s;
+  animation-timing-function: ease;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: none;
+  animation-play-state: running;
+  animation-name: animateRight;
+  animation-timeline: auto;
+  animation-range-start: normal; */
 }
+@keyframes animateRight {
+  0%{
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100%{
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
 
 .chat-body .chat-box {
   height: 282px;
@@ -257,3 +298,39 @@ height: 38px;
 }
 
 
+
+/* chat list */
+.chat_list{
+  height: 320px;
+  background-color: rgb(218, 218, 218);
+}
+.chat_list_item{
+  padding: 10px 14px;
+  border-bottom: 1px solid #b9b9b9;
+  cursor: pointer;
+}
+
+
+/* BUTTON DEsIGN */
+.enq_btn {
+  display: block;
+  width: 98%;
+  padding: 15px 0;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  color: #2f2f2f;
+  margin: 13px 1%;
+  background-color: #f5ef84;
+  border-bottom: 5px solid #dcbb00;
+  -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, .3);
+  box-sizing: border-box;
+}
+.enq_btn:hover {
+  color: #fff;
+  background: #f2a25c;
+  border-bottom: 5px solid #db7d00;
+}

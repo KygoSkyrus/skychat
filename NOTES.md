@@ -16,8 +16,12 @@
 - scroll down is not working
 
 # NOTE : connection are only made when user sends someone a text
+- ALWAYS in your app add how the app works,,
+- in this one , on any corner show the feature your provide , like security, functionalities etc
 
 # Todo 
+- when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
+- add a search icon next to user serch input
 - encrypt messages/passwords
 - add vc
 - user can search other users by therir username and send them msgs
@@ -32,7 +36,7 @@
 - username can npot be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
 - try firebase push notifications
-
+- add a option to share the app with your frnds,, create links to share on social media apps
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, thi sway you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
@@ -46,6 +50,25 @@
 
 
 
+# Workflow Architecture
+- # signup
+  - user create a an account with email/password and username (will add the google/facebook login later)
+  - on successful signup account is create in firebase and also the user record entered in db
+- # signin 
+  - when user signins than userdata(record from users collection) is fetched and all the connections are shown on ui
+  - user can select anyone to chat from here (also user can also search user initially through search input in sidebar to find friend)
+  
+  - upon texting that person is added to user's connection list (connections field is an object which has key value pair of connected username(reciever) and the unique connectionid, i.e. "test1":"connectionid")
+  - but that message is not directly sent to the reciever,, that message will be known as message request and the sender's username along with the connection id generated before will be added to reciever's request list(field: requests)
+  - message is added in db with the connectionid 
+
+  - # UI
+    - In UI there will be two headers compartments. one of which will always be 90% width, initailly it will be "CONNECTIONS", which will show all the connections of user and the Second header will be of "CONNECTION REQUEST",
+    - on clicking either of them will shrink the other header down. (also when shrinked , replace the header with a relatable icon)
+    - on hovering over userlist in both connection and request list, tit should show basic actions like delete chat, remove connection,,,, on request like there can be like accept or remove connection
+
+  - when a connection request is accepted than that connection will be moved to connections field in db and will be removed from request field,
+    
 
 
 
