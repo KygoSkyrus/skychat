@@ -168,11 +168,11 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             email: email,
             avatar: photo,
             connections:{},
+            requests:{},
             time: serverTimestamp(),
         };
-        const docRef = await addDoc(collection(firestore, "users"), userData);
+        await addDoc(collection(firestore, "users"), userData);
 
-        console.log('docref', docRef)
 
         // for adding the custom document id (here username is used as document ID)
         // const collectionRef = collection(firestore, "users");
@@ -180,6 +180,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         //     username: username,
         //     email: email,
         //     avatar: photo,
+        //     connections:{},
+        //     requests:{},
         //     time: serverTimestamp(),
         // });
 
