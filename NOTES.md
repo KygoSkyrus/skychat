@@ -13,6 +13,12 @@
 - whenever a request is declined,, set gthe selectedusertochat to undef so that that the request should not be kept showing
 - when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
 
+
+
+### Edge cases:
+- can user send himself texts?
+
+
 # NOTE : connection are only made when user sends someone a text
 - make sure username is unique
 - ALWAYS in your app add how the app works,,
@@ -82,16 +88,23 @@
     - **CONNECTION_REQUEST**: connection request will be shown on the basis the if there is any new msgs from the sender(which is not a connection)
     - when user opens a requested chat, than he will have to opt in from one of two options i.e. Accept/Delete,[late a Block option will also be given] (user is prohibited to reply or text until he/she makes a decision)
     - when a connection request is **accepted** than that connection will be moved to connections field in db and will be removed from request field,
-    - when a connection request is **deleted** than the connection will be ~~removed from requests list~~
+    - when a connection request is **declined** than the connection will be ~~removed from requests list~~
       + **case_1**: if the sender sends the message again after his previous request is declined. in this case we need to check on every msg send that if the receiver has the sender in request list, if not than add him in the req list otherwise ignore.(not happy with this,, why? bcs here we required to access the receiver's doc, which case two problems, 1:- that its gonna make one extra read from db on every msg sent, 2:- we wanted to implement the security rules in db that user can only access their own records,, so it contradics that thought) 
-        + **solution**: so when the receiver deletes the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side
-    - when a connection request is **blocked** yet to be decided
+        + **solution**: so when the receiver declines the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side
+    - when a connection request is **blocked** .. refer to Block action
     
 
 
 - # Delete Message
   - the messsage doc will have a field deletedBy[array] which will have the username of the persom who has deleted the msg
   - this way we can handle delete msg for a group too
+  - on this action, connection wont be deleted or moved anywhere
+
+- # Delete Connection
+  - messages will be deleted and the connection will be moved to the request list (so that the other person sends a text again it will show in req list, as he is not a connection anymore),, why did we moved him to req list instead of removing him from connection list?? bcz that's the case of blocking
+
+- # Block Connection
+  - when blocked the connection will be moved to a field(blockedConnections) in user collection, (later can be unblocked from this list)
   
 
 

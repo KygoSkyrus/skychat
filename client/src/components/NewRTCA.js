@@ -18,7 +18,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
-import { dbUsers } from "../utils";
+import { dbUsers, getDateStr } from "../utils";
 
 
 // const socket = socketIOClient('http://localhost:3000');
@@ -29,7 +29,7 @@ socket.onAny((event, ...args) => {
   console.log('triggered event :- ', event, args);
 });
 
-
+let prevDate='';
 export const NewRTCA = ({ firebaseApp }) => {
 
   const [user, setuser] = useState({ username: "", room: "" })
@@ -581,8 +581,10 @@ export const NewRTCA = ({ firebaseApp }) => {
     }
   }
 
-  async function deleteConnectionReq() {
+  async function declineConnectionReq() {
 
+    return;
+    //delete msgs here , don't remove from req list
     if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
       delete userData.requests[selectedUserToChat];
 
@@ -595,6 +597,9 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
   async function deleteConnection(id) {
+
+    //dont delete the connection,, either move the connection to req list and delete msgs so that if the other guy sends a msgs again(bcz for him u r still his a connection) than it will be shown in req list,
+    return;
     console.log('id',id)
     if (userData?.connections?.hasOwnProperty(id)) {
       delete userData.connections[id];
@@ -703,7 +708,15 @@ export const NewRTCA = ({ firebaseApp }) => {
 
               {messageList?.length > 0 ?
                 messageList?.map((msgData) => {
-                  return <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
+                  let currDate=getDateStr(msgData?.time?.toDate());
+                  
+                  return (
+                  <>
+                    <div className="bg-light text-dark text-center">{prevDate!==currDate?getDateStr(msgData?.time?.toDate()):""}</div>
+                    <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
+                    {prevDate=currDate}
+                  </>
+                  )
                 })
                 :
                 <section className="m-auto">No messages yet...</section>}
@@ -712,7 +725,7 @@ export const NewRTCA = ({ firebaseApp }) => {
             {userData?.requests[selectedUserToChat] ?
               <div className="req_btn">
                 <section className="enq_btn accept" onClick={() => acceptConnectionReq()} >Accept</section>
-                <section className="enq_btn delete mt-1" onClick={() => deleteConnectionReq()}>Delete</section>
+                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq()}>Delete</section>
               </div>
               :
               <div className="msg-input form-control border-0">
