@@ -18,7 +18,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
-import { dbUsers, getDateStr } from "../utils";
+import { dbUsers, getDateStr, getFullDateStr } from "../utils";
 
 
 // const socket = socketIOClient('http://localhost:3000');
@@ -29,8 +29,8 @@ socket.onAny((event, ...args) => {
   console.log('triggered event :- ', event, args);
 });
 
-let prevDate='';
 export const NewRTCA = ({ firebaseApp }) => {
+  let prevDate = '';
 
   const [user, setuser] = useState({ username: "", room: "" })
   const [letMeIn, setLetMeIn] = useState(false);
@@ -306,6 +306,14 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   // NEW APPROACH______________________________________________________________
 
+  const showChatDate = (currDate) => {
+    if (prevDate !== currDate) {
+      prevDate = currDate;
+      return true;
+    }
+    return false;
+  }
+
   // Sign out function
   const signOut = () => {
     auth.signOut()
@@ -500,6 +508,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         connectionId = uuidv4(); // creating a new connection id
         const userDocRef = doc(db, "users", userData.id);
         //updating the user document with new connection
+        ///initailly add past time like 1970 in deltedTill
         await updateDoc(userDocRef, {
           connections: {
             ...userData.connections,
@@ -524,7 +533,9 @@ export const NewRTCA = ({ firebaseApp }) => {
         await updateDoc(receiverDocRef, {
           requests: {
             ...receiverDoc.requests,
-            [currentUser.displayName]: connectionId,
+            [currentUser.displayName]: {
+              id:connectionId,
+            },
           }
         });
       }
@@ -583,10 +594,13 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function declineConnectionReq() {
 
-    return;
+   
+
+  
     //delete msgs here , don't remove from req list
     if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
-      delete userData.requests[selectedUserToChat];
+      // delete userData.requests[selectedUserToChat];
+      userData.requests[selectedUserToChat].deletedTill=serverTimestamp();
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
@@ -600,7 +614,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     //dont delete the connection,, either move the connection to req list and delete msgs so that if the other guy sends a msgs again(bcz for him u r still his a connection) than it will be shown in req list,
     return;
-    console.log('id',id)
+    console.log('id', id)
     if (userData?.connections?.hasOwnProperty(id)) {
       delete userData.connections[id];
 
@@ -708,14 +722,16 @@ export const NewRTCA = ({ firebaseApp }) => {
 
               {messageList?.length > 0 ?
                 messageList?.map((msgData) => {
-                  let currDate=getDateStr(msgData?.time?.toDate());
-                  
+                  let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
                   return (
-                  <>
-                    <div className="bg-light text-dark text-center">{prevDate!==currDate?getDateStr(msgData?.time?.toDate()):""}</div>
-                    <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
-                    {prevDate=currDate}
-                  </>
+                    <>
+                      {showChatDate(currDate) &&
+                        <div className="text-center date">
+                          <span className="fs-12">{currDate}</span>
+                        </div>
+                      }
+                      <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
+                    </>
                   )
                 })
                 :
@@ -754,7 +770,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                     return (
                       <div className="list" key={i}>
                         <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >{x}</section>
-                        <section className="deleteConnection" onClick={()=>deleteConnection(x)} title="Delete connection"><Trash size={18} /></section>
+                        <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection"><Trash size={18} /></section>
                       </div>
                     )
                   })}

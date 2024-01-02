@@ -169,6 +169,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             avatar: photo,
             connections:{},
             requests:{},
+            blockList:{},
             time: serverTimestamp(),
         };
         await addDoc(collection(firestore, "users"), userData);
