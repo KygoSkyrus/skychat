@@ -61,6 +61,9 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [currentText, setcurrentText] = useState('') // currently typed text
   const [userData, setUserData] = useState() // user info like connection list, email
   const [connectionHeader, setConnectionHeader] = useState(true)
+  const [connectionsToShow, setConnectionsToShow] = useState([]);
+
+
 
   const [toChatWithSelected, setToChatWithSelected] = useState(false);
   const [toChatWithID, setToChatWithID] = useState();//has the id of the othe person who is selected to have chat with
@@ -332,7 +335,6 @@ export const NewRTCA = ({ firebaseApp }) => {
     //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
     getAllUsersList()
 
-
   }, [])
 
   async function checkAuthStatus() {
@@ -400,25 +402,66 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
+  useEffect(() => {
+    async function fetchData() {
+      console.log('userdataaaa', userData)
+      const connections = [];
+      if (Object.keys(userData?.requests)) {
+        for (const uName of Object.keys(userData?.requests)) {
+          const hasNewMessages = await getConnectionRequests(uName);
+          if (hasNewMessages) {
+            connections.push(uName);
+          }
+        }
+      }
+      setConnectionsToShow(connections);
+    };
 
-  async function getConnectionRequests(uName,i){
+    //seeting connection req list
+    if (userData) fetchData();
 
-    let connectionId= userData?.requests?.[uName]?.id;
-    let deletedTill= userData?.requests?.[uName]?.deletedTill;
+  }, [userData])
 
-    console.log('getConnectionRequests func_--------------------',uName)
+  async function getConnectionRequests(uName, i) {
 
+    let connectionId = userData?.requests?.[uName]?.id;
+    let deletedTill = userData?.requests?.[uName]?.deletedTill;
 
-    if(deletedTill){
-      //check if there are new msgs
-      return <section className="request_list_item"> nbvbz</section>
-    }else{
-      return <section className="request_list_item" key={i} onClick={() => handleSelectedUserToChat(uName)} >{uName}</section>
+    console.log('getConnectionRequests func_--------------------', uName)
+
+    if (deletedTill) {
+      let q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", deletedTill), orderBy("time", "desc"), limit(1));
+
+      const querySnapshot = await getDocs(q);
+      // querySnapshot.forEach((doc) => {
+      //   console.log("last msgs => ", doc.id, doc.data());
+      //   // newMessages.push(doc.data());
+      // });
+
+      const hasNewMessages = querySnapshot.size > 0;
+
+      return hasNewMessages;
+    } else {
+      return true;
     }
+
+    // if(deletedTill){
+    //   //checking if there is atleast one new msg after connection had been deleted
+    //   let q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", deletedTill), orderBy("time", "desc"), limit(1));
+    //   const querySnapshot = await getDocs(q);
+    //     querySnapshot.forEach((doc) => {
+    //       console.log("last msgs => ",doc.id, doc.data());
+    //       return;
+    //     });
+    //   return <section className="request_list_item"> nbvbz</section>
+    // }else{
+    //   return <section className="request_list_item" key={i} onClick={() => handleSelectedUserToChat(uName)} >{uName}</section>
+    // }
   }
 
 
 
+  console.log('connectionsToShow-', connectionsToShow)
 
   async function handleSearchUser(e) {
     console.log('eee', e.target.value, allUsersList)
@@ -467,7 +510,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   async function retrieveTexts(userToChat) {
     console.log('ud', userData, userToChat)
     let connectionId = '';
-    let chatsTill=null;
+    let chatsTill = null;
 
     //only allow msgs which fall  after the deletedtill timestamp
 
@@ -475,13 +518,13 @@ export const NewRTCA = ({ firebaseApp }) => {
     if (userData?.connections?.hasOwnProperty(userToChat)) {
       console.log('has as connection')
       connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
-      chatsTill =userData?.connections[userToChat]?.deletedTill
-      getTexts(connectionId,chatsTill)
+      chatsTill = userData?.connections[userToChat]?.deletedTill
+      getTexts(connectionId, chatsTill)
     } else if (userData?.requests?.hasOwnProperty(userToChat)) {
       console.log('has as request')
       connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
-      chatsTill=userData?.requests[userToChat]?.deletedTill
-      getTexts(connectionId,chatsTill)
+      chatsTill = userData?.requests[userToChat]?.deletedTill
+      getTexts(connectionId, chatsTill)
     } else {
       console.log('is not a connection')
       setMessageList([])
@@ -490,13 +533,13 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   }
 
-  async function getTexts(connectionId,chatsTill) {
+  async function getTexts(connectionId, chatsTill) {
     //with the connection if query the msgs collection and get all the msggs
-    console.log('gettexts',connectionId,chatsTill)
+    console.log('gettexts', connectionId, chatsTill)
     let q;
-    if(chatsTill){
+    if (chatsTill) {
       q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(20));
-    }else{
+    } else {
       q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
     }
 
@@ -565,7 +608,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           requests: {
             ...receiverDoc.requests,
             [currentUser.displayName]: {
-              id:connectionId,
+              id: connectionId,
             },
           }
         });
@@ -622,7 +665,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           ...userData.connections,
           [selectedUserToChat]: {
             id: connectionId,
-            deletedTill:deletedTill,
+            deletedTill: deletedTill,
           },
         }
       });
@@ -634,20 +677,22 @@ export const NewRTCA = ({ firebaseApp }) => {
     //delete msgs here , don't remove from req list
     if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
       // delete userData.requests[selectedUserToChat];
-      userData.requests[selectedUserToChat].deletedTill=serverTimestamp();
+      userData.requests[selectedUserToChat].deletedTill = serverTimestamp();
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         requests: userData.requests,
       });
+
+      setSelectedUserToChat(undefined)
     }
   }
 
   async function deleteConnection(id) {
 
     //dont delete the connection,, either move the connection to req list and delete msgs so that if the other guy sends a msgs again(bcz for him u r still his a connection) than it will be shown in req list,
-    
+
     console.log('id', id)
     if (userData?.connections?.hasOwnProperty(id)) {
 
@@ -658,11 +703,16 @@ export const NewRTCA = ({ firebaseApp }) => {
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         connections: userData.connections,
-        requests:{
-          id: connectionId,
-          deletedTill: serverTimestamp(),
+        requests: {
+          ...userData.requests,
+          id: {
+            id: connectionId,
+            deletedTill: serverTimestamp(),
+          }
         }
       });
+
+      setSelectedUserToChat(undefined)
     }
   }
 
@@ -825,14 +875,20 @@ export const NewRTCA = ({ firebaseApp }) => {
             (userData?.requests ?
               Object.keys(userData?.requests)?.length > 0 ?
 
-                <div className="request_list">{
-                  Object.keys(userData?.requests).map((x, i) => {
-                    let y= getConnectionRequests(x,i).then(y=>{
-                      console.log('y',y)
-                      return y
-                    })
-                   return y
-                  })}
+                <div className="request_list">
+                  {connectionsToShow.map((uName, i) => (
+                    <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
+                      {uName}
+                    </section>
+                  ))}
+                  {/* {Object.keys(userData?.requests).map((uName, i) => (
+                    <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
+                      {uName}
+                      {newMessagesInfo[uName] && (
+                        <div className="msg_preview">{newMessagesInfo[uName]?.message}</div>
+                      )}
+                    </section>
+                  ))} */}
                 </div>
                 :
                 <div className="noOneToChat">

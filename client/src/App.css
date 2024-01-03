@@ -367,6 +367,11 @@ height: 38px;
   cursor: pointer;
 }
 
+.request_list_item .msg_preview{
+  color: #828282;
+  font-size: 14px;
+}
+
 .chat_list::-webkit-scrollbar{
   display: none;
   /* width: 6px; */
