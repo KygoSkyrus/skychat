@@ -77,7 +77,7 @@
   - when user signins than userdata(record from users collection) is fetched and all the connections are shown on ui
   - user can select anyone to chat from here (also user can also search user initially through search input in sidebar to find friend)
   
-  - upon texting that person is added to user's connection list (connections field is an object which has key value pair of connected username(reciever) and the unique connectionid, i.e. "test1":"connectionid")
+  - upon texting that person is added to user's connection list (connections field is an object which has key value pair of connected username(reciever) and the unique connectionid, i.e. "test1":{id:"connectionid"})
   - but that message is not directly sent to the reciever,, that message will be known as message request and the sender's username along with the connection id generated before will be added to reciever's request list(field: requests)
   - message is added in db with the connectionid 
 
@@ -85,7 +85,7 @@
     - In UI there will be two headers compartments. one of which will always be 90% width, initailly it will be "CONNECTIONS", which will show all the connections of user and the Second header will be of "CONNECTION REQUEST",
     - on clicking either of them will shrink the other header down. (also when shrinked , replace the header with a relatable icon [can use user icon or chat icon])
     - on hovering over userlist in both connection and request list, it should show basic actions like delete chat, remove connection,,,, on request like there can be like accept or remove connection
-    - **CONNECTION_REQUEST**: connection request will be shown on the basis the if there is any new msgs from the sender(which is not a connection)
+    - **CONNECTION_REQUEST**: connection request will be shown on the basis the if there is any new msgs from the sender(which is not a connection). This will be implemented as while rendering the request list we will check if that connection has a deletedTill value, if not than we will just render that req,, if it has a valid deletedTill value than we will check the db for just one last(latest) message document and compare the time of doc with the deletedTill value to check if the message is sent after the deletion, if yes than we will show this on req list otherwise hide
     - when user opens a requested chat, than he will have to opt in from one of two options i.e. Accept/Delete,[late a Block option will also be given] (user is prohibited to reply or text until he/she makes a decision)
     - when a connection request is **accepted** than that connection will be moved to connections field in db and will be removed from request field,
     - when a connection request is **declined** than the connection will be ~~removed from requests list~~
@@ -102,6 +102,10 @@
 
 - # Delete Connection
   - messages will be deleted and the connection will be moved to the request list (so that the other person sends a text again it will show in req list, as he is not a connection anymore),, why did we moved him to req list instead of removing him from connection list?? bcz that's the case of blocking
+
+- ##### Note
+  - a deleted connection and a declined request will lie in the request list but wont be visible to user unless there are new messages , only then that connection will be shown in  req list
+  - to stop receiving msgs from a connection or a requested connection user has to block that connection 
 
 - # Block Connection
   - when blocked the connection will be moved to a field(blockedConnections) in user collection, (later can be unblocked from this list)

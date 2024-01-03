@@ -372,7 +372,6 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   //this user data is also needed to be set whenevrr user doc is updated, bcz only than the changes like requests and connections will be reflrect live
   async function getCurrentUserData(username) {
-
     //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
     let userObj;
     const q = query(collection(db, "users"), where("username", "==", username));
@@ -400,6 +399,23 @@ export const NewRTCA = ({ firebaseApp }) => {
     return userObj;
   }
 
+
+
+  async function getConnectionRequests(uName,i){
+
+    let connectionId= userData?.requests?.[uName]?.id;
+    let deletedTill= userData?.requests?.[uName]?.deletedTill;
+
+    console.log('getConnectionRequests func_--------------------',uName)
+
+
+    if(deletedTill){
+      //check if there are new msgs
+      return <section className="request_list_item"> nbvbz</section>
+    }else{
+      return <section className="request_list_item" key={i} onClick={() => handleSelectedUserToChat(uName)} >{uName}</section>
+    }
+  }
 
 
 
@@ -449,16 +465,23 @@ export const NewRTCA = ({ firebaseApp }) => {
   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
   //NOTE:::{DONE} make user update whenever doc is modified
   async function retrieveTexts(userToChat) {
-    console.log('ud', userData?.connections, userToChat)
+    console.log('ud', userData, userToChat)
     let connectionId = '';
+    let chatsTill=null;
+
+    //only allow msgs which fall  after the deletedtill timestamp
+
     //checking if the user in connection list or request list
     if (userData?.connections?.hasOwnProperty(userToChat)) {
-      console.log('has own property')
-      connectionId = userData?.connections[userToChat];// this can be set as a state 
-      getTexts(connectionId)
+      console.log('has as connection')
+      connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
+      chatsTill =userData?.connections[userToChat]?.deletedTill
+      getTexts(connectionId,chatsTill)
     } else if (userData?.requests?.hasOwnProperty(userToChat)) {
-      connectionId = userData?.requests[userToChat];// this can be set as a state 
-      getTexts(connectionId)
+      console.log('has as request')
+      connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
+      chatsTill=userData?.requests[userToChat]?.deletedTill
+      getTexts(connectionId,chatsTill)
     } else {
       console.log('is not a connection')
       setMessageList([])
@@ -467,9 +490,15 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   }
 
-  async function getTexts(connectionId) {
+  async function getTexts(connectionId,chatsTill) {
     //with the connection if query the msgs collection and get all the msggs
-    let q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
+    console.log('gettexts',connectionId,chatsTill)
+    let q;
+    if(chatsTill){
+      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(20));
+    }else{
+      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
+    }
 
     //in here also there is a change that user has a connection but never chated with him so we need to run the below else part here too
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -501,7 +530,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         let result = await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
         console.log('ressukt', result)
         if (result?.connections?.hasOwnProperty(selectedUserToChat)) {
-          connectionId = result?.connections[selectedUserToChat]
+          connectionId = result?.connections[selectedUserToChat]?.id;
           return;
         }
 
@@ -512,7 +541,9 @@ export const NewRTCA = ({ firebaseApp }) => {
         await updateDoc(userDocRef, {
           connections: {
             ...userData.connections,
-            [selectedUserToChat]: connectionId,
+            [selectedUserToChat]: {
+              id: connectionId,
+            },
           }
         });
 
@@ -543,7 +574,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       // check if userdata has the connection already and if not than add the connection in user collection
       if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
         console.log('has own property')
-        connectionId = userData?.connections[selectedUserToChat]
+        connectionId = userData?.connections[selectedUserToChat]?.id
       } else {
         //when the person is not a connection than add the current user and connectionid to request list
         console.log('dont have property')
@@ -574,11 +605,14 @@ export const NewRTCA = ({ firebaseApp }) => {
   async function acceptConnectionReq() {
 
     if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
-      let connectionId = userData.requests[selectedUserToChat]
+
+      let connectionId = userData.requests[selectedUserToChat]?.id
+      let deletedTill = userData.requests[selectedUserToChat]?.deletedTill;
+
       console.log('connecyion id', connectionId, userData.requests)
 
       delete userData.requests[selectedUserToChat];
-      console.log('connecyion id after', connectionId, userData.requests)
+      console.log('connection id after', connectionId, userData.requests)
 
       //moving connection from req list to connection list 
       const docRef = doc(db, "users", userData?.id);
@@ -586,7 +620,10 @@ export const NewRTCA = ({ firebaseApp }) => {
         requests: userData.requests,
         connections: {
           ...userData.connections,
-          [selectedUserToChat]: connectionId,
+          [selectedUserToChat]: {
+            id: connectionId,
+            deletedTill:deletedTill,
+          },
         }
       });
     }
@@ -594,9 +631,6 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function declineConnectionReq() {
 
-   
-
-  
     //delete msgs here , don't remove from req list
     if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
       // delete userData.requests[selectedUserToChat];
@@ -613,15 +647,21 @@ export const NewRTCA = ({ firebaseApp }) => {
   async function deleteConnection(id) {
 
     //dont delete the connection,, either move the connection to req list and delete msgs so that if the other guy sends a msgs again(bcz for him u r still his a connection) than it will be shown in req list,
-    return;
+    
     console.log('id', id)
     if (userData?.connections?.hasOwnProperty(id)) {
+
+      let connectionId = userData.connections[id]?.id;
       delete userData.connections[id];
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         connections: userData.connections,
+        requests:{
+          id: connectionId,
+          deletedTill: serverTimestamp(),
+        }
       });
     }
   }
@@ -787,7 +827,11 @@ export const NewRTCA = ({ firebaseApp }) => {
 
                 <div className="request_list">{
                   Object.keys(userData?.requests).map((x, i) => {
-                    return <section className="request_list_item" key={i} onClick={() => handleSelectedUserToChat(x)} >{x}</section>
+                    let y= getConnectionRequests(x,i).then(y=>{
+                      console.log('y',y)
+                      return y
+                    })
+                   return y
                   })}
                 </div>
                 :

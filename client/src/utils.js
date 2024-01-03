@@ -3,6 +3,7 @@ export const dbUsers=[
         "avatar": "avatar 1",
         "email": "test11@gmail.com",
         "connections": {},
+        "requests": {},
         "time": {
             "seconds": 1703787515,
             "nanoseconds": 693000000
@@ -34,7 +35,9 @@ export const dbUsers=[
         "avatar": "avatar 1",
         "email": "test2@email.com",
         "username": "test2",
-        "id": "KzGL2i757kkhf4spaAxr"
+        "id": "KzGL2i757kkhf4spaAxr",
+        "connections": {},
+        "requests": {},
     },
     {
         "connections": {
