@@ -41,6 +41,17 @@ export const NewRTCA = ({ firebaseApp }) => {
 
 
   useEffect(() => {
+    // const currentUser = auth.currentUser;
+
+    //send this function to utils as it might be called for on eor mor component
+    checkAuthStatus();
+
+    //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
+    getAllUsersList()
+
+  }, [])
+
+  useEffect(() => {
     async function fetchData() {
       console.log('userdataaaa', userData)
       const connections = [];
@@ -55,22 +66,12 @@ export const NewRTCA = ({ firebaseApp }) => {
       setConnectionsToShow(connections);
     };
 
-    //seeting connection req list
-    if (userData) fetchData();
-
+    //setting connection req list
+    if (userData) {
+      fetchData();
+      if (selectedUserToChat) retrieveTexts(selectedUserToChat)
+    }
   }, [userData])
-
-
-  useEffect(() => {
-    // const currentUser = auth.currentUser;
-
-    //send this function to utils as it might be called for on eor mor component
-    checkAuthStatus();
-
-    //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
-    getAllUsersList()
-
-  }, [])
 
 
   async function checkAuthStatus() {
@@ -207,8 +208,6 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  // erorr;;{DONE,,few prioblem still exist like on new user msgs are nt refelecting right away}, reteriving of text is not working properly,, have to lsiten fir user doc chnages
-  //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
   async function retrieveTexts(userToChat) {
     console.log('ud', userData, userToChat)
     let connectionId = '';
@@ -216,23 +215,23 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     //checking if the user in connection list or request list
     if (userData?.connections?.hasOwnProperty(userToChat)) {
-      // console.log('has as connection')
+      console.log('has as connection')
       connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.connections[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
     } else if (userData?.requests?.hasOwnProperty(userToChat)) {
-      // console.log('has as request')
+      console.log('has as request')
       connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.requests[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
     } else {
-      // console.log('is not a connection')
+      console.log('is not a connection')
       setMessageList([])
     }
   }
 
   async function getTexts(connectionId, chatsTill) {
-    // console.log('gettexts', connectionId, chatsTill)
+    console.log('gettexts', connectionId)
 
     //only messages after last delete are queried
     let q;
@@ -245,13 +244,20 @@ export const NewRTCA = ({ firebaseApp }) => {
     //in here also there is a change that user has a connection but never chated with him so we need to run the below else part here too
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const msgs = [];
+      console.log('hiddenn')
       querySnapshot.forEach((doc) => {
         let data = doc.data()
         data.id = doc.id;
         msgs.push(data);
 
-        const audio = new Audio(notification);
-        audio.play();
+        //only play sound if the message's timestamp and current timestap are close (in btw 2s)
+        const date1 = data.time?.toDate();
+        const date2 = new Date();
+        const diffTime = Math.abs(date2 - date1);
+        if (diffTime <= 2000) {
+          const audio = new Audio(notification);
+          audio.play();
+        }
       });
       msgs.reverse()
       console.log("Current messages: ", msgs);
@@ -270,11 +276,12 @@ export const NewRTCA = ({ firebaseApp }) => {
 
       //checks for connection id after retreiving fresh/updated data
       async function getConnectionId() {
+        console.log('userdddtatatatatat', userData)
         //we might not need this the below likne to get updated current user after implementing snapshot on user doc
-        let result = await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
+        //let result = await getCurrentUserData(currentUser.displayName)//calling this here to get updated list of all connections user has.. 
         // console.log('ressukt', result)
-        if (result?.connections?.hasOwnProperty(selectedUserToChat)) {
-          connectionId = result?.connections[selectedUserToChat]?.id;
+        if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
+          connectionId = userData?.connections[selectedUserToChat]?.id;
           return;
         }
 
@@ -322,7 +329,43 @@ export const NewRTCA = ({ firebaseApp }) => {
       } else {
         //when the person is not a connection than add the current user and connectionid to request list
         // console.log('dont have property')
-        await getConnectionId(selectedUserToChat)
+
+        // await getConnectionId(selectedUserToChat)
+        connectionId = uuidv4(); // creating a new connection id
+        const userDocRef = doc(db, "users", userData.id);
+        //updating the user document with new connection
+        ///initailly add past time like 1970 in deltedTill
+        await updateDoc(userDocRef, {
+          connections: {
+            ...userData.connections,
+            [selectedUserToChat]: {
+              id: connectionId,
+            },
+          }
+        });
+
+        //getting receiver's doc
+        let receiverDoc;
+        let q = query(collection(db, "users"), where("username", "==", selectedUserToChat));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          // console.log("RECIEVEER'S DOC => ", doc.data());
+          receiverDoc = doc.data()
+          receiverDoc.id = doc.id;
+          return;
+        });
+        console.log('RECIEVEER"S DOC --', receiverDoc)
+
+        //updating the receiver document request list
+        const receiverDocRef = doc(db, "users", receiverDoc.id);
+        await updateDoc(receiverDocRef, {
+          requests: {
+            ...receiverDoc.requests,
+            [currentUser.displayName]: {
+              id: connectionId,
+            },
+          }
+        });
       }
 
 
@@ -346,10 +389,10 @@ export const NewRTCA = ({ firebaseApp }) => {
       let connectionId = userData.requests[selectedUserToChat]?.id
       let deletedTill = userData.requests[selectedUserToChat]?.deletedTill;
 
-      console.log('connecyion id', connectionId, userData.requests)
+      // console.log('connecyion id', connectionId, userData.requests)
 
       delete userData.requests[selectedUserToChat];
-      console.log('connection id after', connectionId, userData.requests)
+      // console.log('connection id after', connectionId, userData.requests)
 
       //moving connection from req list to connection list 
       const docRef = doc(db, "users", userData?.id);
@@ -385,9 +428,8 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function deleteConnection(id) {
 
-    //dont delete the connection,, either move the connection to req list and delete msgs so that if the other guy sends a msgs again(bcz for him u r still his a connection) than it will be shown in req list,
-
-    console.log('id', id)
+    //connection is moved to req list after deleting msgs
+    // console.log('id', id)
     if (userData?.connections?.hasOwnProperty(id)) {
 
       let connectionId = userData.connections[id]?.id;
@@ -422,7 +464,7 @@ export const NewRTCA = ({ firebaseApp }) => {
               <span onClick={() => sidebarVisibility(false)} className="closeButton" > &times; </span>
             </div> */}
 
-            <span onClick={() => sidebarVisibility(false)} className="pointer" style={{ position: "absolute", right: "-23px", color: "#fff" }} >
+            <span onClick={() => sidebarVisibility(false, setSearchedUserList)} className="pointer" style={{ position: "absolute", right: "-23px", color: "#fff" }} >
               <X size="20" />
             </span>
 
@@ -445,6 +487,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           </div>
           <section className="myProfile px-2">
             <span>
+              <img src="" alt="" className="avatar me-2" width="35px" height="35px" />
               {currentUser?.displayName}
             </span>
             <LogOut size="20" onClick={() => signOut()} className='pointer' />
@@ -456,14 +499,23 @@ export const NewRTCA = ({ firebaseApp }) => {
 
         {/***** CHAT HEADER STARTS ******/}
         <div className="chat-head">
-          <div className="hamburger" onClick={() => sidebarVisibility(true)}>
+          <div className="hamburger" onClick={() => sidebarVisibility(true, setSearchedUserList)}>
             <img src={hamburger} alt="." />
           </div>
           {selectedUserToChat &&
             <div className="d-flex align-items-center">
               <ChevronLeft className="pointer" onClick={() => setSelectedUserToChat(undefined)} />
               <section id="chatWith">{selectedUserToChat}</section>
-              <div className="chatWithProfile ms-1"></div>
+
+              <div class="dropdown">
+                <div className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></div>
+                <ul class="dropdown-menu p-2">
+                  <li class="dropdown-item pointer">Block</li>
+                  <li class="dropdown-item pointer">Clear chats</li>
+                  <li class="dropdown-item pointer">Remove connection</li>
+                </ul>
+              </div>
+
             </div>
           }
         </div>
@@ -585,7 +637,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         {/***** CHAT BODY ENDS ******/}
 
 
-        <div className="overlay d-none" onClick={() => sidebarVisibility(false)}></div>
+        <div className="overlay d-none" onClick={() => sidebarVisibility(false, setSearchedUserList)}></div>
       </div>
     </>
   )

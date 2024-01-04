@@ -1,14 +1,20 @@
+:root{
+    --transition: all 0.3s ease-in-out;
+
+    /* colors */
+    --black1: #1b1f22;
+    --violet: rgb(112.520718,44.062154,249.437846);
+}
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* background: #1b1b1b; */
-
-  /* variables */
-  --transition: all 0.3s ease-in-out;
+  background: #1b1b1b;
+  background: var(--black1);
 }
 
-/* BASICS */
+/* BASIC CSS */
 .pointer{
   cursor: pointer !important;
 }
@@ -61,6 +67,25 @@ body {
   color: rgb(206, 206, 206);
 }
 
+.chatWithProfile{
+  border-radius: 50%;
+  background-color: #1b1b1b;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.dropdown-item:focus, .dropdown-item:hover {
+  color: #1e2125;
+  background-color: rgb(39 38 39);
+  background-color: var(--violet);
+  border-radius: 4px;
+  color: #fff;
+}
+
+
+/* connection heading */
 .header {
   grid-template-columns: repeat(10, 1fr);
   grid-column-gap: 0px;
@@ -124,14 +149,6 @@ body {
   position: absolute;
   top: 0;
 }
-
-
-.wlcmMsg{
-  text-align: center;
-  color: rgb(209, 208, 208);
-  font-size: 11px;
-}
-
 
 .noOneToChat{
   height: 320px;
@@ -281,20 +298,21 @@ body {
 /*********** my profile*************/
 .myProfile{
   background-color: #1b1b1b;
-color: white;  
-height: 38px;
+  color: white;  
+  height: 38px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.chatWithProfile{
+.myProfile span{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-wrap: nowrap;
+}
+.myProfile .avatar{
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
-  background-color: #1b1b1b;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 }
 /*********** my profile*************/
 
