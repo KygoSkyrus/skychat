@@ -1,3 +1,5 @@
+import { addDoc, collection } from "firebase/firestore"
+
 export const dbUsers=[
     {
         "avatar": "avatar 1",
@@ -153,3 +155,53 @@ export function getExactTimeStr(d) {
           (d?.getHours() < 12 ? "AM" : "PM")
         )
 }
+
+
+
+export async function writeToDb(db,msgObj) {
+    try {
+      const docRef = await addDoc(collection(db, "v2"), msgObj);
+      //console.log("message send with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
+
+
+  export function hideSearchedUsersList(setSearchedUserList) {
+    clearSearchList(setSearchedUserList)
+    // document.getElementById('userSearchDropdown').classList.toggle('d-none')//hiding the dropdown
+  }
+
+  export const sidebarVisibility = (val,setSearchedUserList) => {
+    let sidebar = document.getElementById("mySidebar");
+    let overlay = document.querySelector('.overlay');
+
+    if (val) {
+      sidebar.style.display = "flex";
+      overlay.classList.remove('d-none');
+    } else {
+      sidebar.style.display = "none";
+      overlay.classList.add('d-none');
+
+      clearSearchList(setSearchedUserList);
+    }
+  };
+
+  function clearSearchList(setSearchedUserList){
+    setSearchedUserList(undefined)  //clearing all records
+    document.querySelector('[type="search"]').value = "";//clearing the input on focus out
+    document.getElementById('userSearchDropdown').classList.add('d-none')
+  }
+
+
+  // Debounce function to delay API calls by a specified time
+export function debounce(func, wait) {
+    let timeoutId;
+    return function (...args) {
+        const context = this;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+

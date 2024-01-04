@@ -350,6 +350,19 @@ height: 38px;
   transform: rotate(180deg);
 }
 
+#userSearchDropdown{
+ overflow: auto;
+ height: 80%;
+}
+#userSearchDropdown::-webkit-scrollbar{
+  /* display: none; */
+  width: 6px;
+}
+#userSearchDropdown::-webkit-scrollbar-thumb{
+  background-color: rgb(166 166 166);
+  border-radius: 4px;
+}
+
 
 
 /* chat list / request list */
@@ -405,6 +418,41 @@ height: 38px;
 .chat_list .list:hover .deleteConnection{
   right: 1px;
 }
+
+
+/*********************************************** custom LOADER ************************************************* */
+.custom-loader {
+  width: 50px;
+  height: 24px;
+  margin: auto;
+  background: radial-gradient(circle closest-side, #766df4 90%, #0000) 0% 50%,
+    radial-gradient(circle closest-side, #766df4 90%, #0000) 50% 50%,
+    radial-gradient(circle closest-side, #766df4 90%, #0000) 100% 50%;
+  background: radial-gradient(circle closest-side, #e7e7e7 90%, #0000) 0% 50%,
+    radial-gradient(circle closest-side, #e7e7e7 90%, #0000) 50% 50%,
+    radial-gradient(circle closest-side, #e7e7e7 90%, #0000) 100% 50%;
+  background-size: calc(100% / 3) 12px;
+  background-repeat: no-repeat;
+  animation: d3 2s infinite linear;
+}
+@keyframes d3 {
+  20% {
+    background-position: 0% 0%, 50% 50%, 100% 50%;
+  }
+  40% {
+    background-position: 0% 100%, 50% 0%, 100% 50%;
+  }
+  60% {
+    background-position: 0% 50%, 50% 100%, 100% 0%;
+  }
+  80% {
+    background-position: 0% 50%, 50% 50%, 100% 100%;
+  }
+}
+/*********************************************** custom LOADER ************************************************* */
+
+
+
 
 
 /* BUTTON DEsIGN */
