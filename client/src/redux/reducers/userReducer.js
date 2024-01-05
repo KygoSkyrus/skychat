@@ -1,17 +1,24 @@
-import { UPDATE_USER_INFO } from "./../actionTypes";
+import { SET_CURRENT_USER } from "./../actionTypes";
+import { SET_USER_INFO } from "./../actionTypes";
 
 const initialState = {
-  userData: null,
+  currentUser: null,
+  userInfo: null,
 };
 
 export const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case UPDATE_USER_INFO:{
-console.log('action--',action)
+    case SET_CURRENT_USER: {
       return {
         ...state,
-        userData: action.payload,
+        currentUser: action.payload,
       };
+    }
+    case SET_USER_INFO: {
+      return {
+        ...state,
+        userInfo: action.payload
+      }
     }
 
     default:

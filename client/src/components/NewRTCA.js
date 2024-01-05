@@ -7,7 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import hamburger from "./../assets/menu.png";
 import notification from "./../assets/discord.mp3";
 import MessageWrapper from "./MessageWrapper";
-import { UPDATE_USER_INFO } from "../redux/actionTypes";
+import Sidebar from "./Sidebar";
+import { SET_CURRENT_USER, SET_USER_INFO } from "../redux/actionTypes";
 import { dbUsers, debounce, hideSearchedUsersList, sidebarVisibility, writeToDb } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash } from 'lucide-react';
 
@@ -31,11 +32,12 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [selectedUserToChat, setSelectedUserToChat] = useState()
   const [messageList, setMessageList] = useState() //messages with the current user
   const [currentText, setcurrentText] = useState('') // currently typed text
-  const [userData, setUserData] = useState() // user info like connection list, email
+  // const [userData, setUserData] = useState() // user info like connection list, email
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
-  const currentUser = useSelector(state => state.user.userData)
+  const currentUser = useSelector(state => state.user.currentUser)
+  const userData = useSelector(state => state.user.userInfo)
   console.log('currentUser', currentUser)
   console.log('connectionsToShow-', connectionsToShow)
 
@@ -78,12 +80,12 @@ export const NewRTCA = ({ firebaseApp }) => {
     await auth.onAuthStateChanged((user) => {
       // console.log('authstate changed NWRTC', user)
       if (user) {
-        dispatch({ type: UPDATE_USER_INFO, payload: user })
+        dispatch({ type: SET_CURRENT_USER, payload: user })
 
         //have to store the result of this query in cache 
         getCurrentUserData(user.displayName);
       } else {
-        dispatch({ type: UPDATE_USER_INFO, payload: null })
+        dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
       }
     });
@@ -115,7 +117,8 @@ export const NewRTCA = ({ firebaseApp }) => {
         // console.log("UPDATED USER => ", doc.data());
         userObj = doc.data();
         userObj.id = doc.id
-        setUserData(userObj)
+        // setUserData(userObj)
+        dispatch({ type: SET_USER_INFO, payload: userObj })
       });
     });
     console.log('USEROBJ------_________', userObj)
@@ -159,44 +162,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  const signOut = () => {
-    auth.signOut()
-      .catch((error) => {
-        console.error(error);
-      });
-  };
 
 
-  const handleSearchUser = debounce(searchUser, 1000);
-
-  const handleChangeUserSearch = (e) => {
-    setSearchedUserList(undefined)  //clearing all records
-    let userSearchDropdown = document.getElementById('userSearchDropdown')
-
-    if (e.target.value.length === 0) {
-      userSearchDropdown?.classList.add('d-none')//hide search list
-    } else {
-      userSearchDropdown?.classList.remove('d-none')//make search result visible
-      document.querySelector('.custom-loader').classList.remove('d-none')//showing loader while typing
-      document.querySelector('.no-item')?.classList.add('d-none')//hiding no item message while typing
-      handleSearchUser(e);
-    }
-  }
-
-  async function searchUser(e) {
-    let result = allUsersList.filter(user => user?.username?.includes(e.target.value))
-
-    let noResult = document.querySelector('.no-item')
-    document.querySelector('.custom-loader')?.classList.add('d-none')//showing loader while typing
-
-    if (result.length === 0) {
-      noResult?.classList.remove('d-none')
-      setSearchedUserList(undefined)  //clearing all records
-    } else {
-      noResult?.classList.add('d-none')
-      setSearchedUserList(result)
-    }
-  }
 
 
   function handleSelectedUserToChat(username) {
@@ -457,43 +424,11 @@ export const NewRTCA = ({ firebaseApp }) => {
       <div className="outer">
 
         {/***** SIDEBAR STARTS ******/}
-        <div className="w3-sidebar  w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
-          <div style={{ height: "90%" }}>
-            {/* <div className="sidebar-head">
-              <span>close</span>
-              <span onClick={() => sidebarVisibility(false)} className="closeButton" > &times; </span>
-            </div> */}
-
-            <span onClick={() => sidebarVisibility(false, setSearchedUserList)} className="pointer" style={{ position: "absolute", right: "-23px", color: "#fff" }} >
-              <X size="20" />
-            </span>
-
-            <div className="p-2">
-              <input type="search" onChange={e => handleChangeUserSearch(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
-            </div>
-
-            <div className="d-none" id="userSearchDropdown">
-              {searchedUserList?.map(x => {
-                return (
-                  <section className="dropdown-item pointer" key={x.id} onClick={e => handleSelectedUserToChat(x?.username)} style={{ width: "unset", margin: "0 0.5rem" }}>
-                    {/* <img className="me-3" src={x.image} alt="shoppitt" height="50px" width="55px" /> */}
-                    <span>{x?.username}</span>
-                  </section>
-                )
-              })}
-              <div className="no-item d-none text-center">No user found</div>
-              <div className="custom-loader d-none" onClick={() => hideSearchedUsersList(setSearchedUserList)} ></div>
-            </div>
-          </div>
-          <section className="myProfile px-2">
-            <span>
-              <img src="" alt="" className="avatar me-2" width="35px" height="35px" />
-              {currentUser?.displayName}
-            </span>
-            <LogOut size="20" onClick={() => signOut()} className='pointer' />
-          </section>
-
-        </div>
+        <Sidebar
+          searchedUserList={searchedUserList}
+          setSearchedUserList={setSearchedUserList}
+          handleSelectedUserToChat={handleSelectedUserToChat}
+        />
         {/***** SIDEBAR ENDS ******/}
 
 

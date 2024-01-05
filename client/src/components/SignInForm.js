@@ -4,7 +4,8 @@ import { useDispatch } from 'react-redux';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
-import { UPDATE_USER_INFO } from '../redux/actionTypes';
+import { SET_CURRENT_USER } from '../redux/actionTypes';
+import { defaultAvatar } from '../utils';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
 
@@ -25,10 +26,10 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     //         console.log('authstate changed', user)
     //         //set user in redux
     //         if (user) {
-    //             dispatch({ type: UPDATE_USER_INFO, payload:user })
+    //             dispatch({ type: SET_CURRENT_USER, payload:user })
     //             navigate('/chat')
     //         } else {
-    //             dispatch({ type: UPDATE_USER_INFO, payload:null })
+    //             dispatch({ type: SET_CURRENT_USER, payload:null })
     //             console.log('')
     //         }
     //     });
@@ -85,7 +86,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             .then((response) => {
                 const user = response.user;
                 console.log('signup user', user)
-                registerUserInDB(user?.email, userCredentials?.username, 'avatar 1')
+                registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
                 // inProgressLoader(dispatch, false)
                 //navigate('/user');//sending user to user page for filling out other details
             })
@@ -107,7 +108,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         setUserCredentials({ email: '', password: '', username: '' })
 
         //setting user and redirecting to chats
-        dispatch({ type: UPDATE_USER_INFO, payload: auth.currentUser })
+        dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
         navigate('/chat')
 
     }
@@ -119,7 +120,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 (response) => {
                     const user = response.user;
                     console.log('signin user', user)
-                    dispatch({ type: UPDATE_USER_INFO, payload: auth.currentUser })
+                    dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                     // signinAPI(user?.email, "", "", user?.photoURL, dispatch)//not needed 
                     // inProgressLoader(dispatch, false)
                     setUserCredentials({ email: '', password: '', username: '' })
@@ -133,40 +134,14 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             });
     }
 
-    //toggles between signIn and signUp form
-    const toggleSignIn = (form) => {
-        console.log('form', form)
-        setCurrAuthMethod(form)
 
-        // let signin = document.querySelector('.signin-form')
-        // let signup = document.querySelector('.signup-form')
-        // if (form === 'signin') {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.add('d-none')
-        //         signin.classList.remove('d-none')
-        //     } else {
-        //         signup.style.left = '0'
-        //         signin.style.right = '0'
-        //     }
-        // } else {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.remove('d-none')
-        //         signin.classList.add('d-none')
-        //     } else {
-        //         signup.style.left = '50%'
-        //         signin.style.right = '50%'
-        //     }
-        // }
-        setUserCredentials({ email: '', password: '', username: '' })
-    }
-
-    async function registerUserInDB(email, username, photo) {
+    async function registerUserInDB(email, username, avatar) {
         const userData = {
             // firstname: firstname,
             // lastname: lastname,
             username: username,
             email: email,
-            avatar: photo,
+            avatar: avatar,
             connections:{},
             requests:{},
             blockList:{},
@@ -187,6 +162,33 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         // });
 
     }
+
+        //toggles between signIn and signUp form
+        const toggleSignIn = (form) => {
+            console.log('form', form)
+            setCurrAuthMethod(form)
+    
+            // let signin = document.querySelector('.signin-form')
+            // let signup = document.querySelector('.signup-form')
+            // if (form === 'signin') {
+            //     if (window.outerWidth < 768) {
+            //         signup.classList.add('d-none')
+            //         signin.classList.remove('d-none')
+            //     } else {
+            //         signup.style.left = '0'
+            //         signin.style.right = '0'
+            //     }
+            // } else {
+            //     if (window.outerWidth < 768) {
+            //         signup.classList.remove('d-none')
+            //         signin.classList.add('d-none')
+            //     } else {
+            //         signup.style.left = '50%'
+            //         signin.style.right = '50%'
+            //     }
+            // }
+            setUserCredentials({ email: '', password: '', username: '' })
+        }
 
     // export const goWithGoogle = (val, navigate, dispatch, route, isAdminLogin) => {
     //     const auth = getAuth();
