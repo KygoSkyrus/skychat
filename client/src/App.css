@@ -24,6 +24,9 @@ body {
 .fs-12{
   font-size: 12px !important;
 }
+.zIndex4{
+  z-index: 4 !important;
+}
 /* BASICS */
 
 
@@ -139,7 +142,7 @@ body {
   transform: translate(-50%, -50%);
   background-color: #111;
   border-radius: 4px;
-  box-shadow: 0 0 5px 0px #000000;
+  box-shadow: 0 0 5px 0px #00000080;
   overflow: hidden;
 }
 
@@ -148,6 +151,11 @@ body {
   height: 100%;
   position: absolute;
   top: 0;
+  z-index: 2;
+  opacity: 1;
+  background: rgb(0 0 0/40%);
+  -webkit-backdrop-filter: blur(10px) brightness(150%);
+  backdrop-filter: blur(2px) brightness(100%);
 }
 
 .noOneToChat{
@@ -345,7 +353,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   overflow: unset !important;
-  z-index: 2;
+  z-index: 3;
 }
 .sidebar-head{
   display: flex;
@@ -471,6 +479,140 @@ body {
 
 
 
+
+/* USER MODAL */
+#userModal,
+#avatarModal{
+  width: 90%;
+  height: 100%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.m-dialog{
+  width: 100%;
+  position: relative;
+  height: calc(100% - 3.5rem);
+  /* overflow: auto; */
+}
+.m-dialog::-webkit-scrollbar{
+  /* display: none; */
+  width: 6px;
+}
+.m-dialog::-webkit-scrollbar-thumb{
+  background-color: rgb(92, 92, 92);
+  border-radius: 4px;
+}
+.m-dialog .btn-close{
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+#userModal .m-dialog img{
+  width: 100px;
+  height: 100px;
+}
+#userModal .m-dialog .uImg{
+  position: relative;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.avatar_edit_btn{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  display: none;
+  opacity: 0;
+  background: #00000059;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  place-items: center;
+  transition: var(--transition);
+}
+#userModal .m-dialog .uImg:hover .avatar_edit_btn{
+  display: grid;
+  opacity: 1;
+}
+
+/* AVATAR EIDT MOAL */
+#avatarModal .avatar_grid{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 5px 0 12px 0;
+  margin-top: 25px;
+  /* height: calc(100% - 3.5rem); */
+  overflow: auto;
+  z-index: 2;
+}
+.avatar_grid::-webkit-scrollbar{
+  display: none;
+}
+#avatarModal img {
+  height: 50px;
+  border-radius: 50%;
+  transform: scale(1);
+  box-shadow: 0 0 10px #191818;
+  /* transition: all ease-in 0.2s; */
+  cursor: pointer;
+}
+#avatarModal img:hover {
+  transform: scale(1.2);
+  border: 2px solid var(--violet);
+}
+.slectedAvatar {
+  transform: scale(1.2) !important;
+  border: 2px solid var(--violet);
+}
+/* upload profile */
+.custom-input-file{
+  position: absolute;
+  visibility: hidden;
+}
+.customLabel{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-wrap: nowrap;
+  font-size: 14px;
+  cursor: pointer;
+}
+.imageHolder{
+  border: 2px solid rgb(126 126 126);
+  border-radius: 50%;
+}
+.displayImg{
+  height: 40px;
+  width: 40px;
+  border: 1px solid var(--bs-secondary);
+  border-radius: 50%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.select_avatar_btn{
+  box-shadow: 0px -3px 5px #0c0c0c52;
+}
+.select_avatar_btn .btn{
+  color: var(--violet);
+  border: 1px solid grey;
+}
+.select_avatar_btn .btn:hover{
+  color: rgb(255, 255, 255);
+  background-color: var(--violet);
+  border: 1px solid var(--violet);
+}
 
 
 /* BUTTON DEsIGN */

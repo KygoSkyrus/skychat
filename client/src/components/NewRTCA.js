@@ -93,6 +93,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function getAllUsersList() {
 
+    //this should be moved to redux
     setAllUsersList(dbUsers);
 
     // commented for testing
@@ -425,6 +426,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
         {/***** SIDEBAR STARTS ******/}
         <Sidebar
+          allUsersList={allUsersList}
           searchedUserList={searchedUserList}
           setSearchedUserList={setSearchedUserList}
           handleSelectedUserToChat={handleSelectedUserToChat}
@@ -442,12 +444,12 @@ export const NewRTCA = ({ firebaseApp }) => {
               <ChevronLeft className="pointer" onClick={() => setSelectedUserToChat(undefined)} />
               <section id="chatWith">{selectedUserToChat}</section>
 
-              <div class="dropdown">
+              <div className="dropdown">
                 <div className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></div>
-                <ul class="dropdown-menu p-2">
-                  <li class="dropdown-item pointer">Block</li>
-                  <li class="dropdown-item pointer">Clear chats</li>
-                  <li class="dropdown-item pointer">Remove connection</li>
+                <ul className="dropdown-menu p-2">
+                  <li className="dropdown-item pointer">Block</li>
+                  <li className="dropdown-item pointer">Clear chats</li>
+                  <li className="dropdown-item pointer">Remove connection</li>
                 </ul>
               </div>
 
@@ -572,7 +574,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         {/***** CHAT BODY ENDS ******/}
 
 
-        <div className="overlay d-none" onClick={() => sidebarVisibility(false, setSearchedUserList)}></div>
+        <div className="overlay pointer d-none" onClick={() => sidebarVisibility(false, setSearchedUserList)}></div>
       </div>
     </>
   )
