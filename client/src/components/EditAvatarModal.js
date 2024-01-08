@@ -32,22 +32,28 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
 
         if (uploadAvatar) {
-            uploadBytes(storageRef, uploadAvatar).then((snapshot) => {
+            let ref= await uploadBytes(storageRef, uploadAvatar).then((snapshot) => {
                 console.log('Uploaded a blob or file!', snapshot);
                 console.log('jdjdjdjd', snapshot.ref)
+
+                return snapshot.ref
             },
                 (error) => {
                     console.log(error)
                 },
-                // async () => {
-                //     await getDownloadURL(uploadTask.snapshot.ref)
-                //         .then((downloadURL) => {
-                //             tempArr.push(downloadURL)
-                //             if (index === productData.image.length - 1 && downloadURL) addProductAPI(tempArr)
-                //         });
-                // }
             )
 
+            let dl = await getDownloadURL(ref)
+                    .then((downloadURL) => {
+                        updatedAvatar = downloadURL
+                        return downloadURL
+                    });
+            console.log('updatedd avatyar',updatedAvatar,dl)
+
+            const userDocRef = doc(db, "users", userData.id);
+                await updateDoc(userDocRef, {
+                    avatar: updatedAvatar
+                });
             // const uploadTask = uploadBytesResumable(storageRef, uploadAvatar.image[index]);
             // uploadTask.on('state_changed',
             //     (snapshot) => {
@@ -76,6 +82,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
         } else {
             if (selectedAvatar && userData.avatar !== selectedAvatar) {
 
+                //move all the update doc code to one place and just pass the updating val
                 const userDocRef = doc(db, "users", userData.id);
                 await updateDoc(userDocRef, {
                     avatar: selectedAvatar
@@ -100,7 +107,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
                 div.style.backgroundImage = `url('${URL.createObjectURL(e.target.files[0])}')`
                 imageHolder.appendChild(div)
             }
-            setUploadAvatar(e.target.files)
+            setUploadAvatar(e.target.files[0])
             setSelectedAvatar(null)
         } else {
             document.getElementById("dynamicLabel").innerHTML = "Choose a file…"

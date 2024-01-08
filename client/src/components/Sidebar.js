@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
-import { LogOut, Tally1, X } from 'lucide-react'
+import { LogOut, Search, SearchCheck, Tally1, X } from 'lucide-react'
 
 import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
 import UserModal from './UserModal'
@@ -66,7 +66,9 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         <Tally1 strokeWidth={4} />
                     </span>
 
-                    <div className="p-2">
+                    <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
+                        <span><Search /></span>
+                        {/* <span>Search a connection</span> */}
                         <input type="search" onChange={e => handleChangeUserSearch(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
                     </div>
 

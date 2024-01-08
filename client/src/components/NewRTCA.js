@@ -10,7 +10,7 @@ import MessageWrapper from "./MessageWrapper";
 import Sidebar from "./Sidebar";
 import { SET_CURRENT_USER, SET_USER_INFO } from "../redux/actionTypes";
 import { dbUsers, debounce, hideSearchedUsersList, sidebarVisibility, writeToDb } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
@@ -409,7 +409,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         connections: userData.connections,
         requests: {
           ...userData.requests,
-          id: {
+          [id]: {
             id: connectionId,
             deletedTill: serverTimestamp(),
           }
@@ -417,6 +417,33 @@ export const NewRTCA = ({ firebaseApp }) => {
       });
 
       setSelectedUserToChat(undefined)
+    }
+  }
+
+  async function blockConnection(id) {
+
+    //connection is moved to block list from connection list or req list / messages are not deketed
+    console.log('id', id)
+    //current only connection list is handled here
+    if (userData?.connections?.hasOwnProperty(id)) {
+
+      let connectionId = userData.connections[id]?.id;
+      delete userData.connections[id];
+
+      //deleting connection req from req list 
+      const docRef = doc(db, "users", userData?.id);
+      await updateDoc(docRef, {
+        connections: userData.connections,
+        blockList: {
+          ...userData.blockList,
+          [id]: {
+            id: connectionId,
+            blockedAt: serverTimestamp(),
+          }
+        }
+      });
+
+      setSelectedUserToChat(undefined)//only call when inner block button is clicked, not on list's btn, so that component wont render bcz of unneccesary state update
     }
   }
 
@@ -534,6 +561,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                     return (
                       <div className="list" key={i}>
                         <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >{x}</section>
+                        <section className="blockConnection" onClick={() => blockConnection(x)} title="Block connection"><UserRoundX size={18} /></section>
                         <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection"><Trash size={18} /></section>
                       </div>
                     )
