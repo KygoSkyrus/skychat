@@ -653,6 +653,10 @@ input[type="search"] {
   width: 100%;
   text-align: center;
   opacity: 0;
+  
+  background: #32d53273;
+  -webkit-backdrop-filter: blur(10px) brightness(150%);
+  backdrop-filter: blur(2px) brightness(100%);
 }
 #blockedConnModal .block_list .list:hover .unblock_overlay{
   opacity: 1;

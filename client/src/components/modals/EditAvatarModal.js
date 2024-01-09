@@ -1,11 +1,11 @@
 import { Trash, Upload, X } from 'lucide-react'
 import React, { useState } from 'react'
-import { getAvatarUrl } from '../utils'
+import { getAvatarUrl } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
 
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../firebaseConfig';
+import { firebaseConfig } from '../../firebaseConfig';
 import { useSelector } from 'react-redux';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 

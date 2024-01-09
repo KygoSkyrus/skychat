@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth'
 import { LogOut, Search, SearchCheck, Tally1, X } from 'lucide-react'
 
 import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
-import UserModal from './UserModal'
+import UserModal from './modals/UserModal'
 
 
 const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserList, allUsersList }) => {
