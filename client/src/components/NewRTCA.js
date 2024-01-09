@@ -10,7 +10,7 @@ import MessageWrapper from "./MessageWrapper";
 import Sidebar from "./Sidebar";
 import { SET_CURRENT_USER, SET_USER_INFO } from "../redux/actionTypes";
 import { dbUsers, debounce, hideSearchedUsersList, sidebarVisibility, writeToDb } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
@@ -350,17 +350,18 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  async function acceptConnectionReq() {
+  async function acceptConnectionReq(userName) {
+    console.log('acceptConnectionReq',userName)
 
-    if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
+    if (userData?.requests?.hasOwnProperty(userName)) {
 
-      let connectionId = userData.requests[selectedUserToChat]?.id
-      let deletedTill = userData.requests[selectedUserToChat]?.deletedTill;
+      let connectionId = userData.requests[userName]?.id;
+      let deletedTill = userData.requests[userName]?.deletedTill;
 
       // console.log('connecyion id', connectionId, userData.requests)
 
-      delete userData.requests[selectedUserToChat];
-      // console.log('connection id after', connectionId, userData.requests)
+      delete userData.requests[userName];
+      console.log('connection id after', connectionId, userData)
 
       //moving connection from req list to connection list 
       const docRef = doc(db, "users", userData?.id);
@@ -368,7 +369,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         requests: userData.requests,
         connections: {
           ...userData.connections,
-          [selectedUserToChat]: {
+          [userName]: {
             id: connectionId,
             deletedTill: deletedTill,
           },
@@ -397,7 +398,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   async function deleteConnection(id) {
 
     //connection is moved to req list after deleting msgs
-    // console.log('id', id)
+    console.log('deleteConnection', id)
     if (userData?.connections?.hasOwnProperty(id)) {
 
       let connectionId = userData.connections[id]?.id;
@@ -515,14 +516,14 @@ export const NewRTCA = ({ firebaseApp }) => {
                 messageList?.map((msgData) => {
                   let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
                   return (
-                    <>
+                    <div key={msgData.id}>
                       {showChatDate(currDate) &&
                         <div className="text-center date">
                           <span className="fs-12">{currDate}</span>
                         </div>
                       }
-                      <MessageWrapper msgData={msgData} myself={currentUser?.displayName} key={msgData.id} />
-                    </>
+                      <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
+                    </div>
                   )
                 })
                 :
@@ -531,8 +532,8 @@ export const NewRTCA = ({ firebaseApp }) => {
             </div>
             {userData?.requests[selectedUserToChat] ?
               <div className="req_btn">
-                <section className="enq_btn accept" onClick={() => acceptConnectionReq()} >Accept</section>
-                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq()}>Delete</section>
+                <section className="enq_btn accept" onClick={() => acceptConnectionReq(selectedUserToChat)} >Accept</section>
+                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(selectedUserToChat)}>Delete</section>
               </div>
               :
               <div className="msg-input form-control border-0">
@@ -561,8 +562,14 @@ export const NewRTCA = ({ firebaseApp }) => {
                     return (
                       <div className="list" key={i}>
                         <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >{x}</section>
-                        <section className="blockConnection" onClick={() => blockConnection(x)} title="Block connection"><UserRoundX size={18} /></section>
-                        <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection"><Trash size={18} /></section>
+                        <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
+                          {/* <Trash size={18} /> */}
+                          <UserRoundX size={18} />
+                        </section>
+                        <section className="blockConnection" onClick={() => blockConnection(x)} title="Block connection">
+                          {/* <UserRoundX size={18} /> */}
+                          <Ban size={18}/>
+                        </section>
                       </div>
                     )
                   })}
@@ -579,9 +586,22 @@ export const NewRTCA = ({ firebaseApp }) => {
 
                 <div className="request_list">
                   {connectionsToShow.map((uName, i) => (
-                    <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
-                      {uName}
-                    </section>
+                    <div className="list" key={i}>
+                      <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
+                        {uName}
+                      </section>
+                      <section className="acceptReq" onClick={() => acceptConnectionReq(uName)} title="Accept connection">
+                        <UserCheck2 size={18} />
+                      </section>
+                      <section className="declineReq" onClick={() => declineConnectionReq(uName)} title="Decline connection">
+                        {/* <Trash size={18} /> */}
+                        <UserRoundX size={18} />
+                      </section>
+                      <section className="blockReq" onClick={() => declineConnectionReq(uName)} title="Block connection">
+                        {/* <UserRoundX size={18} /> */}
+                        <Ban size={18} />
+                      </section>
+                    </div>
                   ))}
                   {/* {Object.keys(userData?.requests).map((uName, i) => (
                     <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>

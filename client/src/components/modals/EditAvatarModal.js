@@ -130,7 +130,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
                     <div className='avatar_grid'>
                         {Array.from(Array(20).keys()).map((x, i) => {
-                            return <img src={getAvatarUrl(i + 1)} alt='skyblog' width='50px' onClick={e => handleAvatarChange(e)} className={`${getAvatarUrl(i + 1) === selectedAvatar ? 'slectedAvatar' : ''}`} />
+                            return <img src={getAvatarUrl(i + 1)} alt='skyblog' width='50px' onClick={e => handleAvatarChange(e)} className={`${getAvatarUrl(i + 1) === selectedAvatar ? 'slectedAvatar' : ''}`} key={i} />
                         })}
                     </div>
                     <div className='p-2 rounded-bottom select_avatar_btn'>

@@ -53,6 +53,7 @@
 - set the users usernsme in displayname of firebase and avatar in photourl
 - show err msg on incorrect login
 - username can npot be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
+- add professional and other versions
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
 - try firebase push notifications
 - add a option to share the app with your frnds,, create links to share on social media apps
@@ -109,6 +110,17 @@
 
 - # Block Connection
   - when blocked the connection will be moved to a field(blockedConnections) in user collection, (later can be unblocked from this list)
+  - if one is blocked, will he get to know that if he is blocked? probably no
+  - he can still send the message currently (maybe we can prohibit him to do so), so when he is unblocked , all the message will sent during the blocked period will also be shown to both of them
+  - when someone is unblocked,, he will be shown to req list based on if he has sent any message after he was unblocked.. user can still search him to send text, also all msgs will be shown(refer above statement)
+
+- # Search User List
+  - are following users allowed to be shown in search list?
+    - the one who are deleted;
+    - the one who are blocked?
+    - the one who's request is declined?
+    - user himself?
+  - all of them.. why? test one by one to check why not
   
 
 

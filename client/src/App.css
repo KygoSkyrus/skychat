@@ -421,11 +421,15 @@ input[type="search"] {
   border-radius: 4px;
 }
 
-.chat_list .list {
+.chat_list .list,
+.request_list .list {
   position: relative;
 }
 .deleteConnection,
-.blockConnection {
+.blockConnection,
+.acceptReq,
+.declineReq,
+.blockReq {
   position: absolute;
   right: -39px;
   top: 50%;
@@ -442,12 +446,26 @@ input[type="search"] {
   justify-content: center;
   align-items: center;
 }
-.chat_list .list:hover .deleteConnection {
+.chat_list .list:hover .blockConnection,
+.request_list .list:hover .blockReq {
   right: 1px;
 }
-.chat_list .list:hover .blockConnection {
+.chat_list .list:hover .deleteConnection,
+.request_list .list:hover .declineReq {
   right: 40px;
-  background: #dc3545a1;
+  background-color: #dc3545a1;
+}
+.request_list .list:hover .acceptReq {
+  right: 79px;
+  background-color: #5ef35e91;
+}
+
+.chat_list .list .blockConnection:hover svg,
+.chat_list .list .deleteConnection:hover svg,
+.request_list .list .acceptReq:hover svg, 
+.request_list .list .declineReq:hover svg, 
+.request_list .list .blockReq:hover svg {
+   transform: scale(1.1);
 }
 
 /*********************************************** custom LOADER ************************************************* */
@@ -627,9 +645,15 @@ input[type="search"] {
   background: #dadada;
 }
 #blockedConnModal .block_list{
+  position: relative;
   background-color: rgb(218, 218, 218);
   overflow: auto;
   height: calc(100% - 3.5rem);
+  /* background-image: url(./assets/light_bg.jpg);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.1; */
 }
 #blockedConnModal .block_list::-webkit-scrollbar {
   /* display: none; */
@@ -660,6 +684,13 @@ input[type="search"] {
 }
 #blockedConnModal .block_list .list:hover .unblock_overlay{
   opacity: 1;
+}
+#blockedConnModal .emptyList{
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
 }
 
 
