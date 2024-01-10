@@ -17,7 +17,7 @@ const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
         if (userData?.blockList?.hasOwnProperty(id)) {
 
             let connectionId = userData.blockList[id]?.id;
-            // let deletedTill = userData.blockList[id]?.blockedAt;
+            let deletedTill = userData.blockList[id]?.blockedAt;
 
             //removing connection from block list 
             delete userData.blockList[id];
@@ -29,8 +29,8 @@ const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
                     ...userData.requests,
                     [id]: {
                         id: connectionId,
-                        //   deletedTill: deletedTill,
-                        deletedTill: serverTimestamp(),
+                        deletedTill: deletedTill,
+                        // deletedTill: serverTimestamp(),
                     }
                 },
             });

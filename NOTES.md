@@ -37,7 +37,7 @@
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - scroll down is not working
 - all the parts like sidebar, chathead etc can go to deifferent component
-
+- when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time
 # Todo 
 - when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 - add a search icon next to user serch input
@@ -112,7 +112,7 @@
   - when blocked the connection will be moved to a field(blockedConnections) in user collection, (later can be unblocked from this list)
   - if one is blocked, will he get to know that if he is blocked? probably no
   - he can still send the message currently (maybe we can prohibit him to do so), so when he is unblocked , all the message will sent during the blocked period will also be shown to both of them
-  - when someone is unblocked,, he will be shown to req list based on if he has sent any message after he was unblocked.. user can still search him to send text, also all msgs will be shown(refer above statement)
+  - when someone is unblocked,, he will be shown to req list based on if he has sent any message after he was blocked.. user can still search him to send text, also all msgs will be shown(refer above statement)
 
 - # Search User List
   - are following users allowed to be shown in search list?

@@ -14,7 +14,7 @@ import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delet
 
 
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, } from "firebase/firestore";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, } from "firebase/firestore";
 
 
 
@@ -45,8 +45,9 @@ export const NewRTCA = ({ firebaseApp }) => {
   useEffect(() => {
     // const currentUser = auth.currentUser;
 
-    //send this function to utils as it might be called for on eor mor component
-    checkAuthStatus();
+    //moved to app [10-1-24]
+    // //send this function to utils as it might be called for one or more component
+    // checkAuthStatus();
 
     //getting all users (have to mve it somewhere whwere eit wont run on every stsate chnages, as its calling db on every stsata chnages decreasing the reads per day... add in usememo, usecallback)
     getAllUsersList()
@@ -76,6 +77,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   }, [userData])
 
 
+   
+  /* //moved to app [10-1-24]
   async function checkAuthStatus() {
     await auth.onAuthStateChanged((user) => {
       // console.log('authstate changed NWRTC', user)
@@ -90,13 +93,14 @@ export const NewRTCA = ({ firebaseApp }) => {
       }
     });
   }
+  */
 
   async function getAllUsersList() {
 
     //this should be moved to redux
     setAllUsersList(dbUsers);
 
-    // commented for testing
+    // //commented for testing  
     // await getDocs(collection(db, "users"))
     // .then((querySnapshot) => {
     //   const newData = querySnapshot.docs
@@ -106,7 +110,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     // })
   }
 
-
+/* //moved to app [10-1-24]
   async function getCurrentUserData(username) {
     //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
     let userObj;
@@ -126,6 +130,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     return userObj;
   }
+  */
 
 
 
@@ -356,7 +361,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     if (userData?.requests?.hasOwnProperty(userName)) {
 
       let connectionId = userData.requests[userName]?.id;
-      let deletedTill = userData.requests[userName]?.deletedTill;
+      let deletedTill = userData.requests[userName]?.deletedTill || Timestamp.fromDate(new Date('1970'));
 
       // console.log('connecyion id', connectionId, userData.requests)
 
@@ -378,12 +383,12 @@ export const NewRTCA = ({ firebaseApp }) => {
     }
   }
 
-  async function declineConnectionReq() {
+  async function declineConnectionReq(userName) {
 
     //delete msgs here , don't remove from req list
-    if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
-      // delete userData.requests[selectedUserToChat];
-      userData.requests[selectedUserToChat].deletedTill = serverTimestamp();
+    if (userData?.requests?.hasOwnProperty(userName)) {
+      // delete userData.requests[userName];
+      userData.requests[userName].deletedTill = serverTimestamp();
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
@@ -423,18 +428,27 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function blockConnection(id) {
 
+    let connectionId='';
     //connection is moved to block list from connection list or req list / messages are not deketed
     console.log('id', id)
     //current only connection list is handled here
     if (userData?.connections?.hasOwnProperty(id)) {
-
-      let connectionId = userData.connections[id]?.id;
+      connectionId = userData.connections[id]?.id;
       delete userData.connections[id];
+      updateUserDoc();
+    }else if (userData?.requests?.hasOwnProperty(id)){
+      connectionId = userData.requests[id]?.id;
+      delete userData.requests[id];
+      updateUserDoc();
+    }
+
+    async function updateUserDoc(){
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         connections: userData.connections,
+        requests: userData.requests,
         blockList: {
           ...userData.blockList,
           [id]: {
@@ -494,6 +508,9 @@ export const NewRTCA = ({ firebaseApp }) => {
             </section>
             <section
               className={`request_header pointer bg-danger ${!connectionHeader && 'header_shadow request_header_lg'}`} onClick={() => setConnectionHeader(false)}>
+
+{/* this should be the main badge indicator */}
+                {connectionsToShow.length}-
               {connectionHeader ? <UserPlus2 size={15} /> : <span className="me-1">Connection Requests</span>}
 
               {userData?.requests && Object.keys(userData?.requests)?.length > 0 &&
@@ -516,7 +533,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                 messageList?.map((msgData) => {
                   let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
                   return (
-                    <div key={msgData.id}>
+                    <div key={msgData.id} className="d-flex flex-column">
                       {showChatDate(currDate) &&
                         <div className="text-center date">
                           <span className="fs-12">{currDate}</span>
@@ -597,7 +614,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                         {/* <Trash size={18} /> */}
                         <UserRoundX size={18} />
                       </section>
-                      <section className="blockReq" onClick={() => declineConnectionReq(uName)} title="Block connection">
+                      <section className="blockReq" onClick={() => blockConnection(uName)} title="Block connection">
                         {/* <UserRoundX size={18} /> */}
                         <Ban size={18} />
                       </section>
