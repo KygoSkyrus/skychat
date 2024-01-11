@@ -591,6 +591,20 @@ input[type="search"] {
   display: grid;
   opacity: 1;
 }
+#userModal .list{
+  list-style-type: none;
+  padding: 0;
+}
+#userModal .list .chat_list_item{
+  color: #fff;
+  background-color: var(--violet);
+  padding: 10px 34px;
+  border-radius: 15px;
+  border-bottom: 2px solid #353535;
+}
+
+
+
 
 /* AVATAR EIDT MOAL */
 #avatarModal .avatar_grid {

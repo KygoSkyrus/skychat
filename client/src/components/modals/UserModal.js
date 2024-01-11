@@ -37,7 +37,7 @@ const UserModal = ({ setShowUserModal }) => {
                         <section className='uname mt-2'>{userData?.username}</section>
                         <section className='email fs-10 text-secondary'>{userData?.email}</section>
 
-                        <ul className='list list-group-item-danger mt-3'>
+                        <ul className='list mt-3'>
                             <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Blocked connections</li>
                         </ul>
 
