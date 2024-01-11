@@ -1,20 +1,16 @@
 import React, { useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
-
-// import firebase from "firebase/compat/app";
-import { initializeApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
+import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 
 // Components
 import "./App.css";
 import { NewRTCA } from "./components/NewRTCA";
 import Authenticate from "./components/Authenticate";
 import Error from "./components/Error"
-import { firebaseConfig } from "./firebaseConfig";
-import { useDispatch } from "react-redux";
 import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
-import { getAuth } from "firebase/auth";
-import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 
 
 
@@ -82,6 +78,7 @@ function App({firebaseApp}) {
 
           <Route exact path="*" element={<Error />} />
         </Routes>
+        {/* <div className="body-bg"><span>SKYCHAT</span></div> */}
       </>
     </div>
   );

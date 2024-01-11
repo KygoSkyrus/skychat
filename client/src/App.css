@@ -13,6 +13,32 @@ body {
   background: #1b1b1b;
   background: var(--black1);
 }
+.body-bg{
+  position: absolute;
+  /* left: 50%;
+  transform: translateX(-50%); */
+  right: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  
+  background-image: url(./assets/page_bg-removebg-preview.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  padding-bottom: 8px;
+}
+.body-bg span{
+  color: var(--violet);
+  padding: 5px 15px;
+  border-radius: 4px;
+  /* font-weight: bold; */
+  letter-spacing: 7px;
+}
 
 /* BASIC CSS */
 .pointer {

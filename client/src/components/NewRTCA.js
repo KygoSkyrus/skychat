@@ -36,6 +36,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
+  const [till,setTill]=useState(''); // has the date till when chats are deleted for selcted user
+
   const currentUser = useSelector(state => state.user.currentUser)
   const userData = useSelector(state => state.user.userInfo)
   console.log('currentUser', currentUser)
@@ -77,7 +79,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   }, [userData])
 
 
-   
+
   /* //moved to app [10-1-24]
   async function checkAuthStatus() {
     await auth.onAuthStateChanged((user) => {
@@ -110,27 +112,27 @@ export const NewRTCA = ({ firebaseApp }) => {
     // })
   }
 
-/* //moved to app [10-1-24]
-  async function getCurrentUserData(username) {
-    //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
-    let userObj;
-    const q = query(collection(db, "users"), where("username", "==", username));
-
-    //for getting real-time updates of user doc
-    onSnapshot(q, (querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        // console.log("UPDATED USER => ", doc.data());
-        userObj = doc.data();
-        userObj.id = doc.id
-        // setUserData(userObj)
-        dispatch({ type: SET_USER_INFO, payload: userObj })
+  /* //moved to app [10-1-24]
+    async function getCurrentUserData(username) {
+      //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
+      let userObj;
+      const q = query(collection(db, "users"), where("username", "==", username));
+  
+      //for getting real-time updates of user doc
+      onSnapshot(q, (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          // console.log("UPDATED USER => ", doc.data());
+          userObj = doc.data();
+          userObj.id = doc.id
+          // setUserData(userObj)
+          dispatch({ type: SET_USER_INFO, payload: userObj })
+        });
       });
-    });
-    console.log('USEROBJ------_________', userObj)
-
-    return userObj;
-  }
-  */
+      console.log('USEROBJ------_________', userObj)
+  
+      return userObj;
+    }
+    */
 
 
 
@@ -192,11 +194,13 @@ export const NewRTCA = ({ firebaseApp }) => {
       connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.connections[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
+      // getTexts(connectionId, till)
     } else if (userData?.requests?.hasOwnProperty(userToChat)) {
       console.log('has as request')
       connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.requests[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
+      // getTexts(connectionId, till)
     } else {
       console.log('is not a connection')
       setMessageList([])
@@ -204,10 +208,19 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
   async function getTexts(connectionId, chatsTill) {
-    console.log('gettexts', connectionId)
+    // NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS 
+    let c;
+    if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
+      c = userData?.connections[selectedUserToChat]?.deletedTill
+    } else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
+      c = userData?.requests[selectedUserToChat]?.deletedTill
+    }
+    console.log('gettexts', connectionId,selectedUserToChat,userData,c)
+
 
     //only messages after last delete are queried
     let q;
+    // let q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(20));
     if (chatsTill) {
       q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(20));
     } else {
@@ -222,6 +235,10 @@ export const NewRTCA = ({ firebaseApp }) => {
         let data = doc.data()
         data.id = doc.id;
         msgs.push(data);
+
+        //when msgs are sent than the deleted msgs were also getting loaded bcz upper query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not
+ console.log('chatsTillchatsTillchatsTillchatsTillchatsTillchatsTillchatsTillchatsTill',chatsTill)
+
 
         //only play sound if the message's timestamp and current timestap are close (in btw 2s)
         const date1 = data.time?.toDate();
@@ -355,8 +372,29 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
+  async function clearChat(id) {
+
+    //connection is moved to req list after deleting msgs
+    console.log('clearChats', id)
+    if (userData?.connections?.hasOwnProperty(id)) {
+
+      // let connectionId = userData.connections[id]?.id;
+      userData.connections[id].deletedTill = serverTimestamp();
+
+      //deleting connection req from req list 
+      const docRef = doc(db, "users", userData?.id);
+      await updateDoc(docRef, {
+        connections: userData.connections,
+      });
+
+      // setSelectedUserToChat(undefined)
+    }
+  }
+
+
+
   async function acceptConnectionReq(userName) {
-    console.log('acceptConnectionReq',userName)
+    console.log('acceptConnectionReq', userName)
 
     if (userData?.requests?.hasOwnProperty(userName)) {
 
@@ -428,7 +466,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   async function blockConnection(id) {
 
-    let connectionId='';
+    let connectionId = '';
     //connection is moved to block list from connection list or req list / messages are not deketed
     console.log('id', id)
     //current only connection list is handled here
@@ -436,13 +474,13 @@ export const NewRTCA = ({ firebaseApp }) => {
       connectionId = userData.connections[id]?.id;
       delete userData.connections[id];
       updateUserDoc();
-    }else if (userData?.requests?.hasOwnProperty(id)){
+    } else if (userData?.requests?.hasOwnProperty(id)) {
       connectionId = userData.requests[id]?.id;
       delete userData.requests[id];
       updateUserDoc();
     }
 
-    async function updateUserDoc(){
+    async function updateUserDoc() {
 
       //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
@@ -488,11 +526,13 @@ export const NewRTCA = ({ firebaseApp }) => {
 
               <div className="dropdown">
                 <div className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></div>
-                <ul className="dropdown-menu p-2">
-                  <li className="dropdown-item pointer">Block</li>
-                  <li className="dropdown-item pointer">Clear chats</li>
-                  <li className="dropdown-item pointer">Remove connection</li>
-                </ul>
+                {userData?.connections.hasOwnProperty(selectedUserToChat) &&
+                  <ul className="dropdown-menu p-2">
+                    <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chats</li>
+                    <li className="dropdown-item pointer" onClick={() => blockConnection(selectedUserToChat)}>Block connection</li>
+                    <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>Remove connection</li>
+                  </ul>
+                }
               </div>
 
             </div>
@@ -509,8 +549,8 @@ export const NewRTCA = ({ firebaseApp }) => {
             <section
               className={`request_header pointer bg-danger ${!connectionHeader && 'header_shadow request_header_lg'}`} onClick={() => setConnectionHeader(false)}>
 
-{/* this should be the main badge indicator */}
-                {connectionsToShow.length}-
+              {/* this should be the main badge indicator */}
+              {connectionsToShow.length}-
               {connectionHeader ? <UserPlus2 size={15} /> : <span className="me-1">Connection Requests</span>}
 
               {userData?.requests && Object.keys(userData?.requests)?.length > 0 &&
@@ -585,7 +625,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                         </section>
                         <section className="blockConnection" onClick={() => blockConnection(x)} title="Block connection">
                           {/* <UserRoundX size={18} /> */}
-                          <Ban size={18}/>
+                          <Ban size={18} />
                         </section>
                       </div>
                     )

@@ -66,7 +66,8 @@
 
 # wouldnt hurt to have
 - add msgs copy and reply feature (least pripority)
-
+- msg delete option for both parties if the msg was sent in between a specific hour 
+- delete a SINGLE MSG
 
 
 
@@ -83,6 +84,7 @@
   - message is added in db with the connectionid 
 
   - # UI
+    - when a chat is opened at the top header the selected person to chat dp will be shown, which will have a dropdown for basic operation such as block, clear chat, delete connection, this dropdown will only be available for a connection and not for conecction in reqlist
     - In UI there will be two headers compartments. one of which will always be 90% width, initailly it will be "CONNECTIONS", which will show all the connections of user and the Second header will be of "CONNECTION REQUEST",
     - on clicking either of them will shrink the other header down. (also when shrinked , replace the header with a relatable icon [can use user icon or chat icon])
     - on hovering over userlist in both connection and request list, it should show basic actions like delete chat, remove connection,,,, on request like there can be like accept or remove connection
