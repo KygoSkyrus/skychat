@@ -32,6 +32,11 @@
 - for msgs theier will be cachhe,, maybe with a cron job
 
 
+
+# ISSUE
+1. when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)
+
+
 # Defects
 -   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
 - add debounce in typing search user

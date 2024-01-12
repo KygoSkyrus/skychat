@@ -36,7 +36,6 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
-  const [till, setTill] = useState(''); // has the date till when chats are deleted for selcted user
 
   const currentUser = useSelector(state => state.user.currentUser)
   const userData = useSelector(state => state.user.userInfo)
@@ -77,7 +76,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     //setting connection req list
     if (userData) {
       fetchData();
-      if (selectedUserToChat) retrieveTexts(selectedUserToChat)
+      // if (selectedUserToChat) retrieveTexts(selectedUserToChat) // commented for issue #1
     }
   }, [userData])
 
@@ -197,13 +196,11 @@ export const NewRTCA = ({ firebaseApp }) => {
       connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.connections[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
-      // getTexts(connectionId, till)
     } else if (userData?.requests?.hasOwnProperty(userToChat)) {
       // console.log('has as request')
       connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
       chatsTill = userData?.requests[userToChat]?.deletedTill
       getTexts(connectionId, chatsTill)
-      // getTexts(connectionId, till)
     } else {
       // console.log('is not a connection')
       setMessageList([])
@@ -211,13 +208,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
   async function getTexts(connectionId, chatsTill) {
-    // NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS 
-    let c;
-    if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
-      c = userData?.connections[selectedUserToChat]?.deletedTill
-    } else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
-      c = userData?.requests[selectedUserToChat]?.deletedTill
-    }
+    
     console.log('gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
 
@@ -229,7 +220,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
     }
 
-    //in here also there is a change that user has a connection but never chated with him so we need to run the below else part here too
+    if(connectionId){
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const msgs = [];
       console.log('chat snapshot running...')
@@ -237,10 +228,6 @@ export const NewRTCA = ({ firebaseApp }) => {
         let data = doc.data()
         data.id = doc.id;
         msgs.push(data);
-
-        //when msgs are sent than the deleted msgs were also getting loaded bcz upper query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not
-        console.log('chatsTillchatsTillchatsTillchatsTillchatsTillchatsTillchatsTillchatsTill', chatsTill)
-
 
         //only play sound if the message's timestamp and current timestap are close (in btw 2s)
         const date1 = data.time?.toDate();
@@ -256,7 +243,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       setMessageList(msgs)
       dummy.current?.scrollIntoView({ behaviour: 'smooth' })
     });
-
+  }
   }
 
   async function sendText() {
@@ -341,8 +328,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         connections: userData.connections,
       });
 
-      // retrieveTexts(id)
-      // setSelectedUserToChat(undefined)
+      setSelectedUserToChat(undefined)
     }
   }
 
