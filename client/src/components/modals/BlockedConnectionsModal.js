@@ -7,6 +7,7 @@ import { doc, getFirestore, serverTimestamp, updateDoc } from 'firebase/firestor
 const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
 
     const userData = useSelector(state => state.user.userInfo)
+    const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
 
     const firebaseApp = useSelector(state => state.firebase.firebaseApp)
     const db = getFirestore(firebaseApp);
@@ -56,7 +57,10 @@ const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
                             Object.keys(userData?.blockList).map((x, i) => {
                                 return (
                                     <div className="list" key={i}>
-                                        <section className="block_list_item">{x}</section>
+                                        <section className="block_list_item">
+                                            <img src={usersList[x]?.avatar} className="me-2" alt="" />
+                                            <span>{x}</span>
+                                        </section>
                                         {/* <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection"><Trash size={18} /></section> */}
                                         <section onClick={() => unblockSelectedUser(x)} className='unblock_overlay' title='Unblock connection'><UserCheck2 /></section>
                                     </div>
@@ -64,7 +68,7 @@ const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
                             })
                             :
                             // <section className='emptyList'>No Blocked connections</section>
-                            <section className='emptyList'>It's empty <br/>Go block someone</section>
+                            <section className='emptyList'>It's empty <br />Go block someone</section>
                         }
                     </div>
 

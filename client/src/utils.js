@@ -1,34 +1,63 @@
 import { addDoc, collection, doc, getFirestore, updateDoc } from "firebase/firestore"
 import { useSelector } from "react-redux"
 
-export const dbUsers = [
-    {
+export const dbUsers = {
+    "test1": {
+        "connections": {},
+        "username": "test1",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2Favatar%20(8).png?alt=media&token=4c4b0ea3-519f-430c-9f0f-8c24df8d163c",
+        "email": "test1@email.com",
+        "requests": {
+            "test2": {
+                "deletedTill": {
+                    "seconds": 1704961618,
+                    "nanoseconds": 801000000
+                },
+                "id": "22e318c9-f125-4e07-9b14-1f74e9047eb2"
+            }
+        },
+        "blockList": {},
         "time": {
             "seconds": 1704899512,
             "nanoseconds": 878000000
         },
-        "blockList": {},
-        "email": "test1@email.com",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2Favatar%20(8).png?alt=media&token=4c4b0ea3-519f-430c-9f0f-8c24df8d163c",
-        "username": "test1",
-        "connections": {},
-        "requests": {},
         "id": "AMaRvZRYFUMabQKINmNF"
     },
-    {
-        "email": "test2@email.com",
+    "test3": {
+        "blockList": {},
+        "time": {
+            "seconds": 1705165774,
+            "nanoseconds": 289000000
+        },
+        "requests": {},
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "email": "test3@email.com",
+        "username": "test3",
+        "connections": {},
+        "id": "I5q047QCTEAgMowlYLBE"
+    },
+    "test2": {
+        "requests": {},
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "connections": {
+            "test1": {
+                "id": "22e318c9-f125-4e07-9b14-1f74e9047eb2",
+                "deletedTill": {
+                    "seconds": 1705054641,
+                    "nanoseconds": 802000000
+                }
+            }
+        },
         "blockList": {},
         "time": {
             "seconds": 1704899556,
             "nanoseconds": 460000000
         },
         "username": "test2",
-        "requests": {},
-        "connections": {},
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "email": "test2@email.com",
         "id": "MSOGk7iP40CehhYW5x5I"
-    },
-]
+    }
+}
 
 export function getDateStr(date) {
     let d = new Date(date)

@@ -8,13 +8,13 @@ import hamburger from "./../assets/menu.png";
 import notification from "./../assets/discord.mp3";
 import MessageWrapper from "./MessageWrapper";
 import Sidebar from "./Sidebar";
-import { SET_CURRENT_USER, SET_USER_INFO } from "../redux/actionTypes";
+import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
 import { dbUsers, debounce, hideSearchedUsersList, sidebarVisibility, writeToDb } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, } from "firebase/firestore";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 
 
 
@@ -27,10 +27,11 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   let prevDate = '';
   const dummy = useRef();
-  const [allUsersList, setAllUsersList] = useState() // all the existing users in the db
+  const lastVisible = useRef(null);
+  const [loading, setLoading] = useState(false);
   const [searchedUserList, setSearchedUserList] = useState() // queries user list
   const [selectedUserToChat, setSelectedUserToChat] = useState()
-  const [messageList, setMessageList] = useState() //messages with the current user
+  const [messageList, setMessageList] = useState([]) //messages with the current user
   const [currentText, setcurrentText] = useState('') // currently typed text
   // const [userData, setUserData] = useState() // user info like connection list, email
   const [connectionHeader, setConnectionHeader] = useState(true)
@@ -39,6 +40,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   const currentUser = useSelector(state => state.user.currentUser)
   const userData = useSelector(state => state.user.userInfo)
+  const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
 
   console.log('===============================================================================')
 
@@ -99,20 +101,28 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
   */
 
+  //getting alluser may not be needed,, just query the user when user search,,...its only needed bcz of avatar,,we have only stored username in the connecction list,,if we can also store the image than this willbe not needed at all... and if its still needed than create a snapshot at the topmost level so that it wont be trigggered in any case,, also cache this and this will only run when a new user is created(snapshot will handle that)...
   async function getAllUsersList() {
 
     //this should be moved to redux
-    setAllUsersList(dbUsers);
+    // setAllUsersList(dbUsers);
+    dispatch({ type: SET_USERS_LIST, payload: dbUsers })
 
-    // //commented for testing  
+    //commented for testing 
     // await getDocs(collection(db, "users"))
     // .then((querySnapshot) => {
-    //   const newData = querySnapshot.docs
-    //     .map((doc) => ({ ...doc.data(), id: doc.id }));
-    //   setAllUsersList(newData);
-    //   console.log('alluserlist',newData);
-    // })
+    //   let userList={};
+    //   querySnapshot.docs
+    //     .map((doc) => {
+    //       let data= doc.data();
+    //       data.id=doc.id;
+    //       // console.log('dddddd',data)
+    //       userList[data.username] = data;
+    //     });
+    //     setAllUsersList(userList);
+    //   })
   }
+  // console.log('alluserlist',usersList);
 
   /* //moved to app [10-1-24]
     async function getCurrentUserData(username) {
@@ -207,43 +217,91 @@ export const NewRTCA = ({ firebaseApp }) => {
     }
   }
 
+
+  // Real-time updates for new messages
+  // const messagesRef = collection(db, 'your_collection');
+  // const realtimeListener = onSnapshot(query(messagesRef, orderBy('timestamp', 'desc'), limit(1)), (snapshot) => {
+  //   snapshot.docChanges().forEach((change) => {
+  //     if (change.type === 'added') {
+  //       const newMessage = { id: change.doc.id, ...change.doc.data() };
+  //       setMessageList((prevMessages) => [newMessage, ...prevMessages]);
+  //     }
+  //   });
+  // });
+
+
   async function getTexts(connectionId, chatsTill) {
-    
+
     console.log('gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
+    // NEW TRY
+    const messagesRef = collection(db, 'v2');
+    let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
+
+    if (lastVisible.current) {
+      console.log('lastVisible.current', lastVisible.current)
+      queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+    }
+
+    const querySnapshot = await getDocs(queryRef);
+    const newMessages = [];
+
+    querySnapshot.forEach((doc) => {
+      newMessages.push({ id: doc.id, ...doc.data() });
+    });
+
+    newMessages.reverse()
+    console.log('oldMsagesss--------', messageList)
+
+    console.log('newmesssagesss--------', newMessages)
+
+    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+    // dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+
+    // Update the reference to the last visible document
+    const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+    lastVisible.current = lastDoc;
+    // NEW TRY END
+    return;
 
     //only messages after last delete are queried
     let q;
     if (chatsTill) {
-      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(20));
+      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
     } else {
-      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(20));
+      q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
     }
 
-    if(connectionId){
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const msgs = [];
-      console.log('chat snapshot running...')
-      querySnapshot.forEach((doc) => {
-        let data = doc.data()
-        data.id = doc.id;
-        msgs.push(data);
+    if (connectionId) {
+      onSnapshot(q, (querySnapshot) => {
 
-        //only play sound if the message's timestamp and current timestap are close (in btw 2s)
-        const date1 = data.time?.toDate();
-        const date2 = new Date();
-        const diffTime = Math.abs(date2 - date1);
-        if (diffTime <= 2000) {
-          const audio = new Audio(notification);
-          audio.play();
+        if (lastVisible.current) {
+          console.log('lastVisible.current', lastVisible.current)
+          q = startAfter(lastVisible.current);
         }
+
+        const msgs = [];
+        console.log('chat snapshot running...')
+        querySnapshot.forEach((doc) => {
+          let data = doc.data()
+          data.id = doc.id;
+          msgs.push(data);
+
+          //only play sound if the message's timestamp and current timestap are close (in btw 2s)
+          const date1 = data.time?.toDate();
+          const date2 = new Date();
+          const diffTime = Math.abs(date2 - date1);
+          if (diffTime <= 2000) {
+            const audio = new Audio(notification);
+            audio.play();
+          }
+        });
+        msgs.reverse()
+        console.log("Current messages: ", msgs);
+        setMessageList(msgs)
+        dummy.current?.scrollIntoView({ behaviour: 'smooth' })
       });
-      msgs.reverse()
-      console.log("Current messages: ", msgs);
-      setMessageList(msgs)
-      dummy.current?.scrollIntoView({ behaviour: 'smooth' })
-    });
-  }
+    }
   }
 
   async function sendText() {
@@ -331,8 +389,6 @@ export const NewRTCA = ({ firebaseApp }) => {
       setSelectedUserToChat(undefined)
     }
   }
-
-
 
   async function acceptConnectionReq(userName) {
     console.log('acceptConnectionReq', userName)
@@ -442,13 +498,40 @@ export const NewRTCA = ({ firebaseApp }) => {
     }
   }
 
+
+  console.log('messagelist-----_____---', messageList)
+
+
+  const loadMoreTexts = async () => {
+    setLoading(true);
+
+    try {
+      retrieveTexts(selectedUserToChat)
+
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleScroll = (e) => {
+    const { scrollTop, clientHeight, scrollHeight } = e.target;
+
+    // Check if the user has scrolled to the top
+    if (scrollTop === 0 && !loading && messageList.length > 0) {
+      loadMoreTexts();
+    }
+  };
+
+
   return (
     <>
       <div className="outer">
 
         {/***** SIDEBAR STARTS ******/}
         <Sidebar
-          allUsersList={allUsersList}
           searchedUserList={searchedUserList}
           setSearchedUserList={setSearchedUserList}
           handleSelectedUserToChat={handleSelectedUserToChat}
@@ -491,13 +574,13 @@ export const NewRTCA = ({ firebaseApp }) => {
             <section
               className={`request_header pointer bg-danger ${!connectionHeader && 'header_shadow request_header_lg'}`} onClick={() => setConnectionHeader(false)}>
 
-              {/* this should be the main badge indicator */}
-              {connectionsToShow.length}-
+              {/* just to check total requests */}
+              {userData?.requests && Object.keys(userData?.requests)?.length}-
               {connectionHeader ? <UserPlus2 size={15} /> : <span className="me-1">Connection Requests</span>}
 
-              {userData?.requests && Object.keys(userData?.requests)?.length > 0 &&
+              {connectionsToShow?.length > 0 &&
                 <span className="req_badge">
-                  {Object.keys(userData?.requests)?.length}
+                  {connectionsToShow.length}
                 </span>}
             </section>
           </div>
@@ -509,7 +592,12 @@ export const NewRTCA = ({ firebaseApp }) => {
         {/***** CHAT BODY STARTS ******/}
         {selectedUserToChat ?
           <div className="chat-body" >
-            <div className="chat-box" id="chatBox">
+            <div className="chat-box" id="chatBox" onScroll={handleScroll}>
+              {loading ?
+                <section className="text-center">LOADING...</section>
+                :
+                <section className="text-center">Load more texts</section>
+              }
 
               {messageList?.length > 0 ?
                 messageList?.map((msgData) => {
@@ -526,7 +614,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                   )
                 })
                 :
-                <section className="m-auto">No messages yet...</section>}
+                <section className="absolute-centered">No messages yet...</section>}
               <div ref={dummy}></div>
             </div>
             {userData?.requests[selectedUserToChat] ?
@@ -563,7 +651,10 @@ export const NewRTCA = ({ firebaseApp }) => {
                   Object.keys(userData?.connections).map((x, i) => {
                     return (
                       <div className="list" key={i}>
-                        <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >{x}</section>
+                        <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >
+                          <img src={usersList[x]?.avatar} className="me-2" alt="" />
+                          <span>{x}</span>
+                        </section>
                         <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
                           {/* <Trash size={18} /> */}
                           <UserRoundX size={18} />
@@ -590,7 +681,8 @@ export const NewRTCA = ({ firebaseApp }) => {
                   {connectionsToShow.map((uName, i) => (
                     <div className="list" key={i}>
                       <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
-                        {uName}
+                        <img src={usersList[uName]?.avatar} className="me-2" alt="" />
+                        <span>{uName}</span>
                       </section>
                       <section className="acceptReq" onClick={() => acceptConnectionReq(uName)} title="Accept connection">
                         <UserCheck2 size={18} />

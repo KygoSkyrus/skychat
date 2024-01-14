@@ -264,7 +264,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
             }
             <input type="email" className="form-control my-2" name="email" id="email1" placeholder="Email address" aria-describedby="emailHelp" value={userCredentials?.email} onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })} />
-            <input type="password" className="form-control" id="password1" name="password" placeholder="Password*" value={userCredentials?.password} onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })} />
+            <input type="password" className="form-control" id="password1" name="password" placeholder="Password*" value={userCredentials?.password} onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })} onKeyUp={(e) => e.key === "Enter" && handleClick()} />
             <button className='btn btn-outline-warning w-100 my-2' onClick={() => handleClick()}>{btnText}</button>
 
             <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>

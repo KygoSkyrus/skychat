@@ -33,9 +33,9 @@
 
 
 
-# ISSUE
-1. when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)
-
+# ISSUE (1=done,0=open)
+1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)
+2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
 
 # Defects
 -   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
@@ -49,6 +49,8 @@
 
 
 # Todo 
+- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
+- add loader (while loading mssgs or for dates)
 - add loading more msgs feature, only showing latest 20 rn
 - when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 - add a search icon next to user serch input

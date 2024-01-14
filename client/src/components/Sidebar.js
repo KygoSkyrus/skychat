@@ -8,11 +8,13 @@ import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
 
 
-const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserList, allUsersList }) => {
+const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserList }) => {
 
     const auth = getAuth();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo)
+    const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
+
 
     const [showUserModal, setShowUserModal] = useState(false)
 
@@ -34,7 +36,8 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
     }
 
     async function searchUser(e) {
-        let result = allUsersList.filter(user => user?.username?.includes(e.target.value))
+        // let result = usersList.filter(user => user?.username?.includes(e.target.value))
+        let result = Object.keys(usersList).filter(user => user.includes(e.target.value))
 
         let noResult = document.querySelector('.no-user')
         document.querySelector('.custom-loader')?.classList.add('d-none')//showing loader while typing
@@ -58,7 +61,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
 
     return (
         <>
-            <div className="w3-sidebar  w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
+            <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
                 <div style={{ height: "90%" }}>
 
                     <span onClick={() => sidebarVisibility(false, setSearchedUserList)} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
@@ -75,9 +78,9 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                     <div className="d-none" id="userSearchDropdown">
                         {searchedUserList?.map(x => {
                             return (
-                                <section className="dropdown-item pointer" key={x.id} onClick={e => handleSelectedUserToChat(x?.username)} style={{ width: "unset", margin: "0 0.5rem" }}>
-                                    {/* <img className="me-3" src={x.image} alt="shoppitt" height="50px" width="55px" /> */}
-                                    <span>{x?.username}</span>
+                                <section className="dropdown-item pointer p-1 px-2" key={x} onClick={e => handleSelectedUserToChat(x)}>
+                                    <img src={usersList[x]?.avatar} className='me-2' alt="" />
+                                    <span>{x}</span>
                                 </section>
                             )
                         })}
