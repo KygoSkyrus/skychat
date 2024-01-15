@@ -28,6 +28,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   let prevDate = '';
   const dummy = useRef();
   const lastVisible = useRef(null);
+  const chatBoxRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
   const [searchedUserList, setSearchedUserList] = useState() // queries user list
   const [selectedUserToChat, setSelectedUserToChat] = useState()
@@ -78,7 +80,9 @@ export const NewRTCA = ({ firebaseApp }) => {
     //setting connection req list
     if (userData) {
       fetchData();
-      // if (selectedUserToChat) retrieveTexts(selectedUserToChat) // commented for issue #1
+      // if (selectedUserToChat) retrieveTexts(selectedUserToChat) //added bcz without this onsnapshot womt work  // commented for issue #1
+
+      if (selectedUserToChat) realtimeListener(selectedUserToChat)
     }
   }, [userData])
 
@@ -218,49 +222,44 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  // Real-time updates for new messages
-  // const messagesRef = collection(db, 'your_collection');
-  // const realtimeListener = onSnapshot(query(messagesRef, orderBy('timestamp', 'desc'), limit(1)), (snapshot) => {
-  //   snapshot.docChanges().forEach((change) => {
-  //     if (change.type === 'added') {
-  //       const newMessage = { id: change.doc.id, ...change.doc.data() };
-  //       setMessageList((prevMessages) => [newMessage, ...prevMessages]);
-  //     }
-  //   });
-  // });
-
-
   async function getTexts(connectionId, chatsTill) {
 
     console.log('gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
     // NEW TRY
-    const messagesRef = collection(db, 'v2');
-    let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
+    if (connectionId) {
+      const messagesRef = collection(db, 'v2');
+      let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
 
-    if (lastVisible.current) {
-      console.log('lastVisible.current', lastVisible.current)
-      queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+      if (lastVisible.current) {
+        console.log('lastVisible.current', lastVisible.current)
+        queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+      }
+
+      const querySnapshot = await getDocs(queryRef);
+      const newMessages = [];
+
+      querySnapshot.forEach((doc) => {
+        newMessages.push({ id: doc.id, ...doc.data() });
+      });
+
+      newMessages.reverse()
+      console.log('oldMsagesss--------', messageList)
+
+      console.log('newmesssagesss--------', newMessages)
+
+      setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+      dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+
+      // Update the reference to the last visible document
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      lastVisible.current = lastDoc;
+
+
+      // //triggering realtime update func
+      // realtimeListener(connectionId)
+
     }
-
-    const querySnapshot = await getDocs(queryRef);
-    const newMessages = [];
-
-    querySnapshot.forEach((doc) => {
-      newMessages.push({ id: doc.id, ...doc.data() });
-    });
-
-    newMessages.reverse()
-    console.log('oldMsagesss--------', messageList)
-
-    console.log('newmesssagesss--------', newMessages)
-
-    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
-    // dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-
-    // Update the reference to the last visible document
-    const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-    lastVisible.current = lastDoc;
     // NEW TRY END
     return;
 
@@ -274,11 +273,6 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     if (connectionId) {
       onSnapshot(q, (querySnapshot) => {
-
-        if (lastVisible.current) {
-          console.log('lastVisible.current', lastVisible.current)
-          q = startAfter(lastVisible.current);
-        }
 
         const msgs = [];
         console.log('chat snapshot running...')
@@ -502,8 +496,40 @@ export const NewRTCA = ({ firebaseApp }) => {
   console.log('messagelist-----_____---', messageList)
 
 
-  const loadMoreTexts = async () => {
+
+  //   Real-time updates for new messages
+  async function realtimeListener(selectedUser) {
+    console.log('uddddd', selectedUser)
+
+    const messagesRef = collection(db, 'v2');
+    // if (chatsTill) {
+    //   q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
+    // } else {
+    //   q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
+    // }
+
+    const connectionId = userData?.connections[selectedUser]?.id;
+    if (connectionId) {
+      console.log('is connectionId true', connectionId)
+
+      onSnapshot(query(messagesRef, where("connectionId", "==", connectionId), orderBy('time', 'desc'), limit(1)), (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            const newMessage = { id: change.doc.id, ...change.doc.data() };
+            console.log('new--------------------', change, newMessage)
+            setMessageList((prevMessages) => [newMessage, ...prevMessages]);
+          }
+        });
+      });
+    }
+  }
+
+
+
+  const loadMoreTexts = async (target) => {
     setLoading(true);
+    const { scrollHeight } = target;
+    const prevheight = scrollHeight;
 
     try {
       retrieveTexts(selectedUserToChat)
@@ -512,6 +538,11 @@ export const NewRTCA = ({ firebaseApp }) => {
       console.error('Error fetching messages:', error);
     } finally {
       setLoading(false);
+
+      setTimeout(() => {
+        console.log('dfskjkjdfsjdfs', prevheight, chatBoxRef.current.scrollHeight)
+        chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight - prevheight
+      }, 500);
     }
   };
 
@@ -521,7 +552,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     // Check if the user has scrolled to the top
     if (scrollTop === 0 && !loading && messageList.length > 0) {
-      loadMoreTexts();
+      loadMoreTexts(e.target);
     }
   };
 
@@ -592,11 +623,16 @@ export const NewRTCA = ({ firebaseApp }) => {
         {/***** CHAT BODY STARTS ******/}
         {selectedUserToChat ?
           <div className="chat-body" >
-            <div className="chat-box" id="chatBox" onScroll={handleScroll}>
+            <div className="chat-box" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
               {loading ?
-                <section className="text-center">LOADING...</section>
+                <div class="text-center">
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only"></span>
+                  </div>
+                </div>
                 :
-                <section className="text-center">Load more texts</section>
+                <div className="text-center load_more"><span>load more</span></div>
+                // <section className="text-center spinner">Load more texts</section>
               }
 
               {messageList?.length > 0 ?

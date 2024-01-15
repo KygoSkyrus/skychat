@@ -77,7 +77,7 @@ export function getExactTimeStr(d) {
                 d?.getHours() :
                 d?.getHours() - 12))
         + ":" +
-        (d?.getMinutes())
+        (d?.getMinutes().toString().padStart(2, '0'))
         + " " +
         (d?.getHours() < 12 ? "AM" : "PM")
     )

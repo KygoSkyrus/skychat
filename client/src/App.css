@@ -124,7 +124,7 @@ body {
   grid-template-columns: repeat(10, 1fr);
   grid-column-gap: 0px;
   grid-row-gap: 0px;
-  background: #dadada;
+  /* background: #dadada; */
 }
 .connection_header {
   grid-area: 1 / 1 / 2 / 10;
@@ -247,6 +247,28 @@ body {
 .chat-body .chat-box::-webkit-scrollbar-thumb {
   background-color: rgb(92, 92, 92);
   border-radius: 4px;
+}
+
+.chat-body .chat-box .load_more span{
+  display: inline-block;
+  padding: 1px 17px;
+  min-width: 88px;
+  color: #eaeaea;
+  background: #35343457;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  top: -4px;
+  /* -webkit-animation: action 1s infinite  alternate;
+  animation: action 1s infinite  alternate; */
+}
+@-webkit-keyframes action {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+@keyframes action {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
 }
 
 .chat-body .chat-box .date span {

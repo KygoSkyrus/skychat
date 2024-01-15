@@ -34,7 +34,7 @@
 
 
 # ISSUE (1=done,0=open)
-1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)
+1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)  {maybe this can be done by setting mewssagelist to  null when user press back btn to go to chatlist}
 2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
 
 # Defects
