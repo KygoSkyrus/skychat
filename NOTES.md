@@ -10,7 +10,7 @@
 
 
 #### PRIORITY
-- whenever a request is declined,, set gthe selectedusertochat to undef so that that the request should not be kept showing
+- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
 - when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
 
 
@@ -29,37 +29,33 @@
 
 # MANAGING FREQUENT DB Calls
 - need to call db only when users doc is updated, like a connection is made or request recieved,,
-- for msgs theier will be cachhe,, maybe with a cron job
+- for msgs their will be cache,, maybe with a cron job
 
 
 
 # ISSUE (1=done,0=open)
 1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)  {maybe this can be done by setting mewssagelist to  null when user press back btn to go to chatlist}
 2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
+3. [0] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
+
 
 # Defects
 -   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
-- add debounce in typing search user
-- firebase is keeeping user logged in forever(can be good , like if user wants out than he can logout , or elese he will be logged in always)
-- u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - scroll down is not working
 - all the parts like sidebar, chathead etc can go to deifferent component
 - when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time
 - hide the author name if its private chat,,,only show when its group
-
+- there is a memory leak error on signinform
 
 # Todo 
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
+- u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - add loader (while loading mssgs or for dates)
 - add loading more msgs feature, only showing latest 20 rn
-- when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 - add a search icon next to user serch input
 - encrypt messages/passwords
-- add vc
-- user can search other users by therir username and send them msgs
-- the receipient will have to accet the msg rqst to see the msgs and then he can start with sender
+- add vc webrtc
 - option to create a group and add members 
-- webrtc
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - create a text like hovered toast if toasts are ever neeeded
@@ -73,14 +69,16 @@
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, thi sway you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
-
+## FINDINGS
+- firebase is keeeping user logged in forever(can be good , like if user wants out than he can logout , or elese he will be logged in always)
 
 
 
 # wouldnt hurt to have
+- delete a SINGLE MSG
 - add msgs copy and reply feature (least pripority)
 - msg delete option for both parties if the msg was sent in between a specific hour 
-- delete a SINGLE MSG
+- when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 
 
 

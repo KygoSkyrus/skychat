@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getFirestore, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, doc, getFirestore, serverTimestamp, updateDoc } from "firebase/firestore"
 import { useSelector } from "react-redux"
 
 export const dbUsers = {
@@ -140,7 +140,90 @@ export const defaultAvatar = 'https://firebasestorage.googleapis.com/v0/b/shopp-
 
 
 
-export async function updateUserDoc(db, id, newValue) {
-    const docRef = doc(db, "users", id);
-    await updateDoc(docRef, newValue);
+// export async function updateUserDoc(db, id, newValue) {
+//     const docRef = doc(db, "users", id);
+//     await updateDoc(docRef, newValue);
+// }
+
+
+export async function acceptConnectionReq(db, userData, userName) {
+    console.log('acceptConnectionReq', userName)
+
+    if (userData?.requests?.hasOwnProperty(userName)) {
+
+        let connectionId = userData.requests[userName]?.id;
+        let deletedTill = userData.requests[userName]?.deletedTill || Timestamp.fromDate(new Date('1970'));
+
+        // console.log('connecyion id', connectionId, userData.requests)
+
+        delete userData.requests[userName];
+        // console.log('connection id after', connectionId, userData)
+
+        //moving connection from req list to connection list 
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            requests: userData.requests,
+            connections: {
+                ...userData.connections,
+                [userName]: {
+                    id: connectionId,
+                    deletedTill: deletedTill,
+                },
+            }
+        });
+    }
+}
+
+export async function declineConnectionReq(db, userData, userName, setSelectedUserToChat) {
+    console.log('declineConnectionReq', userName)
+
+    //delete msgs here , don't remove from req list
+    if (userData?.requests?.hasOwnProperty(userName)) {
+        // delete userData.requests[userName];
+        userData.requests[userName].deletedTill = serverTimestamp();
+
+        //deleting connection req from req list 
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            requests: userData.requests,
+        });
+
+        setSelectedUserToChat(undefined)
+    }
+}
+
+export async function blockConnection(db, userData, id, setSelectedUserToChat) {
+
+    let connectionId = '';
+    //connection is moved to block list from connection list or req list / messages are not deketed
+    console.log('blockConnection', id)
+    //current only connection list is handled here
+    if (userData?.connections?.hasOwnProperty(id)) {
+        connectionId = userData.connections[id]?.id;
+        delete userData.connections[id];
+        updateUserDoc();
+    } else if (userData?.requests?.hasOwnProperty(id)) {
+        connectionId = userData.requests[id]?.id;
+        delete userData.requests[id];
+        updateUserDoc();
+    }
+
+    async function updateUserDoc() {
+
+        //deleting connection req from req list 
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            connections: userData.connections,
+            requests: userData.requests,
+            blockList: {
+                ...userData.blockList,
+                [id]: {
+                    id: connectionId,
+                    blockedAt: serverTimestamp(),
+                }
+            }
+        });
+
+        setSelectedUserToChat(undefined)//only call when inner block button is clicked, not on list's btn, so that component wont render bcz of unneccesary state update
+    }
 }
