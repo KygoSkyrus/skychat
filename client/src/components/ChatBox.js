@@ -23,6 +23,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
     const [loading, setLoading] = useState(false);
     const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
+    const [messageObj, setMessageObj] = useState({}) //messages with the current user
 
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
@@ -36,25 +37,26 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             // realtimeListener(selectedUserToChat)
 
 
-            // Set up the real-time listener for receiving messages
-            const connectionId = userData?.connections[selectedUserToChat]?.id;
-            const messagesRef = collection(db, 'v2');
-            const queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
+            // // Set up the real-time listener for receiving messages
+            // const connectionId = userData?.connections[selectedUserToChat]?.id;
+            // const messagesRef = collection(db, 'v2');
+            // const queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
 
-            const unsubscribe = onSnapshot(queryRef, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const newMessage = { id: change.doc.id, ...change.doc.data() };
-                        setMessageList((prevMessages) => [...prevMessages, newMessage]);
-                        dummy.current?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            });
+            // const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+            //     snapshot.docChanges().forEach((change) => {
+            //         if (change.type === 'added') {
+            //             const newMessage = { id: change.doc.id, ...change.doc.data() };
+            //             // setMessageList((prevMessages) => [...prevMessages, newMessage]);
+            //             setMessageObj({...messageObj, [change.doc.id]: newMessage})
+            //             dummy.current?.scrollIntoView({ behavior: 'smooth' });
+            //         }
+            //     });
+            // });
 
-            // Clean up the subscription when the component unmounts
-            return () => {
-                unsubscribe();
-            };
+            // // Clean up the subscription when the component unmounts
+            // return () => {
+            //     unsubscribe();
+            // };
 
         }
 
@@ -62,7 +64,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
 
 
-    console.log('messagelist-----_____---', messageList)
+    // console.log('messagelist-----_____---', messageList)
+    console.log('messageObj-----_____---', messageObj)
 
 
     async function retrieveTexts(userToChat) {
@@ -83,7 +86,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             getTexts(connectionId, chatsTill)
         } else {
             // console.log('is not a connection')
-            setMessageList([])
+            // setMessageList([])
+            setMessageObj({})
         }
     }
 
@@ -103,18 +107,24 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             }
 
             const querySnapshot = await getDocs(queryRef);
-            const newMessages = [];
+            // const newMessages = [];
+            const newMessagesObj = {};
 
             querySnapshot.forEach((doc) => {
-                newMessages.push({ id: doc.id, ...doc.data() });
+                // newMessages.push({ id: doc.id, ...doc.data() });
+                newMessagesObj[doc.id] = { id: doc.id, ...doc.data() }
             });
 
-            newMessages.reverse()
-            console.log('oldMsagesss--------', messageList)
+            // newMessages.reverse()
+            // console.log('oldMsagesss--------', messageList)
+            // console.log('newmesssagesss--------', newMessages)
 
-            console.log('newmesssagesss--------', newMessages)
+            console.log('oldMsagesss--------', messageObj)
+            console.log('newmesssagesss--------', newMessagesObj)
 
-            setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+            // setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+            setMessageObj({...messageObj,...newMessagesObj});
+
             dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
 
             // Update the reference to the last visible document
@@ -188,10 +198,10 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     const handleScroll = (e) => {
         const { scrollTop, clientHeight, scrollHeight } = e.target;
-
         // Check if the user has scrolled to the top
-        if (scrollTop === 0 && !loading && messageList.length > 0) {
-            loadMoreTexts(e.target);
+        // if (scrollTop === 0 && !loading && messageList.length > 0) {
+        if (scrollTop === 0 && !loading && Object.keys(messageObj)?.length > 0) {
+                loadMoreTexts(e.target);
         }
     };
 
@@ -310,22 +320,40 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                     // <section className="text-center spinner">Load more texts</section>
                 }
 
-                {messageList?.length > 0 ?
-                    messageList?.map((msgData) => {
-                        let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
-                        return (
-                            <div key={msgData.id} className="d-flex flex-column">
-                                {showChatDate(currDate) &&
-                                    <div className="text-center date">
-                                        <span className="fs-12">{currDate}</span>
-                                    </div>
-                                }
-                                <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
-                            </div>
-                        )
-                    })
-                    :
-                    <section className="absolute-centered">No messages yet...</section>
+                {
+                    Object.keys(messageObj)?.length > 0 ?
+                        Object.keys(messageObj)?.map((msgData) => {
+                            let currDate = messageObj[msgData]?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
+                            return (
+                                <div key={messageObj[msgData].id} className="d-flex flex-column">
+                                    {showChatDate(currDate) &&
+                                        <div className="text-center date">
+                                            <span className="fs-12">{currDate}</span>
+                                        </div>
+                                    }
+                                    <MessageWrapper msgData={messageObj[msgData]} myself={currentUser?.displayName} />
+                                </div>
+                            )
+                        })
+                        :
+                        <section className="absolute-centered">No messages yet...</section>
+
+                    // messageList?.length > 0 ?
+                    //     messageList?.map((msgData) => {
+                    //         let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
+                    //         return (
+                    //             <div key={msgData.id} className="d-flex flex-column">
+                    //                 {showChatDate(currDate) &&
+                    //                     <div className="text-center date">
+                    //                         <span className="fs-12">{currDate}</span>
+                    //                     </div>
+                    //                 }
+                    //                 <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
+                    //             </div>
+                    //         )
+                    //     })
+                    //     :
+                    //     <section className="absolute-centered">No messages yet...</section>
                 }
                 <div ref={dummy}></div>
             </div>
