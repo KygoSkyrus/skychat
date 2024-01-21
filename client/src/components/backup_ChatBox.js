@@ -9,7 +9,7 @@ import { acceptConnectionReq, blockConnection, declineConnectionReq, writeToDb }
 import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 
-// import _ from 'lodash';
+import _ from 'lodash';
 // import array from 'lodash/array';
 // import object from 'lodash/object';
 
@@ -27,19 +27,47 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
     const [loading, setLoading] = useState(false);
     const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
+    const [messageObj, setMessageObj] = useState({}) //messages with the current user
 
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
 
 
-    // NOTE : THE RETIRVETEXTS SHOULD BE called in useefect when this chatbox is rendered and when the sleecetd user to chat is true , the retrive text will get messaaegs by onsnappshot like earlier,, bcz initailly too we need  to show atleast 20 msgs, so with the current logic of having snapshot of only 1 msg wont work bcz we still have to load more msgs 
-
     useEffect(() => {
         if (selectedUserToChat) {
             console.log('useefct in chatbox--')
 
-            // realtimeListener(selectedUserToChat)
-            retrieveTexts(selectedUserToChat);
+
+            realtimeListener(selectedUserToChat)
+
+
+            // // Set up the real-time listener for receiving messages
+            // const connectionId = userData?.connections[selectedUserToChat]?.id;
+            // const messagesRef = collection(db, 'v2');
+            // const queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
+
+            // const unsubscribe = onSnapshot(queryRef, (snapshot) => {
+            //     const newMessagesObj = {};
+            //     snapshot.forEach((doc) => {
+            //         // if (change.type === 'added') {
+            //             const newMessage = { id: doc.id, ...doc.data() };
+            //             console.log('recived newmessage in ue',newMessage)
+            //             // setMessageList((prevMessages) => [...prevMessages, newMessage]);
+            //             newMessagesObj[doc.id] = newMessage;
+            //             // }
+            //         });
+            //         console.log('old message  before updating in ue',messageObj,selectedUserToChat)
+
+            //         setMessageObj({...messageObj,...newMessagesObj});
+            //         dummy.current?.scrollIntoView({ behavior: 'smooth' });
+            // });
+
+            // // retrieveTexts(selectedUserToChat);
+
+            // // Clean up the subscription when the component unmounts
+            // return () => {
+            //     unsubscribe();
+            // };
 
         }
 
@@ -47,11 +75,12 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
 
 
-    console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
+    console.log('messagelist-----_____---', messageList)
+    // console.log('messageObj-----_____---', messageObj)
 
 
     async function retrieveTexts(userToChat) {
-        console.log('__retrieveTexts', userData, userToChat)
+        console.log('retrieveTexts', userData, userToChat)
         let connectionId = '';
         let chatsTill = null;
 
@@ -68,16 +97,16 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             getTexts(connectionId, chatsTill)
         } else {
             // console.log('is not a connection')
-            setMessageList([])
+            // setMessageList([])
+            setMessageObj({})
         }
     }
 
-    let isRealTimeUpdate = true;
+
     async function getTexts(connectionId, chatsTill) {
 
-        console.log('__gettexts', connectionId, selectedUserToChat, userData, chatsTill)
+        console.log('gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
-        isRealTimeUpdate = false;
         // NEW TRY
         if (connectionId) {
             const messagesRef = collection(db, 'v2');
@@ -88,51 +117,41 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
             }
 
-            // const querySnapshot = await getDocs(queryRef);
+            const querySnapshot = await getDocs(queryRef);
+            const newMessages = [...messageList];
+            // const newMessagesObj = {};
 
-            console.log('>>>>> before snapshot')
+            querySnapshot.forEach((doc) => {
+                newMessages.push({ id: doc.id, ...doc.data() });
+                // let theMsg={ id: doc.id, ...doc.data() }
+                // if (_.unionBy(newMessages, theMsg) == null) {
+                //     newMessages.push(theMsg);
+                // }
+                // newMessagesObj[doc.id] = { id: doc.id, ...doc.data() }
+            });
 
-            onSnapshot(queryRef, (querySnapshot) => {
-                
+            newMessages.reverse()
+            console.log('oldMsagesss--------', messageList)
+            console.log('newmesssagesss--------', newMessages)
 
-                console.log('>>>>> in snapshot', isRealTimeUpdate)
+            // console.log('oldMsagesss--------', messageObj)
+            // console.log('newmesssagesss--------', newMessagesObj)
 
-                // const newMessages = [...messageList];
-                const newMessages = [];
-    
-                querySnapshot.forEach((doc) => {
-                    let theMsg={ id: doc.id, ...doc.data() }
-                    newMessages.push(theMsg);
-                    // if (_.unionBy(newMessages, theMsg) == null) {
-                    //     newMessages.push(theMsg);
-                    // }
-                });
-    
-                newMessages.reverse()
-                console.log('oldMsagesss--------', messageList)
-                console.log('newmesssagesss--------', newMessages)
-    
-    
-                // setMessageList(newMessages)
-                //isRealTimeUpdate is only true when there is real time update (that that code inside onSnapshot block will run)
-                if(isRealTimeUpdate){
-                    setMessageList((prevMessages) => [...prevMessages, ...newMessages]);          
-                }else{
-                    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);          
-                }
-    
-                dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-    
-                // Update the reference to the last visible document
-                const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-                lastVisible.current = lastDoc;
-                
+            setMessageList(newMessages)
+            // setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+            // setMessageObj({...messageObj,...newMessagesObj}); //messages are reversed while rendering to show in right order
 
-                isRealTimeUpdate = true;
-            })
 
-            console.log('>>>>> after snapshot')
 
+            dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+
+            // Update the reference to the last visible document
+            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            lastVisible.current = lastDoc;
+
+
+            // //triggering realtime update func
+            // realtimeListener(connectionId)
 
         }
         // NEW TRY END
@@ -188,10 +207,10 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         } finally {
             setLoading(false);
 
-            setTimeout(() => {
-                console.log('scroll back to current position - ', prevheight, chatBoxRef.current.scrollHeight)
-                chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight - prevheight
-            }, 500);
+            // setTimeout(() => {
+            //     console.log('dfskjkjdfsjdfs', prevheight, chatBoxRef.current.scrollHeight)
+            //     chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight - prevheight
+            // }, 500);
         }
     };
 
@@ -200,13 +219,16 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         const { scrollTop, clientHeight, scrollHeight } = e.target;
         // Check if the user has scrolled to the top
         if (scrollTop === 0 && !loading && messageList.length > 0) {
+            // if (scrollTop === 0 && !loading && Object.keys(messageObj)?.length > 0) {
             loadMoreTexts(e.target);
         }
     };
 
+    // NOTE : THE RETIRVETEXTS SHOULD BE called in useefect when this chatbox is rendered and when the sleecetd user to chat is true , the retrive text will get messaaegs by onsnappshot like earlier,, bcz initailly too we need  to show atleast 20 msgs, so with the current logic of having snapshot of only 1 msg wont work bcz we still have to load more msgs 
 
+    //   Real-time updates for new messages
     async function realtimeListener(selectedUser) {
-        console.log('__realtimeListener', selectedUser)
+        console.log('realtimeListener', selectedUser)
 
         const messagesRef = collection(db, 'v2');
         // if (chatsTill) {
@@ -217,6 +239,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
         const connectionId = userData?.connections[selectedUser]?.id;
         if (connectionId) {
+            console.log('is connectionId true', connectionId)
 
             onSnapshot(query(messagesRef, where("connectionId", "==", connectionId), orderBy('time', 'desc'), limit(1)), (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
@@ -224,10 +247,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                         const newMessage = { id: change.doc.id, ...change.doc.data() };
                         console.log('new--------------------', change, newMessage)
                         setMessageList((prevMessages) => [newMessage, ...prevMessages]);
+                        // setMessageObj({ [change.doc.id]:newMessage,...messageObj});
                     }
                 });
 
-                //setting last doc which will help in loading more texts 
+                //seeting last doc which will help in loading more texts 
                 const lastDoc = snapshot.docs[snapshot.docs.length - 1];
                 lastVisible.current = lastDoc;
             });
@@ -307,9 +331,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         }
     }
 
-
-    console.log('------->>>>>>>>-----------chat box ends------------------------')
-
     return (
         <div className="chat-body" >
             <div className="chat-box" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
@@ -325,6 +346,23 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 }
 
                 {
+                    // Object.keys(messageObj)?.length > 0 ?
+                    //     Object.keys(messageObj)?.reverse().map((msgData) => {
+                    //         let currDate = messageObj[msgData]?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
+                    //         return (
+                    //             <div key={messageObj[msgData].id} className="d-flex flex-column">
+                    //                 {showChatDate(currDate) &&
+                    //                     <div className="text-center date">
+                    //                         <span className="fs-12">{currDate}</span>
+                    //                     </div>
+                    //                 }
+                    //                 <MessageWrapper msgData={messageObj[msgData]} myself={currentUser?.displayName} />
+                    //             </div>
+                    //         )
+                    //     })
+                    //     :
+                    //     <section className="absolute-centered">No messages yet...</section>
+
                     messageList?.length > 0 ?
                         messageList?.map((msgData) => {
                             let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
