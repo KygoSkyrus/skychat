@@ -9,8 +9,8 @@ import { acceptConnectionReq, blockConnection, declineConnectionReq, writeToDb }
 import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 
-// import _ from 'lodash';
-// import array from 'lodash/array';
+import _ from 'lodash';
+import array from 'lodash/array';
 // import object from 'lodash/object';
 
 
@@ -38,7 +38,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         if (selectedUserToChat) {
             console.log('useefct in chatbox--')
 
-            // realtimeListener(selectedUserToChat)
+            realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
 
         }
@@ -88,48 +88,49 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
             }
 
-            // const querySnapshot = await getDocs(queryRef);
+            const querySnapshot = await getDocs(queryRef);
 
             console.log('>>>>> before snapshot')
 
-            onSnapshot(queryRef, (querySnapshot) => {
-                
+            // onSnapshot(queryRef, (querySnapshot) => {
 
-                console.log('>>>>> in snapshot', isRealTimeUpdate)
 
-                // const newMessages = [...messageList];
-                const newMessages = [];
-    
-                querySnapshot.forEach((doc) => {
-                    let theMsg={ id: doc.id, ...doc.data() }
-                    newMessages.push(theMsg);
-                    // if (_.unionBy(newMessages, theMsg) == null) {
-                    //     newMessages.push(theMsg);
-                    // }
-                });
-    
-                newMessages.reverse()
-                console.log('oldMsagesss--------', messageList)
-                console.log('newmesssagesss--------', newMessages)
-    
-    
-                // setMessageList(newMessages)
-                //isRealTimeUpdate is only true when there is real time update (that that code inside onSnapshot block will run)
-                if(isRealTimeUpdate){
-                    setMessageList((prevMessages) => [...prevMessages, ...newMessages]);          
-                }else{
-                    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);          
-                }
-    
-                dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-    
-                // Update the reference to the last visible document
-                const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-                lastVisible.current = lastDoc;
-                
+            console.log('>>>>> in snapshot', isRealTimeUpdate)
 
-                isRealTimeUpdate = true;
-            })
+            // const newMessages = [...messageList];
+            const newMessages = [];
+
+            querySnapshot.forEach((doc) => {
+                let theMsg = { id: doc.id, ...doc.data() }
+                newMessages.push(theMsg);
+                // if (_.unionBy(newMessages, theMsg) == null) {
+                //     newMessages.push(theMsg);
+                // }
+            });
+
+            newMessages.reverse()
+            console.log('oldMsagesss--------', messageList)
+            console.log('newmesssagesss--------', newMessages)
+
+
+            // setMessageList(newMessages)
+            //isRealTimeUpdate is only true when there is real time update (that that code inside onSnapshot block will run)
+            // if (isRealTimeUpdate) {
+            //     setMessageList((prevMessages) => [...prevMessages, ...newMessages]);
+            // } else {
+            //    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+            // }
+            setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+
+            dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+
+            // Update the reference to the last visible document
+            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+            lastVisible.current = lastDoc;
+
+
+            isRealTimeUpdate = true;
+            // })
 
             console.log('>>>>> after snapshot')
 
@@ -167,7 +168,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 });
                 msgs.reverse()
                 console.log("Current messages: ", msgs);
-                setMessageList(msgs)
+                // setMessageList(msgs)
                 dummy.current?.scrollIntoView({ behaviour: 'smooth' })
             });
         }
@@ -205,7 +206,9 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
     };
 
 
-    async function realtimeListener(selectedUser) {
+
+    let isRealTimeUpdate2 = true;
+    function realtimeListener(selectedUser) {
         console.log('__realtimeListener', selectedUser)
 
         const messagesRef = collection(db, 'v2');
@@ -215,22 +218,61 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         //   q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
         // }
 
+        isRealTimeUpdate2 = false;
+
         const connectionId = userData?.connections[selectedUser]?.id;
         if (connectionId) {
 
-            onSnapshot(query(messagesRef, where("connectionId", "==", connectionId), orderBy('time', 'desc'), limit(1)), (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === 'added') {
-                        const newMessage = { id: change.doc.id, ...change.doc.data() };
-                        console.log('new--------------------', change, newMessage)
-                        setMessageList((prevMessages) => [newMessage, ...prevMessages]);
-                    }
+
+            let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
+
+            // if (lastVisible.current) {
+            //     console.log('lastVisible.current', lastVisible.current)
+            //     queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
+            // }
+
+            onSnapshot(queryRef, (snapshot) => {
+
+                // const newMessages = [];
+                let newMessage = {};
+
+                snapshot.forEach((doc) => {
+                    newMessage = { id: doc.id, ...doc.data() }
                 });
 
+                console.log('snapshot--------------------', isRealTimeUpdate2)
+
+                //only updates when the onsnapshot is triggered oragnically and not by useeffct
+                if (isRealTimeUpdate2) {
+                    console.log('did i run,  --newMessage', newMessage)
+
+// NOTE: THIS IS GETTING EXECUTE TWICE FOR EVRERY SNAPSHOT (try using debouncing,, batching the snapshots and than update all at once, this way the setter fucntion will run once once after batching of msgs
+                    const isDuplicate = messageList.some((existingObject) => existingObject.id === newMessage.id);
+                    console.log('mapping over msglist', isDuplicate)
+
+                    if (!isDuplicate) {
+                       setMessageList((prevMessages) => [...prevMessages, newMessage]);
+                    }
+
+                    // let newArr = _.unionWith(messageList, [newMessage])
+                    // // newMessages.push(theMsg);
+                    // console.log('new Arr', newArr)
+                    // setMessageList(newArr)
+                    // setMessageList((prevMessages) => [...prevMessages, newMessage]);
+                }
                 //setting last doc which will help in loading more texts 
-                const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                lastVisible.current = lastDoc;
-            });
+                // const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                // lastVisible.current = lastDoc;
+
+
+
+                isRealTimeUpdate2 = true;
+
+                console.log('end-')
+
+            })
+
+
         }
     }
 
