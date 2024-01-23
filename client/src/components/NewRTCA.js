@@ -190,7 +190,7 @@ export const NewRTCA = ({ firebaseApp }) => {
               <section id="chatWith">{selectedUserToChat}</section>
 
               <div className="dropdown">
-                <div className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false"></div>
+                <img src={usersList[selectedUserToChat]?.avatar} className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" alt="" />
                 {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                   <ul className="dropdown-menu p-2">
                     <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chats</li>

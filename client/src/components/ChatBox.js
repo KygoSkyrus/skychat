@@ -4,14 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
-import { acceptConnectionReq, blockConnection, declineConnectionReq, writeToDb } from '../utils';
+import { acceptConnectionReq, blockConnection, debounce, declineConnectionReq, writeToDb } from '../utils';
 
 import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 
-import _ from 'lodash';
-import array from 'lodash/array';
-// import object from 'lodash/object';
 
 
 
@@ -49,39 +46,43 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
 
-
-    async function retrieveTexts(userToChat) {
-        console.log('__retrieveTexts', userData, userToChat)
-        let connectionId = '';
+    function getConnectionId(userName){
+        let connectionId = undefined;
         let chatsTill = null;
 
         //checking if the user in connection list or request list
-        if (userData?.connections?.hasOwnProperty(userToChat)) {
-            // console.log('has as connection')
-            connectionId = userData?.connections[userToChat]?.id;// this can be set as a state 
-            chatsTill = userData?.connections[userToChat]?.deletedTill
-            getTexts(connectionId, chatsTill)
-        } else if (userData?.requests?.hasOwnProperty(userToChat)) {
-            // console.log('has as request')
-            connectionId = userData?.requests[userToChat]?.id;// this can be set as a state 
-            chatsTill = userData?.requests[userToChat]?.deletedTill
-            getTexts(connectionId, chatsTill)
-        } else {
-            // console.log('is not a connection')
-            setMessageList([])
-        }
+        if (userData?.connections?.hasOwnProperty(userName)) {
+            connectionId = userData?.connections[userName]?.id;
+            chatsTill = userData?.connections[userName]?.deletedTill;
+        } else if (userData?.requests?.hasOwnProperty(userName)) {
+            connectionId = userData?.requests[userName]?.id;
+            chatsTill = userData?.requests[userName]?.deletedTill;
+        } 
+        
+        return {connectionId, chatsTill};
     }
 
-    let isRealTimeUpdate = true;
+
+    async function retrieveTexts(userToChat) {
+        console.log('__retrieveTexts', userData, userToChat)
+        const {connectionId, chatsTill} = getConnectionId(userToChat)
+        getTexts(connectionId, chatsTill)
+    }
+
     async function getTexts(connectionId, chatsTill) {
 
         console.log('__gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
-        isRealTimeUpdate = false;
         // NEW TRY
         if (connectionId) {
+
             const messagesRef = collection(db, 'v2');
             let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
+
+            //msgs after deleted chats only
+            if (chatsTill) {
+                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
+            }
 
             if (lastVisible.current) {
                 console.log('lastVisible.current', lastVisible.current)
@@ -90,51 +91,29 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
             const querySnapshot = await getDocs(queryRef);
 
-            console.log('>>>>> before snapshot')
-
-            // onSnapshot(queryRef, (querySnapshot) => {
-
-
-            console.log('>>>>> in snapshot', isRealTimeUpdate)
-
-            // const newMessages = [...messageList];
             const newMessages = [];
 
             querySnapshot.forEach((doc) => {
                 let theMsg = { id: doc.id, ...doc.data() }
                 newMessages.push(theMsg);
-                // if (_.unionBy(newMessages, theMsg) == null) {
-                //     newMessages.push(theMsg);
-                // }
             });
 
             newMessages.reverse()
             console.log('oldMsagesss--------', messageList)
             console.log('newmesssagesss--------', newMessages)
 
-
-            // setMessageList(newMessages)
-            //isRealTimeUpdate is only true when there is real time update (that that code inside onSnapshot block will run)
-            // if (isRealTimeUpdate) {
-            //     setMessageList((prevMessages) => [...prevMessages, ...newMessages]);
-            // } else {
-            //    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
-            // }
             setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
 
             dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
 
-            // Update the reference to the last visible document
+            // Update the reference to the last visible document(for loading more texts)
             const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
             lastVisible.current = lastDoc;
 
 
-            isRealTimeUpdate = true;
-            // })
-
-            console.log('>>>>> after snapshot')
-
-
+            console.log('>>>>> after gettexts')
+        }else{
+            setMessageList([])
         }
         // NEW TRY END
         return;
@@ -205,73 +184,53 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         }
     };
 
+    const debounceMsgUpdate = debounce(updateMessageList,900); // reducing this debounce time bugs the realtime msgs
+    // the issue still persists, try batching the msgs
+    // on texting the msg is getting added in list twice
+
+    function updateMessageList(newMsg){
+        let newMsgs=[]
+        newMsgs.push(newMsg)
+        console.log('updatemsgslist',messageList)
+        setMessageList((prevMessages) => [...prevMessages, ...newMsgs]);
+        
+        dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+    }   
 
 
-    let isRealTimeUpdate2 = true;
+    let isRealTimeUpdate = true;
     function realtimeListener(selectedUser) {
         console.log('__realtimeListener', selectedUser)
 
-        const messagesRef = collection(db, 'v2');
-        // if (chatsTill) {
-        //   q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
-        // } else {
-        //   q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
-        // }
+        isRealTimeUpdate = false;
+        const {connectionId, chatsTill} = getConnectionId(selectedUser)
 
-        isRealTimeUpdate2 = false;
-
-        const connectionId = userData?.connections[selectedUser]?.id;
         if (connectionId) {
-
+            
+            const messagesRef = collection(db, 'v2');
 
             let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
-
-            // if (lastVisible.current) {
-            //     console.log('lastVisible.current', lastVisible.current)
-            //     queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
-            // }
+            //chatsTill may not be needed as its real-time
 
             onSnapshot(queryRef, (snapshot) => {
 
-                // const newMessages = [];
                 let newMessage = {};
-
                 snapshot.forEach((doc) => {
                     newMessage = { id: doc.id, ...doc.data() }
                 });
 
-                console.log('snapshot--------------------', isRealTimeUpdate2)
+                console.log('snapshot--------------------', isRealTimeUpdate)
 
-                //only updates when the onsnapshot is triggered oragnically and not by useeffct
-                if (isRealTimeUpdate2) {
+                //only updates when the onsnapshot is triggered oragnically and not by useEffct (only code inside onSnapshot block will run)
+                if (isRealTimeUpdate) {
                     console.log('did i run,  --newMessage', newMessage)
-
-// NOTE: THIS IS GETTING EXECUTE TWICE FOR EVRERY SNAPSHOT (try using debouncing,, batching the snapshots and than update all at once, this way the setter fucntion will run once once after batching of msgs
-                    const isDuplicate = messageList.some((existingObject) => existingObject.id === newMessage.id);
-                    console.log('mapping over msglist', isDuplicate)
-
-                    if (!isDuplicate) {
-                       setMessageList((prevMessages) => [...prevMessages, newMessage]);
-                    }
-
-                    // let newArr = _.unionWith(messageList, [newMessage])
-                    // // newMessages.push(theMsg);
-                    // console.log('new Arr', newArr)
-                    // setMessageList(newArr)
-                    // setMessageList((prevMessages) => [...prevMessages, newMessage]);
+                    // NOTE: THIS IS GETTING EXECUTED TWICE FOR EVRERY SNAPSHOT (try using debouncing,, batching the snapshots and than update all at once, this way the setter fucntion will run once after batching of msgs
+                    debounceMsgUpdate(newMessage)
                 }
-                //setting last doc which will help in loading more texts 
-                // const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                // lastVisible.current = lastDoc;
 
-
-
-                isRealTimeUpdate2 = true;
-
+                isRealTimeUpdate = true;
                 console.log('end-')
-
             })
-
 
         }
     }

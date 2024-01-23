@@ -106,9 +106,6 @@ body {
   background-color: #1b1b1b;
   width: 38px;
   height: 38px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 }
 .dropdown-item:focus,
 .dropdown-item:hover {
