@@ -29,15 +29,12 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
 
 
-    // NOTE : THE RETIRVETEXTS SHOULD BE called in useefect when this chatbox is rendered and when the sleecetd user to chat is true , the retrive text will get messaaegs by onsnappshot like earlier,, bcz initailly too we need  to show atleast 20 msgs, so with the current logic of having snapshot of only 1 msg wont work bcz we still have to load more msgs 
-
     useEffect(() => {
         if (selectedUserToChat) {
             console.log('useefct in chatbox--')
 
             realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
-
         }
 
     }, [selectedUserToChat])
@@ -46,26 +43,43 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
 
-    function getConnectionId(userName){
+    function getConnectionId(userName) {
         let connectionId = undefined;
         let chatsTill = null;
 
         //checking if the user in connection list or request list
         if (userData?.connections?.hasOwnProperty(userName)) {
-            connectionId = userData?.connections[userName]?.id;
-            chatsTill = userData?.connections[userName]?.deletedTill;
+            populateConnectionId(userData.connections)
         } else if (userData?.requests?.hasOwnProperty(userName)) {
-            connectionId = userData?.requests[userName]?.id;
-            chatsTill = userData?.requests[userName]?.deletedTill;
-        } 
-        
-        return {connectionId, chatsTill};
+            populateConnectionId(userData.requests)
+        }
+
+        function populateConnectionId(obj) {
+            connectionId = obj[userName]?.id;
+            chatsTill = obj[userName]?.deletedTill;
+        }
+
+        return { connectionId, chatsTill };
+    }
+
+
+    function notify(text,delay){
+
+        let notification= document.createElement('div')
+        notification.innerHTML=text;
+        notification.classList.add('nothing_to_load')
+
+        chatBoxRef.current.insertBefore(notification, chatBoxRef.current.firstChild);
+
+        setTimeout(() => {
+            notification.remove()
+        }, delay);
     }
 
 
     async function retrieveTexts(userToChat) {
         console.log('__retrieveTexts', userData, userToChat)
-        const {connectionId, chatsTill} = getConnectionId(userToChat)
+        const { connectionId, chatsTill } = getConnectionId(userToChat)
         getTexts(connectionId, chatsTill)
     }
 
@@ -87,6 +101,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             if (lastVisible.current) {
                 console.log('lastVisible.current', lastVisible.current)
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+
+                //to prevent loading msgs before chatsTill
+                if (chatsTill) {
+                    queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+                }
             }
 
             const querySnapshot = await getDocs(queryRef);
@@ -98,21 +117,28 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 newMessages.push(theMsg);
             });
 
-            newMessages.reverse()
-            console.log('oldMsagesss--------', messageList)
-            console.log('newmesssagesss--------', newMessages)
+            if (newMessages.length === 0) {
 
-            setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+                notify('no previous messages',2000);
 
-            dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+            } else {
 
-            // Update the reference to the last visible document(for loading more texts)
-            const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-            lastVisible.current = lastDoc;
+                newMessages.reverse()
+                console.log('oldMsagesss--------', messageList)
+                console.log('newmesssagesss--------', newMessages)
+
+                setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
+
+                dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+
+                // Update the reference to the last visible document(for loading more texts)
+                const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+                lastVisible.current = lastDoc;
+            }
 
 
             console.log('>>>>> after gettexts')
-        }else{
+        } else {
             setMessageList([])
         }
         // NEW TRY END
@@ -184,18 +210,18 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         }
     };
 
-    const debounceMsgUpdate = debounce(updateMessageList,900); // reducing this debounce time bugs the realtime msgs
+    const debounceMsgUpdate = debounce(updateMessageList, 900); // reducing this debounce time bugs the realtime msgs
     // the issue still persists, try batching the msgs
     // on texting the msg is getting added in list twice
 
-    function updateMessageList(newMsg){
-        let newMsgs=[]
+    function updateMessageList(newMsg) {
+        let newMsgs = []
         newMsgs.push(newMsg)
-        console.log('updatemsgslist',messageList)
+        console.log('updatemsgslist', messageList)
         setMessageList((prevMessages) => [...prevMessages, ...newMsgs]);
-        
+
         dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-    }   
+    }
 
 
     let isRealTimeUpdate = true;
@@ -203,10 +229,10 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         console.log('__realtimeListener', selectedUser)
 
         isRealTimeUpdate = false;
-        const {connectionId, chatsTill} = getConnectionId(selectedUser)
+        const { connectionId, chatsTill } = getConnectionId(selectedUser)
 
         if (connectionId) {
-            
+
             const messagesRef = collection(db, 'v2');
 
             let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
@@ -219,7 +245,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                     newMessage = { id: doc.id, ...doc.data() }
                 });
 
-                console.log('snapshot--------------------', isRealTimeUpdate)
+                console.log('snapshot--------------------', isRealTimeUpdate, messageList)
 
                 //only updates when the onsnapshot is triggered oragnically and not by useEffct (only code inside onSnapshot block will run)
                 if (isRealTimeUpdate) {
@@ -227,6 +253,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                     // NOTE: THIS IS GETTING EXECUTED TWICE FOR EVRERY SNAPSHOT (try using debouncing,, batching the snapshots and than update all at once, this way the setter fucntion will run once after batching of msgs
                     debounceMsgUpdate(newMessage)
                 }
+
+
+                // // Update the reference to the last visible document(for loading more texts)
+                // const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                // lastVisible.current = lastDoc;
 
                 isRealTimeUpdate = true;
                 console.log('end-')
@@ -314,15 +345,14 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
     return (
         <div className="chat-body" >
             <div className="chat-box" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
-                {loading ?
+                {loading &&
                     <div className="text-center">
                         <div className="spinner-border" role="status">
                             <span className="sr-only"></span>
                         </div>
                     </div>
-                    :
-                    <div className="text-center load_more"><span>load more</span></div>
-                    // <section className="text-center spinner">Load more texts</section>
+                    // :
+                    // <div className="text-center load_more"><span>load more</span></div>
                 }
 
                 {
