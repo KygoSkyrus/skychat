@@ -84,6 +84,11 @@ export function getExactTimeStr(d) {
 }
 
 
+export function getLocalDateStr(d) {
+    let date = typeof (d) == 'object' ? d?.toDate() : new Date(d);
+    return date.toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
+}
+
 
 export async function writeToDb(db, msgObj) {
     try {

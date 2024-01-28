@@ -36,7 +36,8 @@
 # ISSUE (1=done,0=open)
 1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)  {maybe this can be done by setting mewssagelist to  null when user press back btn to go to chatlist}
 2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
-3. [0] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
+3. [1] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
+4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
 
 
 # Defects
@@ -48,6 +49,9 @@
 - there is a memory leak error on signinform
 
 # Todo 
+- increase the width of iverall chatbody
+- add on enter to move to password input when on username input
+- create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - add loader (while loading mssgs or for dates)
@@ -80,6 +84,13 @@
 - msg delete option for both parties if the msg was sent in between a specific hour 
 - when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 
+
+
+## Components
+- # ChatBox 
+   - in chatbox there is everything that happens inside the chatbox,, (sending and retrieving msgs)
+   - for retrieving and handling realtime msgs update there are two functions in useEffct, "retrieveTexts" is used to get the msgs when the chat is openend, and "realtimeListener" is used for realtime chats update,,
+   - also this realtimeListener could have been avoided as we could have used onsnapshot instead of getDocs() in retrieveTexts
 
 
 # Workflow Architecture

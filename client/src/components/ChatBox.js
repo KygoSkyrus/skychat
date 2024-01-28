@@ -4,12 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
-import { acceptConnectionReq, blockConnection, debounce, declineConnectionReq, writeToDb } from '../utils';
+import { acceptConnectionReq, blockConnection, debounce, declineConnectionReq, getLocalDateStr, writeToDb } from '../utils';
 
 import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
-
-
 
 
 const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => {
@@ -31,7 +29,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     useEffect(() => {
         if (selectedUserToChat) {
-            console.log('useefct in chatbox--')
+            console.log('useEffect in chatbox--')
 
             realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
@@ -42,6 +40,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
 
     console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
+
 
     function getConnectionId(userName) {
         let connectionId = undefined;
@@ -62,32 +61,33 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         return { connectionId, chatsTill };
     }
 
+    function notify(text, delay) {
 
-    function notify(text,delay){
+        let notificationElement = document.createElement('div')
+        notificationElement.innerHTML = text;
+        notificationElement.classList.add('nothing_to_load')
 
-        let notification= document.createElement('div')
-        notification.innerHTML=text;
-        notification.classList.add('nothing_to_load')
+        let section = document.createElement('section')
+        section.classList.add('msg-arrow')
+        notificationElement.appendChild(section)
 
-        chatBoxRef.current.insertBefore(notification, chatBoxRef.current.firstChild);
+        chatBoxRef.current.insertBefore(notificationElement, chatBoxRef.current.firstChild);
 
         setTimeout(() => {
-            notification.remove()
+            notificationElement.remove()
         }, delay);
     }
 
 
-    async function retrieveTexts(userToChat) {
+    async function retrieveTexts(userToChat, loadMoreTexts = false) {
         console.log('__retrieveTexts', userData, userToChat)
         const { connectionId, chatsTill } = getConnectionId(userToChat)
-        getTexts(connectionId, chatsTill)
+        getTexts(connectionId, chatsTill, loadMoreTexts)
     }
 
-    async function getTexts(connectionId, chatsTill) {
-
+    async function getTexts(connectionId, chatsTill, loadMoreTexts) {
         console.log('__gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
-        // NEW TRY
         if (connectionId) {
 
             const messagesRef = collection(db, 'v2');
@@ -99,7 +99,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             }
 
             if (lastVisible.current) {
-                console.log('lastVisible.current', lastVisible.current)
+                // console.log('lastVisible.current', lastVisible.current)
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
 
                 //to prevent loading msgs before chatsTill
@@ -119,63 +119,24 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
             if (newMessages.length === 0) {
 
-                notify('no previous messages',2000);
+                notify('no previous messages', 2000);
 
             } else {
 
                 newMessages.reverse()
-                console.log('oldMsagesss--------', messageList)
-                console.log('newmesssagesss--------', newMessages)
-
                 setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
 
+                // if(!loadMoreTexts){
                 dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
+                // }
 
                 // Update the reference to the last visible document(for loading more texts)
                 const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
                 lastVisible.current = lastDoc;
             }
 
-
-            console.log('>>>>> after gettexts')
         } else {
             setMessageList([])
-        }
-        // NEW TRY END
-        return;
-
-        //only messages after last delete are queried
-        let q;
-        if (chatsTill) {
-            q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
-        } else {
-            q = query(collection(db, "v2"), where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
-        }
-
-        if (connectionId) {
-            onSnapshot(q, (querySnapshot) => {
-
-                const msgs = [];
-                console.log('chat snapshot running...')
-                querySnapshot.forEach((doc) => {
-                    let data = doc.data()
-                    data.id = doc.id;
-                    msgs.push(data);
-
-                    //only play sound if the message's timestamp and current timestap are close (in btw 2s)
-                    const date1 = data.time?.toDate();
-                    const date2 = new Date();
-                    const diffTime = Math.abs(date2 - date1);
-                    if (diffTime <= 2000) {
-                        const audio = new Audio(notification);
-                        audio.play();
-                    }
-                });
-                msgs.reverse()
-                console.log("Current messages: ", msgs);
-                // setMessageList(msgs)
-                dummy.current?.scrollIntoView({ behaviour: 'smooth' })
-            });
         }
     }
 
@@ -187,7 +148,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         const prevheight = scrollHeight;
 
         try {
-            retrieveTexts(selectedUserToChat)
+            retrieveTexts(selectedUserToChat, true)
 
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -195,7 +156,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             setLoading(false);
 
             setTimeout(() => {
-                console.log('scroll back to current position - ', prevheight, chatBoxRef.current.scrollHeight)
+                // console.log('scroll back to current position - ', prevheight, chatBoxRef.current.scrollHeight)
                 chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight - prevheight
             }, 500);
         }
@@ -210,18 +171,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
         }
     };
 
-    const debounceMsgUpdate = debounce(updateMessageList, 900); // reducing this debounce time bugs the realtime msgs
-    // the issue still persists, try batching the msgs
-    // on texting the msg is getting added in list twice
-
-    function updateMessageList(newMsg) {
-        let newMsgs = []
-        newMsgs.push(newMsg)
-        console.log('updatemsgslist', messageList)
-        setMessageList((prevMessages) => [...prevMessages, ...newMsgs]);
-
-        dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-    }
 
 
     let isRealTimeUpdate = true;
@@ -245,22 +194,40 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                     newMessage = { id: doc.id, ...doc.data() }
                 });
 
-                console.log('snapshot--------------------', isRealTimeUpdate, messageList)
-
                 //only updates when the onsnapshot is triggered oragnically and not by useEffct (only code inside onSnapshot block will run)
                 if (isRealTimeUpdate) {
-                    console.log('did i run,  --newMessage', newMessage)
-                    // NOTE: THIS IS GETTING EXECUTED TWICE FOR EVRERY SNAPSHOT (try using debouncing,, batching the snapshots and than update all at once, this way the setter fucntion will run once after batching of msgs
-                    debounceMsgUpdate(newMessage)
+                    console.log('did i run,  --newMessage', snapshot, newMessage)
+
+                    setMessageList((prevArray) => {
+                        const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
+
+                        if (snapshot.metadata.hasPendingWrites) { //(tells if the doc has been written at server)
+                            // const time = getExactTimeStr(new Date())
+                            const time = new Date().toISOString()
+                            newMessage.time = time;
+                        }
+
+
+                        return isDuplicate ? prevArray : [...prevArray, newMessage];
+                    })
+
+                    // only play this audio when msg is from other user, dont play it for yourself
+                    if(newMessage?.author !== userData.username){
+                        const audio = new Audio(notification);
+                        audio.play(); // this is playing twice [fixed]
+                    }
+
+
+                    // Update the reference to the last visible document(for loading more texts, [when there is new message after chats deleted])
+                    if (!lastVisible.current) {
+                        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+                        lastVisible.current = lastDoc;
+                    }
+
+                    dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
                 }
 
-
-                // // Update the reference to the last visible document(for loading more texts)
-                // const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                // lastVisible.current = lastDoc;
-
                 isRealTimeUpdate = true;
-                console.log('end-')
             })
 
         }
@@ -358,7 +325,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                 {
                     messageList?.length > 0 ?
                         messageList?.map((msgData) => {
-                            let currDate = msgData?.time?.toDate().toLocaleDateString('en-in', { year: "numeric", month: "short", day: "numeric" });
+                            let currDate = getLocalDateStr(msgData?.time);
                             return (
                                 <div key={msgData.id} className="d-flex flex-column">
                                     {showChatDate(currDate) &&
