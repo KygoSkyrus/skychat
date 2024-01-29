@@ -232,3 +232,10 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
         setSelectedUserToChat(undefined)//only call when inner block button is clicked, not on list's btn, so that component wont render bcz of unneccesary state update
     }
 }
+
+
+export function populateConnectionId (obj) {
+    let connectionId = obj?.id || undefined;
+    let chatsTill = obj?.deletedTill || null;
+    return { connectionId, chatsTill };
+}

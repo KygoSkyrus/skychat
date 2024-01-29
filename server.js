@@ -2,6 +2,7 @@ const path = require("path");
 const http = require("http");
 const express = require("express");
 const socket = require("socket.io");
+const bodyParser = require('body-parser')
 
 
 const app = express();
@@ -11,10 +12,28 @@ const io = socket(server);
 //set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(bodyParser.json())
+
 const port = process.env.PORT || 5000;
 
 
-// FIREBASE ADMIN
+// FIREBASE ADMIN 
+const admin = require("firebase-admin");
+const serviceAccount = require("path/to/serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://skyrus-3416b-default-rtdb.firebaseio.com"
+});
+
+app.post('/api/doesUserExist', (req,res)=>{
+
+  const {username} = req.body;
+  console.log('user',username)
+
+
+})
+
+// FIREBASE ADMIN 
 // var admin = require("firebase-admin");
 // var serviceAccount = require("path/to/serviceAccountKey.json");
 // admin.initializeApp({

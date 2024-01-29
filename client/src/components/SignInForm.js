@@ -71,16 +71,38 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
         //for validating username
         let name = userCredentials?.username?.trim();
-        if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
-            alert('please fill out all required fields')
-            //setUserCredentials({ ...userCredentials, username: '' })
+        //uncomment this later//commented for testing username duplication
+        // if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
+        //     alert('please fill out all required fields')
+        //     //setUserCredentials({ ...userCredentials, username: '' })
+        //     return;
+        // }
+
+        if (name.includes(" ")) {
+            alert('user name can not contain blank spaces')
             return;
         }
 
-        if(name.includes(" ")){
-            alert('user name can not contain blank spaces')
-        }
+        //here will be an api to server which will pass the username to server and then server will check if that usernam already exists by querying db
+        let resp;
+        fetch(`/api/doesUserExist`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: name
+            })
+        })
+            .then(response => {
+                resp = response;
+                return response.json()
+            })
+            .then(res => {
+                console.log('ress',res)
+            })
 
+            return;
 
         await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
             .then((response) => {
@@ -142,9 +164,9 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             username: username,
             email: email,
             avatar: avatar,
-            connections:{},
-            requests:{},
-            blockList:{},
+            connections: {},
+            requests: {},
+            blockList: {},
             time: serverTimestamp(),
         };
         await addDoc(collection(firestore, "users"), userData);
@@ -163,32 +185,32 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     }
 
-        //toggles between signIn and signUp form
-        const toggleSignIn = (form) => {
-            console.log('form', form)
-            setCurrAuthMethod(form)
-    
-            // let signin = document.querySelector('.signin-form')
-            // let signup = document.querySelector('.signup-form')
-            // if (form === 'signin') {
-            //     if (window.outerWidth < 768) {
-            //         signup.classList.add('d-none')
-            //         signin.classList.remove('d-none')
-            //     } else {
-            //         signup.style.left = '0'
-            //         signin.style.right = '0'
-            //     }
-            // } else {
-            //     if (window.outerWidth < 768) {
-            //         signup.classList.remove('d-none')
-            //         signin.classList.add('d-none')
-            //     } else {
-            //         signup.style.left = '50%'
-            //         signin.style.right = '50%'
-            //     }
-            // }
-            setUserCredentials({ email: '', password: '', username: '' })
-        }
+    //toggles between signIn and signUp form
+    const toggleSignIn = (form) => {
+        console.log('form', form)
+        setCurrAuthMethod(form)
+
+        // let signin = document.querySelector('.signin-form')
+        // let signup = document.querySelector('.signup-form')
+        // if (form === 'signin') {
+        //     if (window.outerWidth < 768) {
+        //         signup.classList.add('d-none')
+        //         signin.classList.remove('d-none')
+        //     } else {
+        //         signup.style.left = '0'
+        //         signin.style.right = '0'
+        //     }
+        // } else {
+        //     if (window.outerWidth < 768) {
+        //         signup.classList.remove('d-none')
+        //         signin.classList.add('d-none')
+        //     } else {
+        //         signup.style.left = '50%'
+        //         signin.style.right = '50%'
+        //     }
+        // }
+        setUserCredentials({ email: '', password: '', username: '' })
+    }
 
     // export const goWithGoogle = (val, navigate, dispatch, route, isAdminLogin) => {
     //     const auth = getAuth();
@@ -260,14 +282,38 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         <>
             <h5 className='text-dark'>{title}</h5>
             <section className='text-center'>{description}</section>
+
             {signInOrSignUp === "signup" &&
                 <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
             }
-            <input type="email" className="form-control my-2" name="email" id="email1" placeholder="Email address" aria-describedby="emailHelp" value={userCredentials?.email} onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })} />
-            <input type="password" className="form-control" id="password1" name="password" placeholder="Password*" value={userCredentials?.password} onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })} onKeyUp={(e) => e.key === "Enter" && handleClick()} />
+
+            <input
+                type="email"
+                className="form-control my-2"
+                name="email"
+                id="email1"
+                placeholder="Email address"
+                aria-describedby="emailHelp"
+                value={userCredentials?.email}
+                onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
+                onKeyUp={(e) => e.key === "Enter" && document.getElementById('password1').focus()}
+            />
+
+            <input
+                type="password"
+                className="form-control"
+                id="password1"
+                name="password"
+                placeholder="Password*"
+                value={userCredentials?.password}
+                onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
+                onKeyUp={(e) => e.key === "Enter" && handleClick()}
+            />
+
             <button className='btn btn-outline-warning w-100 my-2' onClick={() => handleClick()}>{btnText}</button>
 
             <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
+
             <section className='continue-with position-relative w-100 text-center'>
                 <span >OR CONTINUE WITH</span>
                 <section></section>

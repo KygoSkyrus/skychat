@@ -50,7 +50,6 @@
 
 # Todo 
 - increase the width of iverall chatbody
-- add on enter to move to password input when on username input
 - create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -90,7 +89,7 @@
 - # ChatBox 
    - in chatbox there is everything that happens inside the chatbox,, (sending and retrieving msgs)
    - for retrieving and handling realtime msgs update there are two functions in useEffct, "retrieveTexts" is used to get the msgs when the chat is openend, and "realtimeListener" is used for realtime chats update,,
-   - also this realtimeListener could have been avoided as we could have used onsnapshot instead of getDocs() in retrieveTexts
+   - also this realtimeListener could have been avoided as we could have used onsnapshot instead of getDocs() in retrieveTexts (if onsnapshot has is fetching 20 docs and the same snapshot you want to use as realtimelister, than it will work fine as the snapshot will only read the changed or added items in the query)
 
 
 # Workflow Architecture
