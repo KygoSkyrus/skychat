@@ -53,9 +53,6 @@ app.post('/api/doesUserExist', (req, res) => {
       res.json({message:"Internal server error!"})
     });
 
-
-
-
 })
 
 // FIREBASE ADMIN 

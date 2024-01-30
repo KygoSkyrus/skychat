@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
-import { SET_CURRENT_USER } from '../redux/actionTypes';
+import { SET_CURRENT_USER, SET_TOAST } from '../redux/actionTypes';
 import { defaultAvatar } from '../utils';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
@@ -79,7 +79,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         // }
 
         if (name.includes(" ")) {
-            alert('user name can not contain blank spaces')
+            // alert('user name can not contain blank spaces')
+            dispatch({ type: SET_TOAST, payload: {toastContent:"user name can not contain blank spaces", isError: true} })
             return;
         }
 
@@ -96,7 +97,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         let data = await res.json()
 
         if (data.userFound) {
-            alert(data.message)
+            // alert(data.message)
+            dispatch({ type: SET_TOAST, payload: {toastContent:"username already exists", isError: true} })
         }else{
             let isUserCreated=false;
             await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
@@ -122,9 +124,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                         .catch(
                             (err) => console.log('err', err)
                         );
-        
-                    setUserCredentials({ email: '', password: '', username: '' })
-        
+                
                     //setting user and redirecting to chats
                     dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                     navigate('/chat')
