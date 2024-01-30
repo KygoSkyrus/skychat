@@ -71,7 +71,7 @@ body {
   transform: translate(-50%, -50%);
   background-color: rgb(211, 211, 211);
   border-radius: 4px;
-  padding: 0 30px;
+  /* padding: 0 30px; */
   display: flex;
   flex-direction: column;
   justify-content: center;

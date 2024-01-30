@@ -8,10 +8,12 @@ const Authenticate = ({ firebaseApp }) => {
     const [currAuthMethod, setCurrAuthMethod] = useState('signin')
 
     return (
+        <>
+        <div>
         <div className="signin outer-join">
             {/* <button type="button" id='closeSignin' className="d-none" data-bs-dismiss="modal" aria-label="Close"><i className='fa fa-times'></i></button> */}
 
-            <div className="d-flex flex-row p-0 position-relative">
+            <div className="d-flex flex-row py-0 px-4 position-relative">
                 {/* <div className='w-50 signin-img d-flex bg-dark' style={{ zIndex: 2 }}>
                             <img src={loginImg} alt='shoppitt' />
                         </div> */}
@@ -46,6 +48,9 @@ const Authenticate = ({ firebaseApp }) => {
                 </div>
             </div>
         </div>
+        <div className='notify'>sfhdsjkdjksfdkjjd</div>
+        </div>
+        </>
     )
 }
 

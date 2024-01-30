@@ -83,9 +83,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             return;
         }
 
-        //here will be an api to server which will pass the username to server and then server will check if that usernam already exists by querying db
-        let resp;
-        fetch(`/api/doesUserExist`, {
+        //checks if username already exists or not
+        let res = await fetch(`/api/doesUserExist`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -94,45 +93,43 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 username: name
             })
         })
-            .then(response => {
-                resp = response;
-                return response.json()
-            })
-            .then(res => {
-                console.log('ress',res)
-            })
+        let data = await res.json()
 
-            return;
+        if (data.userFound) {
+            alert(data.message)
+        }else{
+            let isUserCreated=false;
+            await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
+                .then((response) => {
+                    const user = response.user;
+                    console.log('signup user', user)
+                    let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
+                    if(isRegistered) isUserCreated = true;
+                    // inProgressLoader(dispatch, false)
+                    //navigate('/user');//sending user to user page for filling out other details
+                })
+                .catch((error) => {
+                    // inProgressLoader(dispatch, false)
+                    setUserCredentials({ email: '', password: '', username: '' })
+                    let errMsg = error.message;
+                    console.log('error', error)
+                    if (error.code === 'auth/email-already-in-use') errMsg = "User already exists!!! Try Signing in instead"
+                    // dispatch(invokeToast({ isSuccess: false, message: errMsg }))
+                });
 
-        await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
-            .then((response) => {
-                const user = response.user;
-                console.log('signup user', user)
-                registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
-                // inProgressLoader(dispatch, false)
-                //navigate('/user');//sending user to user page for filling out other details
-            })
-            .catch((error) => {
-                // inProgressLoader(dispatch, false)
-                setUserCredentials({ email: '', password: '', username: '' })
-                let errMsg = error.message;
-                console.log('error', error)
-                if (error.code === 'auth/email-already-in-use') errMsg = "User already exists!!! Try Signing in instead"
-                // dispatch(invokeToast({ isSuccess: false, message: errMsg }))
-            });
-
-        await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-            .catch(
-                (err) => console.log('err', err)
-            );
-
-
-        setUserCredentials({ email: '', password: '', username: '' })
-
-        //setting user and redirecting to chats
-        dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-        navigate('/chat')
-
+                if(isUserCreated){
+                    await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+                        .catch(
+                            (err) => console.log('err', err)
+                        );
+        
+                    setUserCredentials({ email: '', password: '', username: '' })
+        
+                    //setting user and redirecting to chats
+                    dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                    navigate('/chat')
+                }
+        }
     }
 
     function loginUserFirebase() {
@@ -171,7 +168,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         };
         await addDoc(collection(firestore, "users"), userData);
 
-
+        return true;
         // for adding the custom document id (here username is used as document ID)
         // const collectionRef = collection(firestore, "users");
         // await setDoc(doc(collectionRef, username), {

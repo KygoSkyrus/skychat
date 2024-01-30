@@ -19,16 +19,41 @@ const port = process.env.PORT || 5000;
 
 // FIREBASE ADMIN 
 const admin = require("firebase-admin");
-const serviceAccount = require("path/to/serviceAccountKey.json");
+// const { initializeApp } = require('firebase-admin/app');
+const serviceAccount = require("./serviceAccountKey.json");
+
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://skyrus-3416b-default-rtdb.firebaseio.com"
 });
 
-app.post('/api/doesUserExist', (req,res)=>{
+const firestore = admin.firestore();
 
-  const {username} = req.body;
-  console.log('user',username)
+app.post('/api/doesUserExist', (req, res) => {
+
+  const { username } = req.body;
+  console.log('user', username)
+
+  const usersRef = firestore.collection('users');
+  const query = usersRef.where('username', '==', username);
+
+  query.get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        console.log('User with username "test1" not found.');
+        res.json({userFound: false, message:""})
+      } else {
+        const userDoc = snapshot.docs[0];
+        console.log('User with username "test1" found:', userDoc.data());
+        res.json({userFound: true, message:"Username already exists! Please try a different one."})
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching user:', error);
+      res.json({message:"Internal server error!"})
+    });
+
+
 
 
 })
@@ -113,7 +138,7 @@ io.use((socket, next) => {
   // create new session
   // socket.sessionID = randomId();
   // socket.userID = randomId();
-  console.log('socckte',socket)
+  console.log('socckte', socket)
   const username = socket.handshake.auth.username;
   if (!username) {
     return next(new Error("invalid username"));
@@ -182,7 +207,7 @@ io.on('connection', (socket) => {
 
 
   //new TRYYYYYYYY------------------ENDS--__ __ _ __ __ _ _ __ _ __ _ __ _ ___ __ __ __
- 
+
   //the user arguement is passed from the fronend
   socket.on('joinroom', (user) => {
     //to join a user to a room
@@ -237,7 +262,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', ({ name, msg }) => {
-  console.log('a user disconnected', socket.id);
+    console.log('a user disconnected', socket.id);
   })
 
 
