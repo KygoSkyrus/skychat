@@ -21,8 +21,13 @@
 ## IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in firestore
 
 
-# NOTE : connection are only made when user sends someone a text
+
+# done
 - make sure username is unique
+
+
+
+# NOTE : connection are only made when user sends someone a text
 - ALWAYS in your app add how the app works,,
 - in this one , on any corner show the feature your provide , like security, functionalities etc
 

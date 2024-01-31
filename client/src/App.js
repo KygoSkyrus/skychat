@@ -11,10 +11,11 @@ import { NewRTCA } from "./components/NewRTCA";
 import Authenticate from "./components/Authenticate";
 import Error from "./components/Error"
 import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
+import { Info } from "lucide-react";
 
 
 
-function App({firebaseApp}) {
+function App({ firebaseApp }) {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -80,6 +81,14 @@ function App({firebaseApp}) {
         </Routes>
         {/* <div className="body-bg"><span>SKYCHAT</span></div> */}
       </>
+
+      <div className="info" >
+        <Info className="" data-bs-toggle="dropdown" aria-expanded="false" />
+        <div className="dropdown-menu p-2">
+          <h4>SKYCHAT</h4>
+          <p>info</p>
+        </div>
+      </div>
     </div>
   );
 }

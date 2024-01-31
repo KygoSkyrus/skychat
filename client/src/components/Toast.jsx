@@ -7,21 +7,29 @@ const Toast = () => {
   const dispatch = useDispatch();
   const toastContainer = useRef();
 
-//   const hideToast = () => {
-//     toastContainer.current.classList.remove("d-block");
-//     clearTimeout(timer);
-//   };
+  //   const hideToast = () => {
+  //     toastContainer.current.classList.remove("d-block");
+  //     clearTimeout(timer);
+  //   };
 
   const showToast = () => {
-    console.log('showtoast',toastContainer.current.classList)
-    if(isError){
-        toastContainer.current.classList.add("d-block","error")
-    }else{
-        toastContainer.current.classList.add("d-block")
+    console.log("showtoast", toastContainer.current.classList);
+    if (isError) {
+      toastContainer.current.classList.add(
+        "d-block",
+        "toast_animation",
+        "error"
+      );
+    } else {
+      toastContainer.current.classList.add("d-block", "toast_animation");
     }
     timer = setTimeout(() => {
-      toastContainer.current.classList.remove("d-block","error");
-      dispatch({ type: RESET_TOAST })
+      toastContainer.current.classList.remove(
+        "d-block",
+        "toast_animation",
+        "error"
+      );
+      dispatch({ type: RESET_TOAST });
       //call hidetoast instead of the above lines
     }, 3500);
   };
@@ -34,35 +42,11 @@ const Toast = () => {
     showToast();
   }
 
-//   add fade up/in and fade out animation
   return (
     <>
-    <div className={`toast`} ref={toastContainer}>{message}</div>
-      {/* <div
-        className="toastContainer shadow rounded-1"
-        ref={toastContainer}
-        onClick={hideToast}
-        style={{
-          borderLeft: isSuccess
-            ? "6px solid var(--color-green)"
-            : "6px solid var(--color-red)",
-        }}
-      >
-        {isSuccess ? (
-          <span>
-            <i className="fa-solid fa-circle-check me-3"></i>
-          </span>
-        ) : (
-          <span>
-            <i className="fa-solid fa-triangle-exclamation me-3"></i>
-          </span>
-        )}
-
-        <section className="toast-inner">{message}</section>
-        <span onClick={hideToast}>
-          <i className="fa-solid fa-xmark close ms-5"></i>
-        </span>
-      </div> */}
+      <div className="toast" ref={toastContainer}>
+        {message}
+      </div>
     </>
   );
 };

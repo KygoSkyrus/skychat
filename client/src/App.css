@@ -39,6 +39,19 @@ body {
   /* font-weight: bold; */
   letter-spacing: 7px;
 }
+.App{
+  height: 100vh;
+  display: grid;
+  place-items: center;
+}
+.info{
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 8px;
+  color: #808080;
+  cursor: pointer;
+}
 
 /* BASIC CSS */
 .absolute-centered{
@@ -61,12 +74,8 @@ body {
 }
 /* BASICS */
 
+
 /* join page/ signin */
-.App{
-  height: 100vh;
-  display: grid;
-  place-items: center;
-}
 .outer-join {
   width: 350px;
   height: 400px;
@@ -81,19 +90,21 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  z-index: 1;
 }
 .toast{
-  display: none;
+  /* display: none; */
   position: absolute;
-  background: var(--violet);
-  right: -189px;
   width: 180px;
-  top: 10%;
+  right: 0;
+  top: 30%;
   color: #fff;
+  background: var(--violet);
   font-weight: lighter;
   text-align: center;
   border-radius: 4px;
   padding: 4px;
+  transition: var(--transition);
   opacity: 1 !important;
 }
 .toast::before{
@@ -110,6 +121,10 @@ body {
 }
 .toast.error::before{
   border-top: 5px solid #ec407a;
+}
+.toast_animation{
+  right: -189px;
+  top: 10%;
 }
 
 
