@@ -46,6 +46,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             return populateConnectionId(userData.connections[userName])
         } else if (userData?.requests?.hasOwnProperty(userName)) {
             return populateConnectionId(userData.requests[userName])
+        }else{
+            return populateConnectionId(undefined)
         }
     }
 

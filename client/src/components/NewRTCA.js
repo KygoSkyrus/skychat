@@ -82,6 +82,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     //       // console.log('dddddd',data)
     //       userList[data.username] = data;
     //     });
+    //     console.log('111sna',userList)
     // dispatch({ type: SET_USERS_LIST, payload: userList })
     //   })
   }

@@ -13,7 +13,6 @@ const Toast = () => {
   //   };
 
   const showToast = () => {
-    console.log("showtoast", toastContainer.current.classList);
     if (isError) {
       toastContainer.current.classList.add(
         "d-block",

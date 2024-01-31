@@ -9,27 +9,23 @@
 -- CONCLUSION: if you r going with client than set rules for every user like the user can get and modify his own data only,
 
 
+## FIREBASE finding
+### IMPORTANT NOTE: whenever you try to add orderBy make sure that indexing is enabled in firestore
+
+
+- ALWAYS in your app add how the app works,,
+- in this one , on any corner show the feature your provide , like security, functionalities etc
+
+
+
 #### PRIORITY
-- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
-- when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
+- when user declines a request, the person is hidden from request list bcz the messages are deleetd till then,, and, now when that person sends msg again to the user than the msgs will not be sent to receiver(will not be shown in req list in realtime, and will need to refresh to load that msg) as the sender already has the receievrr as the connection,,NEED SOLUTION
 
 
 
 ### Edge cases:
 - can user send himself texts?
 
-## IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in firestore
-
-
-
-# done
-- make sure username is unique
-
-
-
-# NOTE : connection are only made when user sends someone a text
-- ALWAYS in your app add how the app works,,
-- in this one , on any corner show the feature your provide , like security, functionalities etc
 
 
 # MANAGING FREQUENT DB Calls
@@ -45,6 +41,17 @@
 4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
 
 
+
+
+# done
+- make sure username is unique
+- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
+- creating a new connection from search list is not working,, the code to retrived msgs is breaking as there is no connection exits
+- add loading more msgs feature, only showing latest 20 rn
+- add loader (while loading mssgs or for dates)
+
+
+
 # Defects
 -   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
 - scroll down is not working
@@ -58,9 +65,6 @@
 - create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
-- add loader (while loading mssgs or for dates)
-- add loading more msgs feature, only showing latest 20 rn
-- add a search icon next to user serch input
 - encrypt messages/passwords
 - add vc webrtc
 - option to create a group and add members 
@@ -88,6 +92,8 @@
 - msg delete option for both parties if the msg was sent in between a specific hour 
 - when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 
+
+# NOTE : connection are only made when user sends someone a text
 
 
 ## Components

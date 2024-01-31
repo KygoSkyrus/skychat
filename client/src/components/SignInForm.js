@@ -80,7 +80,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
         if (name.includes(" ")) {
             // alert('user name can not contain blank spaces')
-            dispatch({ type: SET_TOAST, payload: {toastContent:"user name can not contain blank spaces", isError: true} })
+            dispatch({ type: SET_TOAST, payload: { toastContent: "user name can not contain blank spaces", isError: true } })
             return;
         }
 
@@ -98,15 +98,15 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
         if (data.userFound) {
             // alert(data.message)
-            dispatch({ type: SET_TOAST, payload: {toastContent:"username already exists", isError: true} })
-        }else{
-            let isUserCreated=false;
+            dispatch({ type: SET_TOAST, payload: { toastContent: "username already exists", isError: true } })
+        } else {
+            let isUserCreated = false;
             await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
                 .then((response) => {
                     const user = response.user;
                     console.log('signup user', user)
                     let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
-                    if(isRegistered) isUserCreated = true;
+                    if (isRegistered) isUserCreated = true;
                     // inProgressLoader(dispatch, false)
                     //navigate('/user');//sending user to user page for filling out other details
                 })
@@ -119,16 +119,16 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     // dispatch(invokeToast({ isSuccess: false, message: errMsg }))
                 });
 
-                if(isUserCreated){
-                    await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-                        .catch(
-                            (err) => console.log('err', err)
-                        );
-                
-                    //setting user and redirecting to chats
-                    dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                    navigate('/chat')
-                }
+            if (isUserCreated) {
+                await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+                    .catch(
+                        (err) => console.log('err', err)
+                    );
+
+                //setting user and redirecting to chats
+                dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                navigate('/chat')
+            }
         }
     }
 
@@ -281,7 +281,16 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             <section className='text-center'>{description}</section>
 
             {signInOrSignUp === "signup" &&
-                <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
+                <input
+                    type="text"
+                    className="form-control mt-2"
+                    name="username"
+                    id="username"
+                    placeholder="Username"
+                    value={userCredentials?.username}
+                    onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
+                    onKeyUp={(e) => e.key === "Enter" && document.getElementById('email1').focus()}
+                />
             }
 
             <input
@@ -312,7 +321,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
 
             <section className='continue-with position-relative w-100 text-center'>
-                <span >OR CONTINUE WITH</span>
+                <span>OR CONTINUE WITH</span>
                 <section></section>
             </section>
 
