@@ -1,0 +1,21 @@
+{
+  "name": "glbackup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "author": "dg",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.17.3",
+    "firebase-admin": "^12.0.0",
+    "moment": "^2.29.2",
+    "nodemon": "^2.0.15",
+    "socket.io": "^4.4.1"
+  }
+}
