@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
 import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, hideSearchedUsersList, sidebarVisibility, writeToDb } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, VideoIcon } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
@@ -25,6 +25,8 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [selectedUserToChat, setSelectedUserToChat] = useState()
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
+
+  const [videoReq, setVideoReq] = useState(false);
 
 
   const currentUser = useSelector(state => state.user.currentUser)
@@ -187,6 +189,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           </div>
           {selectedUserToChat &&
             <div className="d-flex align-items-center">
+              <VideoIcon className="pointer" onClick={() => setVideoReq(true)} />
               <ChevronLeft className="pointer" onClick={() => setSelectedUserToChat(undefined)} />
               <section id="chatWith">{selectedUserToChat}</section>
 
@@ -236,6 +239,7 @@ export const NewRTCA = ({ firebaseApp }) => {
             firebaseApp={firebaseApp}
             selectedUserToChat={selectedUserToChat}
             setSelectedUserToChat={setSelectedUserToChat}
+            videoReq={videoReq}
           />
           :
           connectionHeader ?

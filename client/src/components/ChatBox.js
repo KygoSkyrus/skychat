@@ -8,9 +8,10 @@ import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDat
 
 import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
+import VideoCall from './VC';
 
 
-const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => {
+const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, videoReq }) => {
     let prevDate = '';
 
     const db = getFirestore(firebaseApp);
@@ -276,6 +277,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
 
     console.log('------->>>>>>>>-----------chat box ends------------------------')
+
+    if (videoReq)
+    return <VideoCall
+    database={db}
+     />
 
     return (
         <div className="chat-body" >
