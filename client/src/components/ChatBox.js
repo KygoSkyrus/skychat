@@ -10,8 +10,10 @@ import { Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import VideoCall from './VC';
 
+// import peer from './webRTCService'
 
-const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, videoReq, setVideoReq }) => {
+
+const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, videoReq, setVideoReq,peer }) => {
     let prevDate = '';
 
     const db = getFirestore(firebaseApp);
@@ -24,10 +26,39 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
     const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
 
-    const[isIncomming,setIsIncoming]=useState(false)
+    const [isIncomming, setIsIncoming] = useState(false)
+    const [isAccepted,setIsAccepted]=useState(false)
+    const [theOfferRequest, setTheOfferRequest] = useState();
+    const [theOfferResponse,setTheOfferResponse]=useState()
 
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
+
+
+    // useEffect(() => {
+    //     // NOTE :: SHOULD BE MOVED OUT OF HERE or maybe not possible
+    //     const initiateCall = async () => {
+    //         const connectionId = userData?.connections[selectedUserToChat]?.id
+
+    //         // INITIATING OUTGOING CALL
+    //         const offer = await peer.getOffer();
+    //         console.log('offer', offer)
+    //         //this offer should be sent to slected user to call
+
+    //         // this offer will act like a message, being a message it will alert user realtime for the incoming call, and also this will be saved , so in future we can shhow it in calllog,,
+    //         // can add a type key here to differentiate it with messages, type can be vc for video call or ac for audio call
+    //         // the offer is like a outgoing call
+    //         const offerObj = {
+    //             connectionId: connectionId,
+    //             author: currentUser.displayName,
+    //             offer: JSON.stringify(offer) || null,
+    //             type: "vc",
+    //             time: serverTimestamp(),
+    //         }
+    //         await addDoc(collection(db, "v2"), offerObj);
+    //     }
+    //     if (videoReq) initiateCall();
+    // }, [videoReq])
 
 
     useEffect(() => {
@@ -42,7 +73,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
 
     console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
 
-
+// move it to utility as its also in vc compo
     function getConnectionId(userName) {
         //checking if the user in connection list or request list
         if (userData?.connections?.hasOwnProperty(userName)) {
@@ -157,14 +188,29 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
 
                     // WHen newmessage is an offer (icoming call, than we have to show the popup for incoming call, or we can redirect to vc componnet and there show the buttons for pickup or hangup along with media running)
 
-                    if (newMessage.type === "vc") {
+                    if (newMessage.type === "vc" && newMessage.author !== currentUser.displayName) {
                         const offer = JSON.parse(newMessage.offer)
+                        newMessage.offer = offer;
                         console.log('its vc', offer)
                         // from here the user will be sent to vc screen , there his camera will be open,, but the vc wont start, at the bottom button to pickup and hangup will be hsown,., these buttons will be rendered by passing a incoming sttae, which will be set true from here and that way , these button will be shown only on incoming calls,,, whne the pickup button will be clicked only then accept the users offer
 
                         // we need to return the offer acceptance answer,, for that we should update this same message, so that we wont have unnecesaary multiple messages just for one connection,
 
+                        setIsIncoming(true)
+                        setTheOfferRequest(newMessage)
                         setVideoReq(true)// fix this,, setting it here is making both chatbox and vc rerender// either move the button chatbox compo or put header for every componnet instead of at top level
+
+                        return;
+                    }else{
+                        // if (newMessage.offerRes) {
+                        //     console.log('if offeres true')
+                        //     const offerRes = JSON.parse(newMessage.offerRes)
+                        //     console.log('offffferres',offerRes)
+                        //     // handleCallAccepted(offerRes);
+                        //     setIsAccepted(true)
+                        //     setTheOfferResponse(offerRes)
+                        //     return;
+                        // }
                     }
 
                     setMessageList((prevArray) => {
@@ -297,7 +343,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
         return <VideoCall
             database={db}
             selectedUserToChat={selectedUserToChat}
+
             isIncomming={isIncomming}
+            isAccepted={isAccepted}
+            theOfferRequest={theOfferRequest}
+            peer={peer}
         />
 
     return (
