@@ -11,7 +11,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import VideoCall from './VC';
 
 
-const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, videoReq }) => {
+const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, videoReq, setVideoReq }) => {
     let prevDate = '';
 
     const db = getFirestore(firebaseApp);
@@ -23,6 +23,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
     const [loading, setLoading] = useState(false);
     const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
+
+    const[isIncomming,setIsIncoming]=useState(false)
 
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
@@ -47,7 +49,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
             return populateConnectionId(userData.connections[userName])
         } else if (userData?.requests?.hasOwnProperty(userName)) {
             return populateConnectionId(userData.requests[userName])
-        }else{
+        } else {
             return populateConnectionId(undefined)
         }
     }
@@ -150,7 +152,20 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
 
                 //only updates when the onsnapshot is triggered oragnically and not by useEffct (only code inside onSnapshot block will run)
                 if (isRealTimeUpdate) {
-                    console.log('isRealTimeUpdate ---newMessage', snapshot, newMessage)
+                    console.log('isRealTimeUpdate ---newMessage', newMessage)
+
+
+                    // WHen newmessage is an offer (icoming call, than we have to show the popup for incoming call, or we can redirect to vc componnet and there show the buttons for pickup or hangup along with media running)
+
+                    if (newMessage.type === "vc") {
+                        const offer = JSON.parse(newMessage.offer)
+                        console.log('its vc', offer)
+                        // from here the user will be sent to vc screen , there his camera will be open,, but the vc wont start, at the bottom button to pickup and hangup will be hsown,., these buttons will be rendered by passing a incoming sttae, which will be set true from here and that way , these button will be shown only on incoming calls,,, whne the pickup button will be clicked only then accept the users offer
+
+                        // we need to return the offer acceptance answer,, for that we should update this same message, so that we wont have unnecesaary multiple messages just for one connection,
+
+                        setVideoReq(true)// fix this,, setting it here is making both chatbox and vc rerender// either move the button chatbox compo or put header for every componnet instead of at top level
+                    }
 
                     setMessageList((prevArray) => {
                         const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
@@ -162,7 +177,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
                     })
 
                     // only play this audio when msg is from other user, dont play it for yourself
-                    if(newMessage?.author !== userData.username){
+                    if (newMessage?.author !== userData.username) {
                         const audio = new Audio(notification);
                         audio.play(); // this is playing twice [fixed]
                     }
@@ -279,9 +294,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, video
     console.log('------->>>>>>>>-----------chat box ends------------------------')
 
     if (videoReq)
-    return <VideoCall
-    database={db}
-     />
+        return <VideoCall
+            database={db}
+            selectedUserToChat={selectedUserToChat}
+            isIncomming={isIncomming}
+        />
 
     return (
         <div className="chat-body" >

@@ -39,6 +39,7 @@
 2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
 3. [1] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
 4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
+5. [0] the user wont be able to know if he has any messages or a vc request,, to do that we may need to listen to any chnages in the doc of user's connection list,, thats the only way i can think of rn. maybe firebase notifications can be used to do this.
 
 
 

@@ -117,7 +117,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   function handleSelectedUserToChat(username) {
     //dispatch an event and set the state there (may or may not be required)
     sidebarVisibility(false, setSearchedUserList)//closing sidebar
-    setSelectedUserToChat(username);//setting selected user
+    setSelectedUserToChat(username);//setting selected user// set the connection string too, either make this state an object or create another state
 
     // retrieveTexts(username);// it will be in useefct in chatbox compo and whenever selectedUsertoChat is changed than it will run this function
   }
@@ -240,6 +240,7 @@ export const NewRTCA = ({ firebaseApp }) => {
             selectedUserToChat={selectedUserToChat}
             setSelectedUserToChat={setSelectedUserToChat}
             videoReq={videoReq}
+            setVideoReq={setVideoReq}
           />
           :
           connectionHeader ?
