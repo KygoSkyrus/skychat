@@ -12,7 +12,6 @@ import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delet
 
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
-import peer from './webRTCService'
 
 
 
@@ -27,7 +26,6 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
-  const [videoReq, setVideoReq] = useState(false);
 
 
   const currentUser = useSelector(state => state.user.currentUser)
@@ -169,28 +167,6 @@ export const NewRTCA = ({ firebaseApp }) => {
     }
   }
 
-  const startVidCall = async () => {
-    const connectionId = userData?.connections[selectedUserToChat]?.id//wont work for request/blocked connection
-
-    // INITIATING OUTGOING CALL
-    const offer = await peer.getOffer();
-    console.log('offer', offer)
-    //this offer should be sent to slected user to call
-
-    // this offer will act like a message, being a message it will alert user realtime for the incoming call, and also this will be saved , so in future we can shhow it in calllog,,
-    // can add a type key here to differentiate it with messages, type can be vc for video call or ac for audio call
-    // the offer is like a outgoing call
-    const offerObj = {
-      connectionId: connectionId,
-      author: currentUser.displayName,
-      offer: JSON.stringify(offer) || null,
-      type: "vc",
-      time: serverTimestamp(),
-    }
-    await addDoc(collection(db, "v2"), offerObj);
-
-  }
-
 
   return (
     <>
@@ -212,7 +188,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           </div>
           {selectedUserToChat &&
             <div className="d-flex align-items-center">
-              <VideoIcon className="pointer" onClick={() => startVidCall()} />
+              <VideoIcon className="pointer" />
               <ChevronLeft className="pointer" onClick={() => setSelectedUserToChat(undefined)} />
               <section id="chatWith">{selectedUserToChat}</section>
 
@@ -262,9 +238,6 @@ export const NewRTCA = ({ firebaseApp }) => {
             firebaseApp={firebaseApp}
             selectedUserToChat={selectedUserToChat}
             setSelectedUserToChat={setSelectedUserToChat}
-            videoReq={videoReq}
-            setVideoReq={setVideoReq}
-            peer={peer}
           />
           :
           connectionHeader ?

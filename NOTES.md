@@ -74,7 +74,7 @@
 - create a text like hovered toast if toasts are ever neeeded
 - set the users usernsme in displayname of firebase and avatar in photourl
 - show err msg on incorrect login
-- username can npot be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
+- username can not be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - add professional and other versions
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
 - try firebase push notifications
