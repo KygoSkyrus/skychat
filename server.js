@@ -20,7 +20,7 @@ const port = process.env.PORT || 5000;
 // FIREBASE ADMIN 
 const admin = require("firebase-admin");
 // const { initializeApp } = require('firebase-admin/app');
-const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = require("./serviceAccountKey");
 
 
 admin.initializeApp({
