@@ -8,33 +8,33 @@
 
 -- CONCLUSION: if you r going with client than set rules for every user like the user can get and modify his own data only,
 
-
-#### PRIORITY
-- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
-- when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
-
-
-
-### Edge cases:
-- can user send himself texts?
-
 ## IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in firestore
-
-
-
-# done
-- make sure username is unique
-
-
 
 # NOTE : connection are only made when user sends someone a text
 - ALWAYS in your app add how the app works,,
 - in this one , on any corner show the feature your provide , like security, functionalities etc
 
 
+
 # MANAGING FREQUENT DB Calls
 - need to call db only when users doc is updated, like a connection is made or request recieved,,
 - for msgs their will be cache,, maybe with a cron job
+
+
+
+
+### Edge cases:
+- can user send himself texts?
+
+
+
+
+# done
+- make sure username is unique
+- when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
+- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
+
+
 
 
 
@@ -46,7 +46,7 @@
 
 
 # Defects
--   //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
+- //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
 - scroll down is not working
 - all the parts like sidebar, chathead etc can go to deifferent component
 - when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time
@@ -54,27 +54,38 @@
 - there is a memory leak error on signinform
 
 # Todo 
+
+**Style**
+- the height of chat body changes as we go from connection to req window, and opens a req chat
 - increase the width of iverall chatbody
-- create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
-- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
+- add a search icon next to user serch input
+- create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
+- create a text like hovered toast if toasts are ever neeeded
+
+
+- add the feature to make your account private;;; in settings add this.... 
+- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
 - add loader (while loading mssgs or for dates)
 - add loading more msgs feature, only showing latest 20 rn
-- add a search icon next to user serch input
 - encrypt messages/passwords
-- add vc webrtc
 - option to create a group and add members 
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
-- create a text like hovered toast if toasts are ever neeeded
 - set the users usernsme in displayname of firebase and avatar in photourl
 - show err msg on incorrect login
-- username can npot be changed , add reges for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
+- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - add professional and other versions
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
 - try firebase push notifications
 - add a option to share the app with your frnds,, create links to share on social media apps
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, thi sway you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
+
+
+
+https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimensional-cute-profession_14126497.html
+
+
 
 
 ## FINDINGS
@@ -119,7 +130,7 @@
     - when a connection request is **accepted** than that connection will be moved to connections field in db and will be removed from request field,
     - when a connection request is **declined** than the connection will be ~~removed from requests list~~
       + **case_1**: if the sender sends the message again after his previous request is declined. in this case we need to check on every msg send that if the receiver has the sender in request list, if not than add him in the req list otherwise ignore.(not happy with this,, why? bcs here we required to access the receiver's doc, which case two problems, 1:- that its gonna make one extra read from db on every msg sent, 2:- we wanted to implement the security rules in db that user can only access their own records,, so it contradics that thought) 
-        + **solution**: so when the receiver declines the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side
+        + **solution**: so when the receiver declines the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side .... and when the person sends the msg again then we show him back in the req list by checking if the msg is recieved after the user declined his previous request(by checking deletedTill timestamp)
     - when a connection request is **blocked** .. refer to Block action
     
 
@@ -149,6 +160,7 @@
     - the one who's request is declined?
     - user himself?
   - all of them.. why? test one by one to check why not
+  - dont let user search the person who are in the request list, and which has a deletedTill (this is why bcz if we dont do this than on search it will show that the request thing with accept and decline button even if the user has declined him earlier,, so better not show it)
   
 
 

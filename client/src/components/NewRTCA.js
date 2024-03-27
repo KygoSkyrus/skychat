@@ -79,9 +79,9 @@ export const NewRTCA = ({ firebaseApp }) => {
     //     .map((doc) => {
     //       let data= doc.data();
     //       data.id=doc.id;
-    //       // console.log('dddddd',data)
     //       userList[data.username] = data;
     //     });
+    //     console.log('dddddd',userList)
     // dispatch({ type: SET_USERS_LIST, payload: userList })
     //   })
   }

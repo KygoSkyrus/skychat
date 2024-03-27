@@ -29,7 +29,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     useEffect(() => {
         if (selectedUserToChat) {
-            console.log('useEffect in chatbox--')
+            console.log('useEffect in chatbox--',selectedUserToChat)
 
             realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
@@ -46,6 +46,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             return populateConnectionId(userData.connections[userName])
         } else if (userData?.requests?.hasOwnProperty(userName)) {
             return populateConnectionId(userData.requests[userName])
+        }else{
+            return populateConnectionId(null)
         }
     }
 
@@ -126,14 +128,17 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     let isRealTimeUpdate = true;
     function realtimeListener(selectedUser) {
-        console.log('__realtimeListener', selectedUser)
-
+        
         isRealTimeUpdate = false;
         const { connectionId, chatsTill } = getConnectionId(selectedUser)
-
+        
+        console.log('__realtimeListener--g-g-g- isRealTimeUpdate', selectedUser,isRealTimeUpdate)
         if (connectionId) {
 
             const messagesRef = collection(db, 'v2');
+
+
+// NOTE:::: THIS ISSUE [2] is happenong bcz for a new chat,, the connection id is created on send text,, and maybe this snapshot does not has connection id,s o maybe thats why its is needed to be refreshed in order to have  a connection id
 
             let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(1));
             //chatsTill may not be needed as its real-time

@@ -213,11 +213,15 @@ body {
 /*chat page*/
 .outer {
   width: 350px;
-  /* height: 400px; */
-  /* position: absolute;
+
+  /* uncommented bcz of sidebar overflow */
+  height: 400px;
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); */
+  transform: translate(-50%, -50%);
+  /* uncommented bcz of sidebar overflow */
+
   background-color: #111;
   border-radius: 4px;
   box-shadow: 0 0 5px 0px #00000080;
