@@ -29,57 +29,64 @@
 
 
 
-# done
-- make sure username is unique
-- when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
-- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
-
-
-
-
-
 # ISSUE (1=done,0=open)
 1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)  {maybe this can be done by setting mewssagelist to  null when user press back btn to go to chatlist}
-2. [0] when texting someone for first time than the msg is not showing immmediately in the ui 
+2. [1] when texting someone for first time than the msg is not showing immmediately in the ui [fixed by calling the realtime listern function with connection id for new connection]
 3. [1] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
 4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
 
 
-# Defects
-- //when  i send a msg to a unknown user,, the msg doesnt show in ui right then
+
+
+
+# done
+- make sure username is unique
+- when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
+- whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
+- // when i send a msg to a unknown user,, the msg doesnt show in ui right then
 - scroll down is not working
-- all the parts like sidebar, chathead etc can go to deifferent component
-- when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time
+
+
+
+
+# Defects
+- when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time [solution: either we have snapshot for every conecction and request (have to get all the ids by connection and put it in a snapshot query), so that whenever a msg is there from any of the user, than the i will get notified,,,also this can be helpful to show msg on the chatlist window,, to show latest msg]
 - hide the author name if its private chat,,,only show when its group
 - there is a memory leak error on signinform
+- add loading more msgs feature, only showing latest 20 rn
 
 # Todo 
+-implement group chat/option to create a group and add members 
+-delete msg
+- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
+- show err msg on incorrect login
+- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
+
+- encrypt messages/passwords
+- check db security using other domain
+- remove localhost and add app's real domain to authorized domain from firebase in production 
+- try firebase push notifications
+
+- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
+- use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
+
 
 **Style**
 - the height of chat body changes as we go from connection to req window, and opens a req chat
-- increase the width of iverall chatbody
+- increase the width of overall chatbody
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - add a search icon next to user serch input
 - create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - create a text like hovered toast if toasts are ever neeeded
 
 
-- add the feature to make your account private;;; in settings add this.... 
-- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option
+- **least priority**
+- all the parts like sidebar, chathead etc can go to deifferent component
 - add loader (while loading mssgs or for dates)
-- add loading more msgs feature, only showing latest 20 rn
-- encrypt messages/passwords
-- option to create a group and add members 
-- check db security using other domain
-- remove localhost and add app's real domain to authorized domain from firebase in production 
 - set the users usernsme in displayname of firebase and avatar in photourl
-- show err msg on incorrect login
-- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - add professional and other versions
-- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme etc,,,try push notifications
-- try firebase push notifications
 - add a option to share the app with your frnds,, create links to share on social media apps
-- use localstoreage or some othr place to store msg,, later u can update those msgs with db,, thi sway you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
+
 
 
 
