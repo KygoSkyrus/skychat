@@ -44,8 +44,10 @@ const Toast = () => {
 
   return (
     <>
-      <div className="toast" ref={toastContainer}>
-        {message}
+      <div className="toast_container" ref={toastContainer}>
+        <div className="toast">
+          {message}
+        </div>
       </div>
     </>
   );

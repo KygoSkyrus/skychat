@@ -6,7 +6,7 @@ import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
 import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, populateConnectionId, writeToDb } from '../utils';
 
-import { Send } from 'lucide-react';
+import { PlusSquare, Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 
 

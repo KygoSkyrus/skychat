@@ -31,7 +31,7 @@
 
 # ISSUE (1=done,0=open)
 1. [1] when chat is cleared and user goes back to connection list and then opens the chat, and texts then all the deleted msgs are also showing (// NOTE ::: SENDING MSGS RIGHT AFTER CLEARING CHATS IS PULLING BACK ALL THNE DELETE CHATS ),, ( //when msgs are sent than the deleted msgs were also getting loaded bcz msg query was not running, only the snapshot was running which pulls the new records, thats the reason that when on first load it works fine bcz then the query used to run nut on sendText it does not)  {maybe this can be done by setting mewssagelist to  null when user press back btn to go to chatlist}
-2. [1] when texting someone for first time than the msg is not showing immmediately in the ui [fixed by calling the realtime listern function with connection id for new connection]
+2. [1] when texting someone for first time than the msg is not showing immmediately in the ui [fixed by calling the realtime-listener function with connection id for new connection]
 3. [1] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
 4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
 
@@ -45,6 +45,7 @@
 - whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
 - // when i send a msg to a unknown user,, the msg doesnt show in ui right then
 - scroll down is not working
+- show err msg on incorrect login
 
 
 
@@ -59,7 +60,6 @@
 -implement group chat/option to create a group and add members 
 -delete msg
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
-- show err msg on incorrect login
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 
 - encrypt messages/passwords
@@ -72,6 +72,7 @@
 
 
 **Style**
+- on desktop show the sidebar..hid it only for mobile
 - the height of chat body changes as we go from connection to req window, and opens a req chat
 - increase the width of overall chatbody
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -128,15 +129,15 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
   - message is added in db with the connectionid 
 
   - # UI
-    - when a chat is opened at the top header the selected person to chat dp will be shown, which will have a dropdown for basic operation such as block, clear chat, delete connection, this dropdown will only be available for a connection and not for conecction in reqlist
+    - when a chat is opened at the top header the selected person to chat dp will be shown, which will have a dropdown for basic operation such as block, clear chat, delete connection, this dropdown will only be available for a connection and not for conection in req list
     - In UI there will be two headers compartments. one of which will always be 90% width, initailly it will be "CONNECTIONS", which will show all the connections of user and the Second header will be of "CONNECTION REQUEST",
     - on clicking either of them will shrink the other header down. (also when shrinked , replace the header with a relatable icon [can use user icon or chat icon])
     - on hovering over userlist in both connection and request list, it should show basic actions like delete chat, remove connection,,,, on request like there can be like accept or remove connection
     - **CONNECTION_REQUEST**: connection request will be shown on the basis the if there is any new msgs from the sender(which is not a connection). This will be implemented as while rendering the request list we will check if that connection has a deletedTill value, if not than we will just render that req,, if it has a valid deletedTill value than we will check the db for just one last(latest) message document and compare the time of doc with the deletedTill value to check if the message is sent after the deletion, if yes than we will show this on req list otherwise hide
-    - when user opens a requested chat, than he will have to opt in from one of two options i.e. Accept/Delete,[late a Block option will also be given] (user is prohibited to reply or text until he/she makes a decision)
+    - when user opens a requested chat, than he will have to opt in from one of two options i.e. Accept/Delete,[later a Block option will also be given] (user is prohibited to reply or text until he/she makes a decision)
     - when a connection request is **accepted** than that connection will be moved to connections field in db and will be removed from request field,
     - when a connection request is **declined** than the connection will be ~~removed from requests list~~
-      + **case_1**: if the sender sends the message again after his previous request is declined. in this case we need to check on every msg send that if the receiver has the sender in request list, if not than add him in the req list otherwise ignore.(not happy with this,, why? bcs here we required to access the receiver's doc, which case two problems, 1:- that its gonna make one extra read from db on every msg sent, 2:- we wanted to implement the security rules in db that user can only access their own records,, so it contradics that thought) 
+      + **case_1**: if the sender sends the message again after his previous request is declined. in this case we need to check on every msg send that if the receiver has the sender in request list, if not than add him in the req list otherwise ignore.(not happy with this,, why? bcs here we required to access the receiver's doc, which cause two problems, 1:- that its gonna make one extra read from db on every msg sent, 2:- we wanted to implement the security rules in db that user can only access their own records,, so it contradicts that thought) 
         + **solution**: so when the receiver declines the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side .... and when the person sends the msg again then we show him back in the req list by checking if the msg is recieved after the user declined his previous request(by checking deletedTill timestamp)
     - when a connection request is **blocked** .. refer to Block action
     

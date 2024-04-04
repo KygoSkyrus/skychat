@@ -37,7 +37,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
 
 
-    function handleClick() {
+    function handleClick(e) {
+        e.preventDefault();  
         if (signInOrSignUp === "signup") {
             createUserAccountFirebase()
         } else if (signInOrSignUp === "signin") {
@@ -80,7 +81,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
         if (name.includes(" ")) {
             // alert('user name can not contain blank spaces')
-            dispatch({ type: SET_TOAST, payload: {toastContent:"user name can not contain blank spaces", isError: true} })
+            dispatch({ type: SET_TOAST, payload: { toastContent: "user name can not contain blank spaces", isError: true } })
             return;
         }
 
@@ -98,15 +99,15 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
         if (data.userFound) {
             // alert(data.message)
-            dispatch({ type: SET_TOAST, payload: {toastContent:"username already exists", isError: true} })
-        }else{
-            let isUserCreated=false;
+            dispatch({ type: SET_TOAST, payload: { toastContent: "username already exists", isError: true } })
+        } else {
+            let isUserCreated = false;
             await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
                 .then((response) => {
                     const user = response.user;
                     console.log('signup user', user)
                     let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
-                    if(isRegistered) isUserCreated = true;
+                    if (isRegistered) isUserCreated = true;
                     // inProgressLoader(dispatch, false)
                     //navigate('/user');//sending user to user page for filling out other details
                 })
@@ -116,19 +117,19 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     let errMsg = error.message;
                     console.log('error', error)
                     if (error.code === 'auth/email-already-in-use') errMsg = "User already exists!!! Try Signing in instead"
-                    // dispatch(invokeToast({ isSuccess: false, message: errMsg }))
+                    dispatch({ type: SET_TOAST, payload: { toastContent: errMsg, isError: true } })
                 });
 
-                if(isUserCreated){
-                    await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-                        .catch(
-                            (err) => console.log('err', err)
-                        );
-                
-                    //setting user and redirecting to chats
-                    dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                    navigate('/chat')
-                }
+            if (isUserCreated) {
+                await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+                    .catch(
+                        (err) => console.log('err', err)
+                    );
+
+                //setting user and redirecting to chats
+                dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                navigate('/chat')
+            }
         }
     }
 
@@ -147,6 +148,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 }
             )
             .catch((error) => {
+                dispatch({ type: SET_TOAST, payload: { toastContent: "Authentication Failed, Invalid email/password", isError: true } })
                 // inProgressLoader(dispatch, false)
                 setUserCredentials({ email: '', password: '', username: '' })
                 // dispatch(invokeToast({ isSuccess: false, message: "Authentication Failed, Invalid email/password" }))
@@ -277,50 +279,54 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     return (
         <>
-            <h5 className='text-dark'>{title}</h5>
+            <h5 className='text-dark text-center fw-bold'>{title}</h5>
             <section className='text-center'>{description}</section>
 
-            {signInOrSignUp === "signup" &&
-                <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
-            }
+            <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e=>handleClick(e)}>
+                {signInOrSignUp === "signup" &&
+                    <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
+                }
 
-            <input
-                type="email"
-                className="form-control my-2"
-                name="email"
-                id="email1"
-                placeholder="Email address"
-                aria-describedby="emailHelp"
-                value={userCredentials?.email}
-                onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
-                onKeyUp={(e) => e.key === "Enter" && document.getElementById('password1').focus()}
-            />
+                <input
+                    type="email"
+                    className="form-control my-2"
+                    name="email"
+                    id="email1"
+                    placeholder="Email address"
+                    aria-describedby="emailHelp"
+                    value={userCredentials?.email}
+                    onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
+                    onKeyUp={(e) => e.key === "Enter" && document.getElementById('password1').focus()}
+                />
 
-            <input
-                type="password"
-                className="form-control"
-                id="password1"
-                name="password"
-                placeholder="Password*"
-                value={userCredentials?.password}
-                onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
-                onKeyUp={(e) => e.key === "Enter" && handleClick()}
-            />
+                <input
+                    type="password"
+                    className="form-control"
+                    id="password1"
+                    name="password"
+                    placeholder="Password*"
+                    value={userCredentials?.password}
+                    onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
+                    onKeyUp={(e) => e.key === "Enter" && handleClick()}
+                />
 
-            <button className='btn btn-outline-warning w-100 my-2' onClick={() => handleClick()}>{btnText}</button>
+                <button type='submit' className='btn btn-outline-warning w-100 my-2' 
+                // onClick={() => handleClick()}
+                >{btnText}</button>
 
-            <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
+                <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
 
-            <section className='continue-with position-relative w-100 text-center'>
-                <span >OR CONTINUE WITH</span>
-                <section></section>
-            </section>
+                <section className='continue-with position-relative w-100 text-center'>
+                    <span >OR CONTINUE WITH</span>
+                    <section></section>
+                </section>
 
-            <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1'
-            // onClick={() => goWithGoogle(signInOrSignUp, navigate, dispatch)}
-            >
-                <svg width="25" height="25" viewBox="5 5 35 35" xmlns="http://www.w3.org/2000/svg" style={{ height: "32px", width: "32px", marginLeft: "-8px" }}><g fill="none" fillRule="evenodd"><path d="M31.64 23.205c0-.639-.057-1.252-.164-1.841H23v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"></path><path d="M23 32c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711h-3.007v2.332A8.997 8.997 0 0 0 23 32z" fill="#34A853"></path><path d="M17.964 24.71a5.41 5.41 0 0 1-.282-1.71c0-.593.102-1.17.282-1.71v-2.332h-3.007A8.996 8.996 0 0 0 14 23c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path><path d="M23 17.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C27.463 14.891 25.426 14 23 14a8.997 8.997 0 0 0-8.043 4.958l3.007 2.332c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"></path><path d="M14 14h18v18H14V14z"></path></g></svg> <span>Google</span>
-            </button>
+                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1'
+                // onClick={() => goWithGoogle(signInOrSignUp, navigate, dispatch)}
+                >
+                    <svg width="25" height="25" viewBox="5 5 35 35" xmlns="http://www.w3.org/2000/svg" style={{ height: "32px", width: "32px", marginLeft: "-8px" }}><g fill="none" fillRule="evenodd"><path d="M31.64 23.205c0-.639-.057-1.252-.164-1.841H23v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"></path><path d="M23 32c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711h-3.007v2.332A8.997 8.997 0 0 0 23 32z" fill="#34A853"></path><path d="M17.964 24.71a5.41 5.41 0 0 1-.282-1.71c0-.593.102-1.17.282-1.71v-2.332h-3.007A8.996 8.996 0 0 0 14 23c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path><path d="M23 17.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C27.463 14.891 25.426 14 23 14a8.997 8.997 0 0 0-8.043 4.958l3.007 2.332c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"></path><path d="M14 14h18v18H14V14z"></path></g></svg> <span>Google</span>
+                </button>
+            </form>
         </>
     )
 }

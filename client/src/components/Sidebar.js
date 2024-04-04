@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
-import { LogOut, Search, SearchCheck, Tally1, X } from 'lucide-react'
+import { LogOut, Plus, PlusSquare, Search, SearchCheck, Tally1, Users2, X } from 'lucide-react'
 
 import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
+import GroupModal from './modals/GroupModal'
+import SearchComponent from './SearchComponent'
 
 
 const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserList }) => {
@@ -17,6 +19,8 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
 
 
     const [showUserModal, setShowUserModal] = useState(false)
+
+    const [showGroupModal, setShowGroupModal] = useState(false)
 
 
     const handleSearchUser = debounce(searchUser, 1000);
@@ -62,16 +66,18 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
     return (
         <>
             <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
-                <div style={{ height: "90%" }}>
+                <div style={{ height: "75%" }}>
 
                     <span onClick={() => sidebarVisibility(false, setSearchedUserList)} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
                         {/* <X size="20" /> */}
                         <Tally1 strokeWidth={4} />
                     </span>
 
-                    <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
+<SearchComponent/>
+
+
+                    {/* <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
                         <span><Search /></span>
-                        {/* <span>Search a connection</span> */}
                         <input type="search" onChange={e => handleChangeUserSearch(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
                     </div>
 
@@ -86,15 +92,27 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         })}
                         <div className="no-user d-none text-center">No user found</div>
                         <div className="custom-loader d-none" onClick={() => hideSearchedUsersList(setSearchedUserList)} ></div>
-                    </div>
+                    </div> */}
+
                 </div>
-                <section className="myProfile px-2">
-                    <span>
-                        <img src={userData?.avatar} alt="" className="avatar pointer me-2" onClick={() => setShowUserModal(true)} />
-                        {currentUser?.displayName}
-                    </span>
-                    <LogOut size="20" onClick={() => signOut()} className='pointer' />
-                </section>
+                <div>
+                    <section onClick={() => setShowGroupModal(true)}>
+                        <button className='w-100 px-2 py-2 bg-light d-flex justify-content-between'>
+                            <span>Start a group</span>
+                            <span>
+                                <Users2 size={16} />
+                                <Plus size={12} />
+                            </span>
+                        </button>
+                    </section>
+                    <section className="myProfile px-2">
+                        <span>
+                            <img src={userData?.avatar} alt="" className="avatar pointer me-2" onClick={() => setShowUserModal(true)} />
+                            {currentUser?.displayName}
+                        </span>
+                        <LogOut size="20" onClick={() => signOut()} className='pointer' />
+                    </section>
+                </div>
 
             </div>
 
@@ -102,6 +120,13 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                 <>
                     <UserModal setShowUserModal={setShowUserModal} />
                     <div className="overlay pointer zIndex4" onClick={() => setShowUserModal(false)}></div>
+                </>
+            }
+
+            {showGroupModal &&
+                <>
+                    <GroupModal setShowGroupModal={setShowGroupModal} />
+                    <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>
                 </>
             }
         </>

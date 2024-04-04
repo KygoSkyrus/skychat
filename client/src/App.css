@@ -92,19 +92,23 @@ body {
   align-items: center;
   z-index: 1;
 }
-.toast{
-  /* display: none; */
+.toast_container{
   position: absolute;
-  width: 180px;
   right: 0;
   top: 30%;
+  width: 100%;
+  transition: var(--transition);
+}
+.toast{
+  /* display: none; */
+
+  /* width: 180px; */
   color: #fff;
   background: var(--violet);
   font-weight: lighter;
   text-align: center;
   border-radius: 4px;
   padding: 4px;
-  transition: var(--transition);
   opacity: 1 !important;
 }
 .toast::before{
@@ -123,7 +127,8 @@ body {
   border-top: 5px solid #ec407a;
 }
 .toast_animation{
-  right: -189px;
+  right: -189px; 
+  right: calc(-100% - 4px);
   top: 10%;
 }
 
@@ -645,6 +650,7 @@ input[type="search"] {
 
 /* USER MODAL */
 #userModal,
+#groupModal,
 #avatarModal,
 #blockedConnModal {
   width: 90%;
@@ -798,7 +804,16 @@ input[type="search"] {
 
 
 
-/* BLOCKED CONNECTIONS MOAL */
+
+/* GROUP MODAL */
+#groupModal .m-dialog{
+  background: #161616;
+  color: #f0f0f0;
+}
+
+
+
+/* BLOCKED CONNECTIONS MODAL */
 #blockedConnModal .m-dialog{
   background: #dadada;
 }

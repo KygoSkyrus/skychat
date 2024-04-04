@@ -20,7 +20,7 @@ const Authenticate = ({ firebaseApp }) => {
                         </div> */}
                         <div className='forms-holder' >
                             {currAuthMethod === 'signin' ?
-                                <div className={`signin-form d-flex justify-content-center align-items-center flex-column h-100`} >
+                                <div className={`signin-form`} >
                                     <SignInForm
                                         title="SignIn to your account"
                                         description="Enter your email and password to sign in to your account"
@@ -33,7 +33,7 @@ const Authenticate = ({ firebaseApp }) => {
                                     />
                                 </div>
                                 :
-                                <div className={`signup-form d-flex justify-content-center align-items-center flex-column h-100 ${window.outerWidth < 768 && 'd-none'}`} >
+                                <div className={`signup-form ${window.outerWidth < 768 && 'd-none'}`} >
                                     <SignInForm
                                         title="Create an account"
                                         description="Enter your email below to create your account"
