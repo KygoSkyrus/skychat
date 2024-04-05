@@ -446,6 +446,7 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
   text-wrap: nowrap;
+  position: relative;
 }
 .myProfile .avatar {
   width: 30px;
@@ -453,6 +454,31 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border-radius: 50%;
+}
+.myProfile .setting-icon{
+  display: none;
+  position: absolute;
+  left: 0;
+  color: white;
+  background: #3b3b3bb0;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+  cursor: pointer;
+  transform: var(--transition);
+}
+.myProfile span:hover .setting-icon{
+  display: inline;
+  animation: rotate infinite 8s linear;
+}
+@keyframes rotate {
+  0%{
+    rotate: 0deg;
+  }
+  100%{
+    rotate: 360deg;
+  }
 }
 /*********** my profile*************/
 
@@ -509,25 +535,33 @@ input[type="search"] {
   outline: none;
   border: none;
 }
-#userSearchDropdown {
+#userSearchDropdown, 
+#userSearchDropdownGroup {
   overflow: auto;
   height: 80%;
 }
-#userSearchDropdown section{
+#userSearchDropdown section, 
+#userSearchDropdownGroup section{
   width: unset;
   margin: 0 0.5rem;
 }
-#userSearchDropdown img{
+#userSearchDropdown img, 
+#userSearchDropdownGroup img{
   width: 30px;
-  height: 30px;
+  height: 30px; 
 }
-#userSearchDropdown::-webkit-scrollbar {
+#userSearchDropdown ::-webkit-scrollbar, 
+#userSearchDropdownGroup::-webkit-scrollbar {
   /* display: none; */
   width: 6px;
 }
-#userSearchDropdown::-webkit-scrollbar-thumb {
+#userSearchDropdown::-webkit-scrollbar-thumb, 
+#userSearchDropdownGroup::-webkit-scrollbar-thumb {
   background-color: rgb(166 166 166);
   border-radius: 4px;
+}
+#userSearchDropdownGroup .dropdown-item{
+  color: #fff;
 }
 
 

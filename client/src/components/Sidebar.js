@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
-import { LogOut, Plus, PlusSquare, Search, SearchCheck, Tally1, Users2, X } from 'lucide-react'
+import { Cog, LogOut,  Plus, Search, SearchCheck, Settings,  Tally1, Users2, X } from 'lucide-react'
 
 import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
@@ -15,7 +15,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
     const auth = getAuth();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo)
-    const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
+    // const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
 
 
     const [showUserModal, setShowUserModal] = useState(false)
@@ -23,37 +23,37 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
     const [showGroupModal, setShowGroupModal] = useState(false)
 
 
-    const handleSearchUser = debounce(searchUser, 1000);
+    // const handleSearchUser = debounce(searchUser, 1000);
 
-    const handleChangeUserSearch = (e) => {
-        setSearchedUserList(undefined)  //clearing all records
-        let userSearchDropdown = document.getElementById('userSearchDropdown')
+    // const handleChangeUserSearch = (e) => {
+    //     setSearchedUserList(undefined)  //clearing all records
+    //     let userSearchDropdown = document.getElementById('userSearchDropdown')
 
-        if (e.target.value.length === 0) {
-            userSearchDropdown?.classList.add('d-none')//hide search list
-        } else {
-            userSearchDropdown?.classList.remove('d-none')//make search result visible
-            document.querySelector('.custom-loader').classList.remove('d-none')//showing loader while typing
-            document.querySelector('.no-user')?.classList.add('d-none')//hiding no item message while typing
-            handleSearchUser(e);
-        }
-    }
+    //     if (e.target.value.length === 0) {
+    //         userSearchDropdown?.classList.add('d-none')//hide search list
+    //     } else {
+    //         userSearchDropdown?.classList.remove('d-none')//make search result visible
+    //         document.querySelector('.custom-loader').classList.remove('d-none')//showing loader while typing
+    //         document.querySelector('.no-user')?.classList.add('d-none')//hiding no item message while typing
+    //         handleSearchUser(e);
+    //     }
+    // }
 
-    async function searchUser(e) {
-        // let result = usersList.filter(user => user?.username?.includes(e.target.value))
-        let result = Object.keys(usersList).filter(user => user.includes(e.target.value))
+    // async function searchUser(e) {
+    //     // let result = usersList.filter(user => user?.username?.includes(e.target.value))
+    //     let result = Object.keys(usersList).filter(user => user.includes(e.target.value))
 
-        let noResult = document.querySelector('.no-user')
-        document.querySelector('.custom-loader')?.classList.add('d-none')//showing loader while typing
+    //     let noResult = document.querySelector('.no-user')
+    //     document.querySelector('.custom-loader')?.classList.add('d-none')//showing loader while typing
 
-        if (result.length === 0) {
-            noResult?.classList.remove('d-none')
-            setSearchedUserList(undefined)  //clearing all records
-        } else {
-            noResult?.classList.add('d-none')
-            setSearchedUserList(result)
-        }
-    }
+    //     if (result.length === 0) {
+    //         noResult?.classList.remove('d-none')
+    //         setSearchedUserList(undefined)  //clearing all records
+    //     } else {
+    //         noResult?.classList.add('d-none')
+    //         setSearchedUserList(result)
+    //     }
+    // }
 
 
     const signOut = () => {
@@ -73,7 +73,12 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         <Tally1 strokeWidth={4} />
                     </span>
 
-<SearchComponent/>
+                    <SearchComponent
+                        id={"userSearchDropdown"}
+                        handleSelectedUserToChat={handleSelectedUserToChat}
+                        searchedUserList={searchedUserList}
+                        setSearchedUserList={setSearchedUserList}
+                    />
 
 
                     {/* <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
@@ -108,6 +113,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                     <section className="myProfile px-2">
                         <span>
                             <img src={userData?.avatar} alt="" className="avatar pointer me-2" onClick={() => setShowUserModal(true)} />
+                            <Cog className='setting-icon'/>
                             {currentUser?.displayName}
                         </span>
                         <LogOut size="20" onClick={() => signOut()} className='pointer' />
@@ -125,7 +131,12 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
 
             {showGroupModal &&
                 <>
-                    <GroupModal setShowGroupModal={setShowGroupModal} />
+                    <GroupModal
+                        setShowGroupModal={setShowGroupModal}
+                        handleSelectedUserToChat={handleSelectedUserToChat}
+                        searchedUserList={searchedUserList}
+                        setSearchedUserList={setSearchedUserList} 
+                    />
                     <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>
                 </>
             }
