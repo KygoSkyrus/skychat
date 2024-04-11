@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { debounce, hideSearchedUsersList } from '../utils'
 
 
-const SearchComponent = ({handleSelectedUserToChat, searchedUserList, setSearchedUserList, id}) => {
+const SearchComponent = ({ handleSelectedUserToChat,handleSelectedGroupMember, searchedUserList, setSearchedUserList, id }) => {
 
 
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
@@ -44,19 +44,25 @@ const SearchComponent = ({handleSelectedUserToChat, searchedUserList, setSearche
     }
 
 
+    const handleSelect=(x)=>{
+        id === "userSearchDropdownGroup" ? handleSelectedGroupMember(x) : handleSelectedUserToChat(x)
+    }
+
+
 
 
     return (
-        <>    <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
-            <span><Search /></span>
-            {/* <span>Search a connection</span> */}
-            <input type="search" onChange={e => handleChangeUserSearch(e)} className="rounded-3 p-1 px-2 w-100" placeholder="find friends" />
-        </div>
+        <>
+            <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
+                <span><Search /></span>
+                {/* <span>Search a connection</span> */}
+                <input type="search" onChange={e => handleChangeUserSearch(e)} className={`rounded-3 p-1 px-2 w-100 ${id === 'userSearchDropdownGroup' && ' bg-dark text-light'}`} placeholder="find friends" />
+            </div>
 
             <div className="d-none" id={id}>
                 {searchedUserList?.map(x => {
                     return (
-                        <section className="dropdown-item pointer p-1 px-2" key={x} onClick={e => handleSelectedUserToChat(x)}>
+                        <section className="dropdown-item pointer p-1 px-2" key={x} onClick={e => handleSelect(x)}>
                             <img src={usersList[x]?.avatar} className='me-2' alt="" />
                             <span>{x}</span>
                         </section>

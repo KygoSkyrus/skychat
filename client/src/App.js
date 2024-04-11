@@ -12,6 +12,7 @@ import Authenticate from "./components/Authenticate";
 import Error from "./components/Error"
 import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
 import { Info } from "lucide-react";
+import Toast from "./components/Toast";
 
 
 

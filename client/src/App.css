@@ -216,6 +216,11 @@ body {
 }
 
 /*chat page*/
+.outer-top{
+  width: 350px;
+  height: 400px;
+  position: relative;
+}
 .outer {
   width: 350px;
 
@@ -231,6 +236,7 @@ body {
   border-radius: 4px;
   box-shadow: 0 0 5px 0px #00000080;
   overflow: hidden;
+  z-index: 1;
 }
 
 .overlay {
@@ -540,6 +546,9 @@ input[type="search"] {
   overflow: auto;
   height: 80%;
 }
+#userSearchDropdownGroup {
+  height: 100%;
+}
 #userSearchDropdown section, 
 #userSearchDropdownGroup section{
   width: unset;
@@ -843,8 +852,40 @@ input[type="search"] {
 #groupModal .m-dialog{
   background: #161616;
   color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
 }
-
+#groupModal .groupMembers:has(section){
+  height: 105px;
+}
+#groupModal .groupMembers::-webkit-scrollbar {
+  /* display: none; */
+  height: 4px;
+}
+#groupModal .groupMembers::-webkit-scrollbar-thumb {
+  background-color: rgb(189, 189, 189);
+  border-radius: 4px;
+}
+#groupModal .groupMembers .selectedMember:hover:after{
+  content: "";
+  width: 35px;
+  height: 35px;
+  background: #00ff0054;
+  position: absolute;
+  right: .5rem;
+  top: .25rem;
+  border-radius: 50%;
+}
+#groupModal .groupMembers .selectedMember svg{
+  background: #bf1919;
+  border-radius: 50%;
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  z-index: 1;
+}
 
 
 /* BLOCKED CONNECTIONS MODAL */

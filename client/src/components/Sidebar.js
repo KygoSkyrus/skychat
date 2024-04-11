@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
-import { Cog, LogOut,  Plus, Search, SearchCheck, Settings,  Tally1, Users2, X } from 'lucide-react'
+import { Cog, LogOut, Plus, Search, SearchCheck, Settings, Tally1, Users2, X } from 'lucide-react'
 
 import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
@@ -111,11 +111,13 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         </button>
                     </section>
                     <section className="myProfile px-2">
-                        <span>
-                            <img src={userData?.avatar} alt="" className="avatar pointer me-2" onClick={() => setShowUserModal(true)} />
-                            <Cog className='setting-icon'/>
+                        <div>
+                            <span onClick={() => setShowUserModal(true)} >
+                                <img src={userData?.avatar} alt="" className="avatar pointer me-2" />
+                                <Cog className='setting-icon' />
+                            </span>
                             {currentUser?.displayName}
-                        </span>
+                        </div>
                         <LogOut size="20" onClick={() => signOut()} className='pointer' />
                     </section>
                 </div>
@@ -135,7 +137,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         setShowGroupModal={setShowGroupModal}
                         handleSelectedUserToChat={handleSelectedUserToChat}
                         searchedUserList={searchedUserList}
-                        setSearchedUserList={setSearchedUserList} 
+                        setSearchedUserList={setSearchedUserList}
                     />
                     <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>
                 </>
