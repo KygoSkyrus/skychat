@@ -598,6 +598,18 @@ input[type="search"] {
   width: 35px;
   height: 35px;
 }
+.chat_list .list .groupIcon,
+.request_list .list .groupIcon,
+.block_list .list .groupIcon {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #9898986b;
+  border-radius: 50%;
+  color: whitesmoke;
+}
 
 .request_list_item .msg_preview {
   color: #828282;

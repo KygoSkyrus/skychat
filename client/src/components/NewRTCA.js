@@ -24,6 +24,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
   const [searchedUserList, setSearchedUserList] = useState() // queries user list
   const [selectedUserToChat, setSelectedUserToChat] = useState()
+  const [selectedGroupToChat, setSelectedGroupToChat] = useState(null)
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
@@ -51,7 +52,7 @@ export const NewRTCA = ({ firebaseApp }) => {
         for (const uName of Object.keys(userData?.requests)) {
           const hasNewMessages = await getConnectionRequests(uName);
           if (hasNewMessages) {
-            connections.push(uName);
+            connections.push(userData?.requests[uName].groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
           }
         }
       }
@@ -64,6 +65,8 @@ export const NewRTCA = ({ firebaseApp }) => {
       // if (selectedUserToChat) retrieveTexts(selectedUserToChat) //added bcz without this onsnapshot wont work  // commented for issue #1
     }
   }, [userData])
+
+  console.log('connextions sto show', connectionsToShow)
 
 
 
@@ -112,10 +115,11 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  function handleSelectedUserToChat(username) {
+  function handleSelectedUserToChat(username,groupName) {
     //dispatch an event and set the state there (may or may not be required)
     sidebarVisibility(false, setSearchedUserList)//closing sidebar
     setSelectedUserToChat(username);//setting selected user
+    if(groupName) setSelectedGroupToChat(groupName)
 
     // retrieveTexts(username);// it will be in useefct in chatbox compo and whenever selectedUsertoChat is changed than it will run this function
   }
@@ -137,6 +141,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       });
 
       setSelectedUserToChat(undefined)
+      setSelectedGroupToChat(undefined)
     }
   }
 
@@ -163,6 +168,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       });
 
       setSelectedUserToChat(undefined)
+      setSelectedGroupToChat(undefined)
     }
   }
 
@@ -188,7 +194,9 @@ export const NewRTCA = ({ firebaseApp }) => {
             </div>
             {selectedUserToChat &&
               <div className="d-flex align-items-center">
-                <ChevronLeft className="pointer" onClick={() => setSelectedUserToChat(undefined)} />
+                <ChevronLeft className="pointer" onClick={() => {setSelectedUserToChat(undefined);setSelectedGroupToChat(undefined)}} />
+                working here
+                {selectedGroupToChat +","+selectedUserToChat}
                 <section id="chatWith">{selectedUserToChat}</section>
 
                 <div className="dropdown">
@@ -227,7 +235,6 @@ export const NewRTCA = ({ firebaseApp }) => {
               </section>
             </div>
           }
-
           {/***** CHAT HEADER ENDS ******/}
 
 
@@ -248,9 +255,15 @@ export const NewRTCA = ({ firebaseApp }) => {
                     Object.keys(userData?.connections).map((x, i) => {
                       return (
                         <div className="list" key={i}>
-                          <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x)} >
-                            <img src={usersList[x]?.avatar} className="me-2" alt="" />
-                            <span>{x}</span>
+                          <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x,userData?.connections[x].groupName && false)} >
+                            {userData?.connections[x].groupName ?
+                              <span className="me-2 groupIcon" >
+                                <Users size={18} />
+                              </span>
+                              :
+                              <img src={usersList[x]?.avatar} className="me-2" alt="" />
+                            }
+                            <span>{userData?.connections[x].groupName || x}</span>
                           </section>
                           <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
                             {/* <Trash size={18} /> */}
@@ -275,25 +288,36 @@ export const NewRTCA = ({ firebaseApp }) => {
                 Object.keys(userData?.requests)?.length > 0 ?
 
                   <div className="request_list">
-                    {connectionsToShow.map((uName, i) => (
-                      <div className="list" key={i}>
-                        <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
-                          <img src={usersList[uName]?.avatar} className="me-2" alt="" />
-                          <span>{uName}</span>
-                        </section>
-                        <section className="acceptReq" onClick={() => acceptConnectionReq(db, userData, uName)} title="Accept connection">
-                          <UserCheck2 size={18} />
-                        </section>
-                        <section className="declineReq" onClick={() => declineConnectionReq(db, userData, uName, setSelectedUserToChat)} title="Decline connection">
-                          {/* <Trash size={18} /> */}
-                          <UserRoundX size={18} />
-                        </section>
-                        <section className="blockReq" onClick={() => blockConnection(db, userData, uName, setSelectedUserToChat)} title="Block connection">
-                          {/* <UserRoundX size={18} /> */}
-                          <Ban size={18} />
-                        </section>
-                      </div>
-                    ))}
+                    {connectionsToShow.map((uName, i) => {
+                      // uname has just the username for one to one connection,, but it is an object for groups
+                      let id = uName?.id || uName;
+                      return (
+                        <div className="list" key={i}>
+                          <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(id,uName?.groupName && false)}>
+                            {uName?.groupName ?
+                              <span className="me-2 groupIcon" >
+                                <Users size={18} />
+                              </span>
+                              :
+                              <img src={usersList[uName]?.avatar} className="me-2" alt="" />
+                            }
+                            <span>{uName?.groupName || uName}</span>
+                          </section>
+                          <section className="acceptReq" onClick={() => acceptConnectionReq(db, userData, id)} title="Accept connection">
+                            <UserCheck2 size={18} />
+                          </section>
+                          <section className="declineReq" onClick={() => declineConnectionReq(db, userData, id, setSelectedUserToChat)} title="Decline connection">
+                            {/* <Trash size={18} /> */}
+                            <UserRoundX size={18} />
+                          </section>
+                          <section className="blockReq" onClick={() => blockConnection(db, userData, id, setSelectedUserToChat)} title="Block connection">
+                            {/* <UserRoundX size={18} /> */}
+                            <Ban size={18} />
+                          </section>
+                        </div>
+                      )
+                    }
+                    )}
                     {/* {Object.keys(userData?.requests).map((uName, i) => (
                     <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
                       {uName}
