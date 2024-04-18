@@ -115,11 +115,13 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
-  function handleSelectedUserToChat(username,groupName) {
+  function handleSelectedUserToChat(username, groupName) {
     //dispatch an event and set the state there (may or may not be required)
     sidebarVisibility(false, setSearchedUserList)//closing sidebar
     setSelectedUserToChat(username);//setting selected user
-    if(groupName) setSelectedGroupToChat(groupName)
+
+    console.log('handleSelectedUserToChat  cliekced', groupName)
+    if (groupName) setSelectedGroupToChat(groupName)
 
     // retrieveTexts(username);// it will be in useefct in chatbox compo and whenever selectedUsertoChat is changed than it will run this function
   }
@@ -173,6 +175,37 @@ export const NewRTCA = ({ firebaseApp }) => {
   }
 
 
+  const exitGroup = (id, setSelectedUserToChat) => {
+    // let connectionId = '';
+    //connection is moved to block list from connection list or req list / messages are not deketed
+    console.log('exit group', id)
+    //current only connection list is handled here
+    if (userData?.connections?.hasOwnProperty(id)) {
+      // connectionId = userData.connections[id]?.id;
+      delete userData.connections[id];
+      updateUserDoc();
+    } else if (userData?.requests?.hasOwnProperty(id)) {
+      // connectionId = userData.requests[id]?.id;
+      delete userData.requests[id];
+      updateUserDoc();
+    }
+
+
+    async function updateUserDoc() {
+
+      //deleting connection req from req list 
+      const docRef = doc(db, "users", userData?.id);
+      await updateDoc(docRef, {
+        connections: userData.connections,
+        requests: userData.requests,
+        blockList: userData.blockList,
+      });
+
+      setSelectedUserToChat(undefined)
+    }
+  }
+
+
   return (
     <>
       <div className="outer-top">
@@ -194,10 +227,8 @@ export const NewRTCA = ({ firebaseApp }) => {
             </div>
             {selectedUserToChat &&
               <div className="d-flex align-items-center">
-                <ChevronLeft className="pointer" onClick={() => {setSelectedUserToChat(undefined);setSelectedGroupToChat(undefined)}} />
-                working here
-                {selectedGroupToChat +","+selectedUserToChat}
-                <section id="chatWith">{selectedUserToChat}</section>
+                <ChevronLeft className="pointer" onClick={() => { setSelectedUserToChat(undefined); setSelectedGroupToChat(undefined) }} />
+                <section id="chatWith">{selectedGroupToChat || selectedUserToChat}</section>
 
                 <div className="dropdown">
                   <img src={usersList[selectedUserToChat]?.avatar} className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" alt="" />
@@ -255,7 +286,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                     Object.keys(userData?.connections).map((x, i) => {
                       return (
                         <div className="list" key={i}>
-                          <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x,userData?.connections[x].groupName && false)} >
+                          <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x, userData?.connections[x]?.groupName || false)} >
                             {userData?.connections[x].groupName ?
                               <span className="me-2 groupIcon" >
                                 <Users size={18} />
@@ -265,14 +296,22 @@ export const NewRTCA = ({ firebaseApp }) => {
                             }
                             <span>{userData?.connections[x].groupName || x}</span>
                           </section>
-                          <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
-                            {/* <Trash size={18} /> */}
-                            <UserRoundX size={18} />
-                          </section>
-                          <section className="blockConnection" onClick={() => blockConnection(db, userData, x, setSelectedUserToChat)} title="Block connection">
-                            {/* <UserRoundX size={18} /> */}
-                            <Ban size={18} />
-                          </section>
+                          {userData?.connections[x]?.groupName ?
+                            <section className="blockConnection" onClick={() => exitGroup(x, setSelectedUserToChat)} title="Exsit group">
+                              <LogOut size={18} />
+                            </section>
+                            :
+                            <>
+                              <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
+                                {/* <Trash size={18} /> */}
+                                <UserRoundX size={18} />
+                              </section>
+                              <section className="blockConnection" onClick={() => blockConnection(db, userData, x, setSelectedUserToChat)} title="Block connection">
+                                {/* <UserRoundX size={18} /> */}
+                                <Ban size={18} />
+                              </section>
+                            </>
+                          }
                         </div>
                       )
                     })}
@@ -293,7 +332,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                       let id = uName?.id || uName;
                       return (
                         <div className="list" key={i}>
-                          <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(id,uName?.groupName && false)}>
+                          <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(id, uName?.groupName || false)}>
                             {uName?.groupName ?
                               <span className="me-2 groupIcon" >
                                 <Users size={18} />

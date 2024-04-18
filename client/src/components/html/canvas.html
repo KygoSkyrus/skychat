@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Canvas Example</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            background-color: #000;
+        }
+
+        canvas {
+            background-color: #24242473;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+
+    <script>
+        var canvas = document.getElementById("myCanvas");
+        canvas.width = window.innerWidth-2;
+        canvas.height = window.innerHeight-4;
+
+        var ctx = canvas.getContext("2d");
+
+        // Create a loop to draw the boxes
+        for (var i = 0; i < canvas.width; i += 32) {
+            for (var j = 0; j < canvas.height; j += 32) {
+                // Draw a box
+                // ctx.fillStyle = "black";//like background color
+                ctx.fillRect(i, j, 30, 30);
+                // Create a border
+                ctx.strokeStyle = "green";
+                ctx.lineWidth = 0.2;
+                ctx.strokeRect(i, j, 50, 50);
+            }
+        }
+    </script>
+</body>
+
+</html>

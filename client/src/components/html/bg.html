@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Orbitron:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            padding: 6px;
+            margin: 0;
+            background: #000;
+            width: 100vw;
+            height: 100vh;
+            /* display: flex;
+            flex-wrap: wrap;
+            gap: 3px; */
+            overflow: hidden;
+            text-align: center;
+            box-shadow: inset 0px 0px 85px rgb(238 238 238 / 31%);
+        }
+
+        .box {
+            width: 30px;
+            height: 30px;
+            border: 0.5px solid rgb(34, 33, 33);
+            display: inline-block;
+            margin: 2px;
+            transition: 500ms all;
+        }
+
+        .box:hover {
+            border: 0.5px solid rgb(151, 255, 110);
+        }
+        
+
+        .name {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* z-index: 1; */
+        }
+
+        .name section {
+            font-size: 120px;
+            font-family: "Jersey 25", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            color: violet;
+            text-shadow: 1px 2px 19px #ee82eead;
+        }
+
+        .seeThrough{
+            width:700px;
+            height: 700px;
+            position: absolute;
+            top: 13%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            background: linear-gradient(45deg, #0080002b, green, #0080002b);            
+            mix-blend-mode: color;
+            /* animation: rotate 4s infinite linear; */
+        }
+        @keyframes rotate {
+            from{
+                rotate: 0deg;
+            }
+            to{
+                rotate: 360deg;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="name">
+        <section>CYBERPUNK</section>
+    </div>
+
+    <div class="seeThrough"></div>
+
+
+    <script>
+
+        const body = document.querySelector('body');
+        Array.from(Array(900), (x) => {
+            const box = document.createElement('section');
+            box.classList.add('box')
+            body.appendChild(box)
+        })
+
+    </script>
+</body>
+
+</html>
