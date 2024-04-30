@@ -15,8 +15,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "e:/sky/bloggingSite/skychat/client/src/components",
-      "program": "e:/sky/bloggingSite/skychat/client/src/components/build/Debug/outDebug",
+      "cwd": "e:/sky/bloggingSite/skychat/client/src/components/html",
+      "program": "e:/sky/bloggingSite/skychat/client/src/components/html/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

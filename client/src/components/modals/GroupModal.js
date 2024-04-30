@@ -43,7 +43,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                     [connectionId]: {
                         id: connectionId,
                         groupName,
-                        members:selectedUsersForGroup,
+                        // members:selectedUsersForGroup,
                         // isGroup:true,
                     },
                 }
@@ -78,7 +78,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                         [connectionId]: {
                             id: connectionId,
                             groupName,
-                            members:selectedUsersForGroup,
+                            // members:selectedUsersForGroup,
                         },
                     }
                 });

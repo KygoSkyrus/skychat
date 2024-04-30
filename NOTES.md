@@ -50,6 +50,12 @@
 
 
 
+### Possible edge cases for group;
+- check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy
+- 
+
+
+
 # Defects
 - when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time [solution: either we have snapshot for every conecction and request (have to get all the ids by connection and put it in a snapshot query), so that whenever a msg is there from any of the user, than the i will get notified,,,also this can be helpful to show msg on the chatlist window,, to show latest msg]
 - hide the author name if its private chat,,,only show when its group
@@ -58,6 +64,7 @@
 
 # Todo 
 -implement group chat/option to create a group and add members 
+- implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much
 -delete msg
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
@@ -140,7 +147,23 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
       + **case_1**: if the sender sends the message again after his previous request is declined. in this case we need to check on every msg send that if the receiver has the sender in request list, if not than add him in the req list otherwise ignore.(not happy with this,, why? bcs here we required to access the receiver's doc, which cause two problems, 1:- that its gonna make one extra read from db on every msg sent, 2:- we wanted to implement the security rules in db that user can only access their own records,, so it contradicts that thought) 
         + **solution**: so when the receiver declines the connection reuqest than instead of deleting connection req, we will delete all the messages from the reciever's side .... and when the person sends the msg again then we show him back in the req list by checking if the msg is recieved after the user declined his previous request(by checking deletedTill timestamp)
     - when a connection request is **blocked** .. refer to Block action
-    
+
+    - **group**: 
+      - on *creating group* user can add any user by searching the user name
+      - there will be modal.. first there will be a text box to enter username then when user click on search to search,,, it is exactly like search on sidebar
+      - next below that there will be all the users in the connection list(maybe show req list or blocked connection too but then before adding them user has to unlock or approve his reuqest)
+      - selected users  will also be shown on the top and can be unseletected too.
+      - minimum 2 user must be selected to create a group.
+      - for groups, instead of group name the group id will be used as key in the connection/request list (this is why bcz there can be groups of similar name)
+      - how it will be determined that given connection is a group or not? ... on connections/req list it will be checked if the connection has a group name.. if it has a groupname field than its a group.
+      - when a group is created, the groupName and connection id is stored in connections of the user who created the group and in the request list of all the user who are the member of the group..
+      - group also has charcaterstics similar to connections,, like when someone creates a group and adds you than it will show up in request list.. you need to join the group in order to text.. you will get accept and delete group options there..
+      - on the connections ui you will get a button to exit on hover,, this will remove you from the group...
+      - on openeing a group,, on the top right,, there will be  a dropdown which will have the options to delete chat and exit group.
+      - `NOTE:`as we are not storing much information in the connection object about the group,,, there will be a separate collection
+      - this group will store all the neccessary information related to group, such as members list, created at/by, {the main motive of having this collection is to have  a common source of keeping track of members of group.. bcz we dont want to modify every users connection list wheneevr someone joins or exists..}
+      - whenever users is added/join.. the other user will get a message like notifiction(like date one) that this user has been adeded, same with someone leaves the group
+      - we have to keep record of this in the user's connection object of relative group along with the group name,,, we will store the date time when the user has joined this group... this will help us to show the msgs only agfter the user has joined,,,
 
 
 - # Delete Message
