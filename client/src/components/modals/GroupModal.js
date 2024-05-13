@@ -21,6 +21,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
     const [groupName, setGroupName] = useState('');
 
     const db = getFirestore(firebaseApp);
+    console.log('ud',userData)
 
 
     // on creating group user can add any user by searcing the user name
@@ -83,6 +84,17 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                     }
                 });
             // })
+            
+            //adding the creator to the member list
+            const members=[...selectedUsersForGroup];
+            members.push(userData?.username);
+            // creating document in group collection with same id as of groupId (has group details)
+            await setDoc(doc(db, "group", connectionId), {
+                groupName,
+                members,
+                createdBy: userData?.username,
+                createdAt: serverTimestamp(),
+              });
         }
 
             // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh

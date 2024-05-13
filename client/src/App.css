@@ -868,7 +868,7 @@ input[type="search"] {
   flex-direction: column;
 }
 #groupModal .groupMembers:has(section){
-  height: 105px;
+  height: 106px;
 }
 #groupModal .groupMembers::-webkit-scrollbar {
   /* display: none; */

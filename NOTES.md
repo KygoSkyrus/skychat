@@ -24,7 +24,7 @@
 
 
 ### Edge cases:
-- can user send himself texts?
+- can user send himself texts? NO, as this will create confusion bcz the user itself will recieve request and also it is not that important
 
 
 
@@ -52,7 +52,7 @@
 
 ### Possible edge cases for group;
 - check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy
-- 
+- do not show yourself in the search list of users
 
 
 
@@ -161,9 +161,9 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
       - on the connections ui you will get a button to exit on hover,, this will remove you from the group...
       - on openeing a group,, on the top right,, there will be  a dropdown which will have the options to delete chat and exit group.
       - `NOTE:`as we are not storing much information in the connection object about the group,,, there will be a separate collection
-      - this group will store all the neccessary information related to group, such as members list, created at/by, {the main motive of having this collection is to have  a common source of keeping track of members of group.. bcz we dont want to modify every users connection list wheneevr someone joins or exists..}
-      - whenever users is added/join.. the other user will get a message like notifiction(like date one) that this user has been adeded, same with someone leaves the group
-      - we have to keep record of this in the user's connection object of relative group along with the group name,,, we will store the date time when the user has joined this group... this will help us to show the msgs only agfter the user has joined,,,
+      - this collection will store all the neccessary information related to group, such as members list, created at/by, {the main motive of having this collection is to have  a common source of keeping track of members of group.. bcz we dont want to modify every users connection list wheneever someone joins or exists..}
+      - whenever users is added/join.. the other user will get a message like notification(like date one) that this user has been adeded, same with someone leaves the group
+      - we have to keep record of this in the user's connection object of relative group along with the group name,,, we will store the date time when the user has joined this group... this will help us to show the msgs only after the user has joined,,,
 
 
 - # Delete Message
@@ -189,7 +189,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
     - the one who are deleted;
     - the one who are blocked?
     - the one who's request is declined?
-    - user himself?
+    - user himself?// cant have user texting himself,, as it would try to send a request to hisself
   - all of them.. why? test one by one to check why not
   - dont let user search the person who are in the request list, and which has a deletedTill (this is why bcz if we dont do this than on search it will show that the request thing with accept and decline button even if the user has declined him earlier,, so better not show it)
   
