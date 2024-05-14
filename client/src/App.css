@@ -158,9 +158,12 @@ body {
 
 .chatWithProfile {
   border-radius: 50%;
-  background-color: #1b1b1b;
+  background-color: #9898986b;
   width: 38px;
   height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .dropdown-item:focus,
 .dropdown-item:hover {
