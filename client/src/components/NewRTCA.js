@@ -13,6 +13,7 @@ import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delet
 import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import Toast from "./Toast";
+import EntityInfoModal from "./modals/EntityInfoModal";
 
 
 
@@ -29,6 +30,9 @@ export const NewRTCA = ({ firebaseApp }) => {
   const [selectedGroupName, setSelectedGroupName] = useState(undefined)
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
+
+  const [showEntityInfoModal, setShowEntityInfoModal] = useState(false)// controls user/info modal
+
 
 
   const currentUser = useSelector(state => state.user.currentUser)
@@ -249,7 +253,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                       <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chat</li>
                       <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>Remove connection</li>
                       {isGroupSelected ?
-                        <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>Group info</li>
+                        <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
                         :
                         <li className="dropdown-item pointer" onClick={() => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)}>Block connection</li>
                       }
@@ -394,6 +398,18 @@ export const NewRTCA = ({ firebaseApp }) => {
 
 
           <div className="overlay pointer d-none" onClick={() => sidebarVisibility(false, setSearchedUserList)}></div>
+
+          {showEntityInfoModal &&
+            <>
+              <EntityInfoModal
+                setShowEntityInfoModal={setShowEntityInfoModal}
+                selectedUserToChat={selectedUserToChat}
+                selectedGroupName={selectedGroupName}
+              />
+              <div className="overlay pointer zIndex4" onClick={() => setShowEntityInfoModal(false)}></div>
+            </>
+          }
+
         </div>
         <Toast />
       </div>
