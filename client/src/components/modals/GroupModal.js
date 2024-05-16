@@ -21,7 +21,9 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
     const [groupName, setGroupName] = useState('');
 
     const db = getFirestore(firebaseApp);
-    console.log('ud',userData)
+    console.log('ud', userData)
+
+    // NOTE:: CLOSE THIS GROUP MODAL WHEN CCLICKED ON CHECK>>>>
 
 
     // on creating group user can add any user by searcing the user name
@@ -34,6 +36,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
         // let connectionId;
         if (groupName) {
             let connectionId = uuidv4(); // creating a new connection id
+            const members = [];
 
             const userDocRef = doc(db, "users", userData.id);
             // updating the user document with new connection in connection list
@@ -51,9 +54,9 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
             });
 
             // getting receiver's doc
-            let receiversDoc=[];
-            for(let x of selectedUsersForGroup){
-            // selectedUsersForGroup.map(async x=>{
+            let receiversDoc = [];
+            for (let x of selectedUsersForGroup) {
+                // selectedUsersForGroup.map(async x=>{
                 let q = query(collection(db, "users"), where("username", "==", x));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
@@ -62,16 +65,17 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                     temp = doc.data()
                     temp.id = doc.id;
                     receiversDoc.push(temp)
-                    // return;
+                    console.log('tempp', temp)
+                    members.push({ name: temp.username, avatar: temp.avatar })
                 });
-            // })
+                // })
             }
-            console.log('receiversDoc',receiversDoc)
+            console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
-            for(let x of receiversDoc){
-                console.log("x",x)
-            // receiversDoc.map(async x=>{
+            for (let x of receiversDoc) {
+                console.log("x", x)
+                // receiversDoc.map(async x=>{
                 const receiverDocRef = doc(db, "users", x.id);
                 await updateDoc(receiverDocRef, {
                     requests: {
@@ -83,24 +87,24 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                         },
                     }
                 });
-            // })
-            
+                // })
+            }
+
             //adding the creator to the member list
-            const members=[...selectedUsersForGroup];
-            members.push(userData?.username);
+            members.push({ name: userData?.username, avatar: userData?.avatar })
             // creating document in group collection with same id as of groupId (has group details)
             await setDoc(doc(db, "group", connectionId), {
                 groupName,
                 members,
                 createdBy: userData?.username,
                 createdAt: serverTimestamp(),
-              });
-        }
+            });
 
             // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
             // realtimeListener(selectedUserToChat, connectionId)
 
             setGroupName(''); // resetting input text field
+            setShowGroupModal(false)// hiding modal
         }
     }
 

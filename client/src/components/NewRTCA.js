@@ -251,7 +251,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                   {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                     <ul className="dropdown-menu p-2">
                       <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chat</li>
-                      <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>Remove connection</li>
+                      <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>{isGroupSelected?'Exit Group':'Remove connection'}</li>
                       {isGroupSelected ?
                         <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
                         :

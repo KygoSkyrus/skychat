@@ -4,6 +4,7 @@
   /* colors */
   --black1: #1b1f22;
   --violet: rgb(112.520718, 44.062154, 249.437846);
+  --green: rgb(60, 235, 44);
 }
 
 body {
@@ -597,7 +598,8 @@ input[type="search"] {
 
 .chat_list .list img,
 .request_list .list img,
-.block_list .list img {
+.block_list .list img,
+.member_list .list img  {
   width: 35px;
   height: 35px;
 }
@@ -629,7 +631,8 @@ input[type="search"] {
 }
 
 .chat_list .list,
-.request_list .list {
+.request_list .list,
+.member_list .list {
   position: relative;
 }
 .deleteConnection,
@@ -654,6 +657,7 @@ input[type="search"] {
   align-items: center;
 }
 .chat_list .list:hover .blockConnection,
+.member_list .list:hover .blockConnection,
 .request_list .list:hover .blockReq {
   right: 1px;
 }
@@ -671,7 +675,8 @@ input[type="search"] {
 .chat_list .list .deleteConnection:hover svg,
 .request_list .list .acceptReq:hover svg, 
 .request_list .list .declineReq:hover svg, 
-.request_list .list .blockReq:hover svg {
+.request_list .list .blockReq:hover svg,
+.member_list .list .blockConnection:hover svg {
    transform: scale(1.1);
 }
 
@@ -708,6 +713,7 @@ input[type="search"] {
 
 /* USER MODAL */
 #userModal,
+#entityInfoModal,
 #groupModal,
 #avatarModal,
 #blockedConnModal {
@@ -749,7 +755,8 @@ input[type="search"] {
   object-fit: cover;
   border-radius: 50%;
 }
-#userModal .m-dialog .uImg {
+#userModal .m-dialog .uImg,
+#entityInfoModal .m-dialog .uImg {
   position: relative;
   border-radius: 50%;
   transition: var(--transition);
@@ -773,7 +780,8 @@ input[type="search"] {
   display: grid;
   opacity: 1;
 }
-#userModal .list{
+#userModal .list,
+#entityInfoModal .list{
   list-style-type: none;
   padding: 0;
 }
@@ -787,8 +795,65 @@ input[type="search"] {
 
 
 
+/* ENTITY INFO MODAL */
+#entityInfoModal .entityInfoOver{
+  overflow: auto;
+}
+#entityInfoModal .entityInfoOver::-webkit-scrollbar {
+  /* display: none; */
+  width: 6px;
+}
+#entityInfoModal .entityInfoOver::-webkit-scrollbar-thumb {
+  background-color: rgb(171, 171, 171);
+  border-radius: 4px;
+}
+#entityInfoModal .m-dialog .uImg {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #393939;
+  display: grid;
+  place-items: center;
+}
 
-/* AVATAR EIDT MOAL */
+#entityInfoModal .member_heading{
+  padding: 10px 34px;
+  border-radius: 15px;
+  border-bottom: 2px solid #353535;
+  background-color: var(--green);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#entityInfoModal .member_list {
+  height: 0;
+}
+.member_list .list {
+  overflow: hidden;
+}
+#entityInfoModal .list:hover {
+  color: #fff;
+  /* background-color: var(--green); */
+  background-color: rgba(54, 54, 54, 0.352);
+}
+#entityInfoModal .list .chat_list_item {
+  color: #fff;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 10px;
+  border-bottom: 1px solid #353535;
+}
+#entityInfoModal .blockConnection{
+  background: transparent;
+  color: gray;
+}
+
+
+
+
+
+/* AVATAR EIDT MODAL */
 #avatarModal .avatar_grid {
   display: flex;
   justify-content: center;

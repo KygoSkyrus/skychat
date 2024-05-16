@@ -325,6 +325,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             </div>
 
             {userData?.requests[selectedUserToChat] ?
+            // when request chat is opened
                 <div className="req_btn">
                     <section className="enq_btn accept" onClick={() => acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
                     <div className="d-flex gap-1">
