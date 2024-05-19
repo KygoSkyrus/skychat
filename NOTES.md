@@ -61,11 +61,13 @@
 - hide the author name if its private chat,,,only show when its group
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
+- for member list in groupifo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
 
 # Todo 
 -implement group chat/option to create a group and add members 
 - implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much
 -delete msg
+- **** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 

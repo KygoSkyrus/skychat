@@ -680,6 +680,15 @@ input[type="search"] {
    transform: scale(1.1);
 }
 
+.request_list .list:hover .overrideClrGreen{
+  right: 40px ;
+  background-color: #5ef35e91;
+}
+.request_list .list:hover .overrideClrRed{
+  right: 1px;
+  background-color: #dc3545a1;
+}
+
 /*********************************************** custom LOADER ************************************************* */
 .custom-loader {
   width: 50px;

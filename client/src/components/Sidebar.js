@@ -138,6 +138,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                         handleSelectedUserToChat={handleSelectedUserToChat}
                         searchedUserList={searchedUserList}
                         setSearchedUserList={setSearchedUserList}
+                        type="create_group"
                     />
                     <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>
                 </>
