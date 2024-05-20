@@ -309,17 +309,18 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                             let currDate = getLocalDateStr(msgData?.time);
                             return (
                                 <div key={msgData.id} className="d-flex flex-column">
+                                    {/* show dates */}
                                     {showChatDate(currDate) &&
                                         <div className="text-center date">
                                             <span className="fs-12">{currDate}</span>
                                         </div>
                                     }
+
+                                    {/* show notifications */}
                                     {msgData?.isNotification ?
                                         <div className="text-center date">
                                             <span className="fs-12 px-2" style={{ background: "var(--violet)" }}>
-                                                {/* later move all this to utill where msgdata will be passed and there all this checking of type and notification adn formatting will take place */}
-                                                {msgData?.type === "added" &&                                                  
-                                                    getFormattedNotification(msgData?.message, userData?.username)}
+                                                {getFormattedNotification(msgData, userData?.username)}
                                             </span>
                                         </div>
                                         :
@@ -340,7 +341,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat].groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat].groupName ?
-                            <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat)}>Leave group</section>
+                            <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}>Leave group</section>
                             :
                             <>
                                 <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Delete</section>

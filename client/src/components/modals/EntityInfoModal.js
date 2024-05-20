@@ -1,8 +1,8 @@
-import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query, serverTimestamp } from 'firebase/firestore'
 import { ArrowLeft, Edit, LogOut, MessageSquareX, UserRoundPlus, Users, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr } from '../../utils'
+import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr, writeToDb } from '../../utils'
 import GroupModal from './GroupModal'
 import { SET_TOAST } from '../../redux/actionTypes'
 
@@ -68,7 +68,18 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
             receiverDoc.id = doc.id;
             return;
         });
-        exitGroup(db, receiverDoc, selectedUserToChat)
+        await exitGroup(db, receiverDoc, selectedUserToChat, false, true)
+
+        // SENDING NOTIFICATION (USER removed)
+        const msgData = {
+            connectionId: selectedUserToChat,
+            author: userData?.username,
+            message: `${userData?.username} removed ${userName}`,
+            time: serverTimestamp(),
+            isNotification: true,
+            type: "removed",
+        };
+        await writeToDb(db, msgData);
 
     }
 
@@ -99,7 +110,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // when members are added to group on group creation or later,,, tha deletetill timestamp is added to show the chats of group only since the user has joined
     //when a member leaves or joins a group.,, it should reflect right away
     // when user accepst the req list,,, than when user clicks on ddropdown on top right ,, than  it still throws error ,, maybe it thinks that we are still on request tab
-    // notification is not going for all members
+    // {still a problem} - notification is not going for all members
 
     return (
         <>

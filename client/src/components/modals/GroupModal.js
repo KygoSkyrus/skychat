@@ -74,9 +74,10 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
             console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
-            for (let x of receiversDoc) {
-                console.log("x", x)
-                const receiverDocRef = doc(db, "users", x.id);
+            for(let i=0; i < receiversDoc?.length; i++){
+            // for (let x of receiversDoc) {
+                console.log("x", receiversDoc[i])
+                const receiverDocRef = doc(db, "users", receiversDoc[i].id);
                 await updateDoc(receiverDocRef, {
                     requests: {
                         ...receiversDoc.requests,
@@ -93,7 +94,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                 const msgData = {
                     connectionId,
                     author: userData?.username,
-                    message: `${userData?.username} added ${x?.username}`,
+                    message: `${userData?.username} added ${receiversDoc[i]?.username}`,
                     time: serverTimestamp(),
                     isNotification: true,
                     type: "added",
@@ -111,9 +112,6 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                 createdBy: userData?.username,
                 createdAt: serverTimestamp(),
             });
-
-            // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
-            // realtimeListener(selectedUserToChat, connectionId)
 
             setGroupName(''); // resetting input text field
             setShowGroupModal(false)// hiding modal

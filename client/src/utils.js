@@ -333,7 +333,8 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
 }
 
 
-export const exitGroup = async (db, userData, id, setSelectedUserToChat) => {
+export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTriggeredByAdmin=false) => {
+    // @params: isTriggeredByAdmin-> will be false when this function is triggered by user(who's leaving), and if true it means user is being removed
 
     //removing member from group list 
     const docRef = doc(db, "group", id);
@@ -376,6 +377,20 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat) => {
         if (setSelectedUserToChat) setSelectedUserToChat(undefined);
         // setIsGroupSelected(false);
     }
+
+    if(!isTriggeredByAdmin){
+        // SENDING NOTIFICATION (USER LEFT)
+        const msgData = {
+            connectionId: id,
+            author: userData?.username,
+            message: `${userData?.username} left`,
+            time: serverTimestamp(),
+            isNotification: true,
+            type: "left",
+        };
+        await writeToDb(db, msgData);
+    }
+
 }
 
 
@@ -385,8 +400,12 @@ export function populateConnectionId(obj) {
     return { connectionId, chatsTill };
 }
 
-export function getFormattedNotification(msg,myName){
-    let temp = msg?.split(" added ");
-    if(temp[1]===myName) return `${temp[0]} added you`;
-    return msg;
+export function getFormattedNotification(msgData, myName) {
+    let temp;
+    // if the notification is for adding and removing a member
+    if (msgData?.type === "added" || msgData?.type === "removed") {
+        temp = msgData?.message?.split(` ${msgData?.type} `);
+        if (temp[1] === myName) return `${temp[0]} ${msgData?.type} you`;
+    }
+    return msgData?.message;
 }

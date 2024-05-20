@@ -221,7 +221,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                   {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                     <ul className="dropdown-menu p-2">
                       <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chat</li>
-                      <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat) : deleteConnection(selectedUserToChat)}>{isGroupSelected ? 'Exit Group' : 'Remove connection'}</li>
+                      <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false) : deleteConnection(selectedUserToChat)}>{isGroupSelected ? 'Exit Group' : 'Remove connection'}</li>
                       {isGroupSelected ?
                         <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
                         :
@@ -290,7 +290,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                           
                           {/* ACTIONS */}
                           {userData?.connections[x]?.groupName ?
-                            <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat)} title="Exit group">
+                            <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat, false, false)} title="Exit group">
                               <LogOut size={18} />
                             </section>
                             :
@@ -342,7 +342,7 @@ export const NewRTCA = ({ firebaseApp }) => {
                             <UserCheck2 size={18} />
                           </section>
                           {uName?.groupName ?
-                            <section className={`declineReq overrideClrRed`} onClick={() => exitGroup(db, userData, id, setSelectedUserToChat)} title="Decline & exit group">
+                            <section className={`declineReq overrideClrRed`} onClick={() => exitGroup(db, userData, id, setSelectedUserToChat, false)} title="Decline & exit group">
                               <UserRoundX size={18} />
                             </section>
                             :
