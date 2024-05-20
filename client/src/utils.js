@@ -1,4 +1,4 @@
-import { Timestamp, addDoc, collection, doc, getFirestore, serverTimestamp, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, doc, getFirestore, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
 import { useSelector } from "react-redux"
 
 export const dbUsers = {
@@ -248,6 +248,35 @@ export async function acceptConnectionReq(db, userData, userName) {
     }
 }
 
+export async function acceptGroupReq(db, userData, id) {
+    console.log('acceptGroupReq', id)
+
+    if (userData?.requests?.hasOwnProperty(id)) {
+
+        let groupName = userData.requests[id]?.groupName;
+        let deletedTill = userData.requests[id]?.deletedTill || Timestamp.fromDate(new Date('1970'));
+
+        // console.log('connecyion id', connectionId, userData.requests)
+
+        delete userData.requests[id];
+        // console.log('connection id after', connectionId, userData)
+
+        //moving group from req list to connection list 
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            requests: userData.requests,
+            connections: {
+                ...userData.connections,
+                [id]: {
+                    id,
+                    groupName,
+                    deletedTill: deletedTill,
+                },
+            }
+        });
+    }
+}
+
 export async function declineConnectionReq(db, userData, userName, setSelectedUserToChat) {
     console.log('declineConnectionReq', userName)
 
@@ -282,6 +311,7 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
         updateUserDoc();
     }
 
+    // create a common function for this function,, pass the userdata and all keys
     async function updateUserDoc() {
 
         //deleting connection req from req list 
@@ -303,8 +333,60 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
 }
 
 
-export function populateConnectionId (obj) {
+export const exitGroup = async (db, userData, id, setSelectedUserToChat) => {
+
+    //removing member from group list 
+    const docRef = doc(db, "group", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        // console.log("Document data:", docSnap.data());
+        let data = docSnap.data();
+        let newMemberList = data.members.filter(x => x.name !== userData?.username)
+        data.members = newMemberList;
+
+        await updateDoc(docRef, data);// updating document
+    }
+
+
+    // let connectionId = '';                                                                       
+    //connection is deleted from connection list or req list / messages are not deleted
+    console.log('exit group', id)
+    //current only connection list is handled here
+    if (userData?.connections?.hasOwnProperty(id)) {
+        // connectionId = userData.connections[id]?.id;
+        delete userData.connections[id];
+        updateUserDoc();
+    } else if (userData?.requests?.hasOwnProperty(id)) {
+        // connectionId = userData.requests[id]?.id;
+        delete userData.requests[id];
+        updateUserDoc();
+    }
+
+
+    async function updateUserDoc() {
+
+        //deleting connection req from req list 
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            connections: userData.connections,
+            requests: userData.requests,
+            blockList: userData.blockList,
+        });
+
+        if (setSelectedUserToChat) setSelectedUserToChat(undefined);
+        // setIsGroupSelected(false);
+    }
+}
+
+
+export function populateConnectionId(obj) {
     let connectionId = obj?.id || undefined;
     let chatsTill = obj?.deletedTill || null;
     return { connectionId, chatsTill };
+}
+
+export function getFormattedNotification(msg,myName){
+    let temp = msg?.split(" added ");
+    if(temp[1]===myName) return `${temp[0]} added you`;
+    return msg;
 }

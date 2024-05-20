@@ -4,10 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
-import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, populateConnectionId, writeToDb } from '../utils';
+import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, populateConnectionId, writeToDb, exitGroup, acceptGroupReq, getNotification, getFormattedNotification } from '../utils';
 
 import { PlusSquare, Send } from 'lucide-react';
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
+import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter } from "firebase/firestore";
 
 
 const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => {
@@ -314,7 +314,17 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                                             <span className="fs-12">{currDate}</span>
                                         </div>
                                     }
-                                    <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
+                                    {msgData?.isNotification ?
+                                        <div className="text-center date">
+                                            <span className="fs-12 px-2" style={{ background: "var(--violet)" }}>
+                                                {/* later move all this to utill where msgdata will be passed and there all this checking of type and notification adn formatting will take place */}
+                                                {msgData?.type === "added" &&                                                  
+                                                    getFormattedNotification(msgData?.message, userData?.username)}
+                                            </span>
+                                        </div>
+                                        :
+                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
+                                    }
                                 </div>
                             )
                         })
@@ -325,11 +335,18 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
             </div>
 
             {userData?.requests[selectedUserToChat] ?
+                // when request chat is opened
                 <div className="req_btn">
-                    <section className="enq_btn accept" onClick={() => acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
+                    <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat].groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
                     <div className="d-flex gap-1">
-                        <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Delete</section>
-                        <section className="enq_btn delete mt-1" onClick={() => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)}>Block</section>
+                        {userData?.requests[selectedUserToChat].groupName ?
+                            <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat)}>Leave group</section>
+                            :
+                            <>
+                                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Delete</section>
+                                <section className="enq_btn delete mt-1" onClick={() => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)}>Block</section>
+                            </>
+                        }
                     </div>
                 </div>
                 :

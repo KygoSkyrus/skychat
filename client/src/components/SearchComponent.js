@@ -8,6 +8,7 @@ const SearchComponent = ({ handleSelectedUserToChat,handleSelectedGroupMember, s
 
 
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
+    const userData = useSelector(state => state.user.userInfo)
 
 
     const handleSearchUser = debounce(searchUser, 1000);
@@ -27,8 +28,7 @@ const SearchComponent = ({ handleSelectedUserToChat,handleSelectedGroupMember, s
     }
 
     async function searchUser(e) {
-        // let result = usersList.filter(user => user?.username?.includes(e.target.value))
-        let result = Object.keys(usersList).filter(user => user.includes(e.target.value))
+        let result = Object.keys(usersList).filter(user => user.includes(e.target.value) && user!==userData.username)
 
         let userSearchDropdown = document.getElementById(id)
         let noResult = userSearchDropdown.querySelector('.no-user')

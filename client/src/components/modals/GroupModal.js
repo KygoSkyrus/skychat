@@ -7,8 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
+import { writeToDb } from '../../utils';
 
-const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserList, setSearchedUserList }) => {
+const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserList, setSearchedUserList, type, memberList, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
 
@@ -17,10 +18,13 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
     const firebaseApp = useSelector(state => state.firebase.firebaseApp)
 
     const [selectedUsersForGroup, setSelectedUsersForGroup] = useState([])
-    const [firstPage, setFirstPage] = useState(true);
+    const [firstPage, setFirstPage] = useState(type !== "add_member");
     const [groupName, setGroupName] = useState('');
 
     const db = getFirestore(firebaseApp);
+    console.log('ud', userData)
+
+    // NOTE:: CLOSE THIS GROUP MODAL WHEN CCLICKED ON CHECK>>>>
 
 
     // on creating group user can add any user by searcing the user name
@@ -33,6 +37,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
         // let connectionId;
         if (groupName) {
             let connectionId = uuidv4(); // creating a new connection id
+            const members = [];
 
             const userDocRef = doc(db, "users", userData.id);
             // updating the user document with new connection in connection list
@@ -50,9 +55,9 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
             });
 
             // getting receiver's doc
-            let receiversDoc=[];
-            for(let x of selectedUsersForGroup){
-            // selectedUsersForGroup.map(async x=>{
+            let receiversDoc = [];
+            for (let x of selectedUsersForGroup) {
+                // selectedUsersForGroup.map(async x=>{
                 let q = query(collection(db, "users"), where("username", "==", x));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
@@ -61,16 +66,16 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                     temp = doc.data()
                     temp.id = doc.id;
                     receiversDoc.push(temp)
-                    // return;
+                    console.log('tempp', temp)
+                    members.push({ name: temp.username, avatar: temp.avatar })
                 });
-            // })
+                // })
             }
-            console.log('receiversDoc',receiversDoc)
+            console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
-            for(let x of receiversDoc){
-                console.log("x",x)
-            // receiversDoc.map(async x=>{
+            for (let x of receiversDoc) {
+                console.log("x", x)
                 const receiverDocRef = doc(db, "users", x.id);
                 await updateDoc(receiverDocRef, {
                     requests: {
@@ -78,17 +83,40 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                         [connectionId]: {
                             id: connectionId,
                             groupName,
+                            deletedTill: serverTimestamp(),
                             // members:selectedUsersForGroup,
                         },
                     }
                 });
-            // })
-        }
+
+                // SENDING NOTIFICATION (USER ADDED)
+                const msgData = {
+                    connectionId,
+                    author: userData?.username,
+                    message: `${userData?.username} added ${x?.username}`,
+                    time: serverTimestamp(),
+                    isNotification: true,
+                    type: "added",
+                };
+                await writeToDb(db, msgData);
+            }
+
+            //adding the creator to the member list
+            members.push({ name: userData?.username, avatar: userData?.avatar })
+            // creating document in group collection with same id as of groupId (has group details)
+            await setDoc(doc(db, "group", connectionId), {
+                id: connectionId,
+                groupName,
+                members,
+                createdBy: userData?.username,
+                createdAt: serverTimestamp(),
+            });
 
             // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
             // realtimeListener(selectedUserToChat, connectionId)
 
             setGroupName(''); // resetting input text field
+            setShowGroupModal(false)// hiding modal
         }
     }
 
@@ -96,14 +124,99 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
     const handleSelectedGroupMember = (member) => {
         if (selectedUsersForGroup.includes(member)) {
             dispatch({ type: SET_TOAST, payload: { toastContent: "User already exists", isError: true } })
-        } else {
-            setSelectedUsersForGroup(prev => [...prev, member])
+            return;
         }
+
+        if (memberList) {
+            for (let i = 0; i < memberList.length; i++) {
+                if (memberList[i].name === member) {
+                    dispatch({ type: SET_TOAST, payload: { toastContent: "User is already a member", isError: true } })
+                    return;
+                }
+            }
+        }
+        setSelectedUsersForGroup(prev => [...prev, member])
     }
+
+
 
     const handleContinue = (e) => {
         e.preventDefault();
         setFirstPage(false)
+    }
+
+
+
+    const addMember = async () => {
+        // here you add the selected users to the group collection
+        // and add the group to users' request list (just like what we did when we created the group)
+
+        if (selectedUsersForGroup) {
+            // let connectionId = uuidv4(); // creating a new connection id
+            const members = [];// array of objects of member and their avatar
+
+            // ADDING GROUP TO USER'S REQ LIST-------
+            // getting receiver's doc
+            let receiversDoc = [];
+            for (let x of selectedUsersForGroup) {
+                let q = query(collection(db, "users"), where("username", "==", x));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    let temp;
+                    temp = doc.data()
+                    temp.id = doc.id;
+                    receiversDoc.push(temp)
+                    console.log('tempp', temp)
+                    members.push({ name: temp.username, avatar: temp.avatar })
+                });
+            }
+            console.log('receiversDoc', receiversDoc)
+
+            //updating the receiver document request list
+            for (let x of receiversDoc) {
+                console.log("x", x)
+                const receiverDocRef = doc(db, "users", x.id);
+                await updateDoc(receiverDocRef, {
+                    requests: {
+                        ...receiversDoc.requests,
+                        [groupInfo?.id]: {
+                            id: groupInfo?.id,
+                            groupName: groupInfo?.groupName,
+                            deletedTill: serverTimestamp(),
+                        },
+                    }
+                });
+
+                // SENDING NOTIFICATION (USER ADDED)
+                const msgData = {
+                    connectionId: groupInfo?.id,
+                    author: groupInfo?.createdBy,
+                    message: `${groupInfo?.createdBy} added ${x?.username}`,
+                    time: serverTimestamp(),
+                    isNotification: true,
+                    type: "added",
+                };
+                await writeToDb(db, msgData);
+            }
+            // ADDING GROUP TO USER'S REQ LIST-------
+
+
+            // UPDATING GROUP TO WITH NEW MEMBERS
+            const docRef = doc(db, "group", groupInfo?.id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                let data = docSnap.data();
+                let newMemberList = [...data.members, ...members]
+                data.members = newMemberList;
+
+                console.log('data when meners added', data)
+
+                await updateDoc(docRef, data);// updating document
+                setGroupInfo(data);
+                setShowGroupModal(false);//closing addmember modal
+            }
+
+        }
     }
 
 
@@ -150,7 +263,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                             />
 
                             {selectedUsersForGroup.length > 0 &&
-                                <section className='pointer bold bg-success rounded-3 d-flex justify-content-center align-items-center' style={{ width: "30px", height: "30px", position: "absolute", bottom: "16px", right: "16px" }} onClick={createGroup}>
+                                <section className='pointer bold bg-success rounded-3 d-flex justify-content-center align-items-center' style={{ width: "30px", height: "30px", position: "absolute", bottom: "16px", right: "16px" }} onClick={type === "add_member" ? addMember : createGroup}>
                                     <Check size={20} strokeWidth={4} />
                                 </section>
                             }

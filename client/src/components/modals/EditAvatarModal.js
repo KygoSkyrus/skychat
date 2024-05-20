@@ -12,7 +12,7 @@ import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
 const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
-    const firebaseApp = initializeApp(firebaseConfig);
+    const firebaseApp = initializeApp(firebaseConfig);// need to make it gloabl
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp);
 
