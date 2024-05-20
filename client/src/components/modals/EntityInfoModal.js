@@ -92,26 +92,23 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
         }
     }
 
-    // NEXT>> work on clearchat in group, and check the msgs are showing in correct chronology
 
-    // done..have  to delete the self from group collections too when a user is removed and exits volunteeraly
-    // when group is created,,,send a msg too that you have created this group
-    // for adding members in group  mdoal ,, things you have to do is send a msg to group that user has added,, same goes when a member is removed
-    // second important thing is that u need to check if the msg if recieved by the members only,, not by the removed members 
-    // in the commection or req list for qruop,, every individual should have saved time when they have jpined or added to group
-    //ADDED:> when a user is added to group (using btn in groupinfo),, after the group has been already created,, than a chatstill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
-    //REMOVE:> when a user is removed than first he will be remived from the group collection,, and than the group will me deleted from connection list 
+    // [done]..have  to delete the self from group collections too when a user is removed and exits volunteeraly
+    // [done]..for adding members in group  mdoal ,, things you have to do is send a msg to group that user has added,, same goes when a member is removed
+    // [done]..second important thing is that u need to check if the msg if recieved by the members only,, not by the removed members 
+  
+    //ADDED:> when a user is added to group by admin(using btn in groupinfo after the group has been already created),, than a deletedTill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
+    //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the group will me deleted from connection list 
     // GROUP has basicalaly three actions,, 
     // accept; which means user accespts to be in group,, [avaiallabe in req list]
     // delete; means the user exits the group... [this is avaiallabe in both connection and req list]
     // clearChat; means the chat is cleared... [ avaialable in connection list only]
     // Add/remove member: only admin can perfrom this action( let this action be displayed but throw a notifiction if anyone other than admin tries to perform these actions)
-    // when user leaves it should show right than in the groupmemberlist,,,
-    // when members are added to group on group creation or later,,, tha deletetill timestamp is added to show the chats of group only since the user has joined
-    //when a member leaves or joins a group.,, it should reflect right away
-    // when user accepst the req list,,, than when user clicks on ddropdown on top right ,, than  it still throws error ,, maybe it thinks that we are still on request tab
-    // {still a problem} - notification is not going for all members
 
+    // when user leaves it should show right than in the groupmemberlist,,,can we do something like this that if we are groupinfo page and right then if someone leaves,,,we see the chnage in member list,,, can add a snapshot for groupinfo,,,maybe that will work in real time
+    // user cant add more than 25 members in group
+    // CASE:?? if the admin leaves than there is no admin, hence no members can be added
+    
     return (
         <>
             <div className="" id="entityInfoModal" >
