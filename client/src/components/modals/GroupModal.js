@@ -74,8 +74,8 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
             console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
-            for(let i=0; i < receiversDoc?.length; i++){
-            // for (let x of receiversDoc) {
+            for (let i = 0; i < receiversDoc?.length; i++) {
+                // for (let x of receiversDoc) {
                 console.log("x", receiversDoc[i])
                 const receiverDocRef = doc(db, "users", receiversDoc[i].id);
                 await updateDoc(receiverDocRef, {
@@ -120,12 +120,25 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
 
 
     const handleSelectedGroupMember = (member) => {
+
+        // only 25 members can be added while creating a group
+        if (selectedUsersForGroup.length >= 25) {
+            dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
+            return;
+        }
+        
+        // checks if user is already selected
         if (selectedUsersForGroup.includes(member)) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "User already exists", isError: true } })
+            dispatch({ type: SET_TOAST, payload: { toastContent: "User already selected", isError: true } })
             return;
         }
 
         if (memberList) {
+            if (memberList?.length + selectedUsersForGroup.length >= 25) {
+                dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
+                return;
+            }
+            // check if user is already a member
             for (let i = 0; i < memberList.length; i++) {
                 if (memberList[i].name === member) {
                     dispatch({ type: SET_TOAST, payload: { toastContent: "User is already a member", isError: true } })

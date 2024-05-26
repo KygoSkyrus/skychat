@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query, serverTimestamp } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query, serverTimestamp, onSnapshot } from 'firebase/firestore'
 import { ArrowLeft, Edit, LogOut, MessageSquareX, UserRoundPlus, Users, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,18 +21,17 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
 
     useEffect(() => {
-        getGroupInfo();
+        const docRef = doc(db, "group", selectedUserToChat);
+
+        const unsubscribe = onSnapshot(docRef, (doc) => {
+            console.log("Document data:", doc.data());
+            setGroupInfo(doc.data());
+        });
+
+        // snapshot cleanup
+        return () => unsubscribe();
     }, [])
 
-    const getGroupInfo = async () => {
-        const docRef = doc(db, "group", selectedUserToChat);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
-            setGroupInfo(docSnap.data());
-        }
-    }
 
     const removeMember = async (userName) => {
         // here you remove this user from the group collection
@@ -96,6 +95,10 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // [done]..have  to delete the self from group collections too when a user is removed and exits volunteeraly
     // [done]..for adding members in group  mdoal ,, things you have to do is send a msg to group that user has added,, same goes when a member is removed
     // [done]..second important thing is that u need to check if the msg if recieved by the members only,, not by the removed members 
+    // [done]..user cant add more than 25 members in group
+    // [done]..when user leaves it should show right than in the groupmemberlist,,,can we do something like this that if we are groupinfo page and right then if someone leaves,,,we see the chnage in member list,,, can add a snapshot for groupinfo,,,maybe that will work in real time
+
+    // CASE:?? if the admin leaves than there is no admin, hence no members can be added.. possible solution>> is to have createdBy as an array.. which initailly will have one(creator) user.. and if that user leaves than push the next member from memberlist to that array,, this array will be like stack,, the top user is the current admin,,,and the first ever user will be the creator. 
   
     //ADDED:> when a user is added to group by admin(using btn in groupinfo after the group has been already created),, than a deletedTill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
     //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the group will me deleted from connection list 
@@ -105,9 +108,9 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // clearChat; means the chat is cleared... [ avaialable in connection list only]
     // Add/remove member: only admin can perfrom this action( let this action be displayed but throw a notifiction if anyone other than admin tries to perform these actions)
 
-    // when user leaves it should show right than in the groupmemberlist,,,can we do something like this that if we are groupinfo page and right then if someone leaves,,,we see the chnage in member list,,, can add a snapshot for groupinfo,,,maybe that will work in real time
-    // user cant add more than 25 members in group
-    // CASE:?? if the admin leaves than there is no admin, hence no members can be added
+    // first when a user is removed from group or he leaves himself than the chat should not disapper ,,as it should show the group but messaging should be disabled..later the group can be ... (if this is time taking than leave it)
+    //.... this can be done by adding a key the users cneection list of that group,,along with groyupname and connection a=id,, a key of removedAt should be added on removal of group of when leavong..by this key wew will hide and shpw gthe text input  field on chat wondow.. if this key is there than hide the input as the user is no longer a member,,, and when user is added again,,it will be check if the user already has the group connection id(bcz there might be a case that user has cleared the chat),,,if yes than this key will be deleted and everything will be same as usual... also note that when this key is avaialbe than it  should not show the exit group button to user
+
     
     return (
         <>
@@ -140,9 +143,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                         <div className="member_list w-100">{
                             groupInfo?.members?.map(x => (
                                 <div className="list" key={x.name}>
-                                    <section className="chat_list_item"
-                                    //  onClick={() => handleSelectedUserToChat(x, userData?.connections[x]?.groupName || false)} 
-                                    >
+                                    <section className="chat_list_item" >
                                         <img src={x.avatar} className="me-2" alt="" />
                                         <div>
                                             <span>{x.name}</span>

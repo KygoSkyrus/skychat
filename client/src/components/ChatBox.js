@@ -37,6 +37,14 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     }, [selectedUserToChat])
 
+    // added to handle closing of group chat window when user is removed 
+    useEffect(()=>{
+        console.log('new useefect')
+        if(!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat)){
+            setSelectedUserToChat(undefined);
+        }
+    },[userData])
+
     console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
 
 

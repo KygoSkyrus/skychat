@@ -51,23 +51,24 @@
 
 
 ### Possible edge cases for group;
-- check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy
-- do not show yourself in the search list of users
+- check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy[show a popup that go to blocklist and unloack to add this member to group]
+- [done]do not show yourself in the search list of users
 
 
 
 # Defects
+- for member list in groupifo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
 - when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time [solution: either we have snapshot for every conecction and request (have to get all the ids by connection and put it in a snapshot query), so that whenever a msg is there from any of the user, than the i will get notified,,,also this can be helpful to show msg on the chatlist window,, to show latest msg]
 - hide the author name if its private chat,,,only show when its group
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
-- for member list in groupifo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
 
 # Todo 
 -implement group chat/option to create a group and add members 
 - implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much
 -delete msg
 - **** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
+- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 
@@ -76,12 +77,11 @@
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - try firebase push notifications
 
-- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
 **Style**
-- on desktop show the sidebar..hid it only for mobile
+- on desktop show the sidebar..hide it only for mobile
 - the height of chat body changes as we go from connection to req window, and opens a req chat
 - increase the width of overall chatbody
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -91,7 +91,7 @@
 
 
 - **least priority**
-- all the parts like sidebar, chathead etc can go to deifferent component
+- all the parts like sidebar, chathead etc can go to different component
 - add loader (while loading mssgs or for dates)
 - set the users usernsme in displayname of firebase and avatar in photourl
 - add professional and other versions
