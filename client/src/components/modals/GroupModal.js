@@ -121,6 +121,12 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
 
     const handleSelectedGroupMember = (member) => {
 
+        // prevent user from added blocked connections
+        if(userData?.blockList.hasOwnProperty(member)) {
+            dispatch({ type: SET_TOAST, payload: { toastContent: "Selected user is blocked. Unblock to add in group", isError: true } })
+            return;
+        }
+
         // only 25 members can be added while creating a group
         if (selectedUsersForGroup.length >= 25) {
             dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })

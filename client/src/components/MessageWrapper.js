@@ -1,12 +1,13 @@
 import React from 'react'
 import { getExactTimeStr } from '../utils';
 
-const MessageWrapper = ({ msgData, myself }) => {
+const MessageWrapper = ({ msgData, myself, isGroupSelected }) => {
 
   const deriveDate = (d) => {
     let date = new Date(d);
     return getExactTimeStr(date);
   }
+  console.log('isGroupSelected',isGroupSelected)
 
   return (
     <>
@@ -30,11 +31,13 @@ const MessageWrapper = ({ msgData, myself }) => {
       </div>
 
       {/* we can remove the sender reciever name for one to one chat */}
-      <section className={
-        myself === msgData.author
-          ? "authorName me"
-          : "authorName other"
-      }>{msgData.author}</section>
+      {isGroupSelected &&
+        <section className={
+          myself === msgData.author
+            ? "authorName me"
+            : "authorName other"
+        }>{msgData.author}</section>
+      }
     </>
   );
 }

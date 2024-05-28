@@ -10,7 +10,7 @@ import { PlusSquare, Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter } from "firebase/firestore";
 
 
-const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => {
+const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGroupSelected }) => {
     let prevDate = '';
 
     const db = getFirestore(firebaseApp);
@@ -37,6 +37,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
 
     }, [selectedUserToChat])
 
+    
     // added to handle closing of group chat window when user is removed 
     useEffect(()=>{
         console.log('new useefect')
@@ -332,7 +333,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat }) => 
                                             </span>
                                         </div>
                                         :
-                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName} />
+                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName} 
+                                        isGroupSelected={isGroupSelected} />
                                     }
                                 </div>
                             )

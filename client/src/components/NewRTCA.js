@@ -52,26 +52,32 @@ export const NewRTCA = ({ firebaseApp }) => {
   }, [])
 
   useEffect(() => {
-    async function fetchData() {
-      const connections = [];
-      if (Object.keys(userData?.requests)) {
-        for (const uName of Object.keys(userData?.requests)) {
-          const hasNewMessages = await getConnectionRequests(uName);
-          if (hasNewMessages) {
-            connections.push(userData?.requests[uName].groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
-          }
-        }
-      }
-      setConnectionsToShow(connections);
-    };
-
     //setting connection req list
     if (userData) {
+      console.log('calling fetchData')
       fetchData();
       // if (selectedUserToChat) retrieveTexts(selectedUserToChat) //added bcz without this onsnapshot wont work  // commented for issue #1
     }
   }, [userData])
 
+  async function fetchData() {
+    // this function filters the requests which are recent(fresh ones and the one which has new msgs after deleted earlier)
+    const connections = [];
+    if (Object.keys(userData?.requests)) {
+      for (const uName of Object.keys(userData?.requests)) {
+        const hasNewMessages = await getConnectionRequests(uName);
+        if (hasNewMessages) {
+          connections.push(userData?.requests[uName].groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
+        }
+      }
+    }
+    setConnectionsToShow(connections);
+  };
+
+  useEffect(()=>{
+    if(!connectionHeader) fetchData(); // to load the request list when requests window is opened
+  },[connectionHeader])
+  
   console.log('connextions sto show', connectionsToShow)
 
 
@@ -266,6 +272,7 @@ export const NewRTCA = ({ firebaseApp }) => {
               firebaseApp={firebaseApp}
               selectedUserToChat={selectedUserToChat}
               setSelectedUserToChat={setSelectedUserToChat}
+              isGroupSelected={isGroupSelected}
             />
             :
             connectionHeader ?

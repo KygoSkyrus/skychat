@@ -34,7 +34,7 @@
 2. [1] when texting someone for first time than the msg is not showing immmediately in the ui [fixed by calling the realtime-listener function with connection id for new connection]
 3. [1] unable to get realtime chat msgs (possible solution,, either convert the getDocs to onsnapshot and store the messages like obj of obj not array of obj to avoid having duplicate data)
 4. [1] ANOTEHR PROBLEM IS THAT right after deleting chats and then there are new msgs,, than these msgs wont have a lasvisible element set due to which load more texts wont work (how to set this?)
-
+5. [1] when conection who is deleted texts again than he is not shown in req list dynamically,, i dont think req list is working in real time [this is why bcz the user is not added in request list in userData when user sends msg again,, bcz we never removed the user and just added a deletedTill date, thats why]{this is partially solved that,, whenever user goes to request page than the request list will be rendered,, but if the user is on req list already and than he gets a msg(like above case) than he wont see it in real time}
 
 
 
@@ -46,20 +46,19 @@
 - // when i send a msg to a unknown user,, the msg doesnt show in ui right then
 - scroll down is not working
 - show err msg on incorrect login
+- hide the author name if its private chat,,,only show when its group
 
 
 
 
 ### Possible edge cases for group;
-- check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy[show a popup that go to blocklist and unloack to add this member to group]
+- [done]check if you can add a blocked connection to a group,, if yes than you have to unblock the person,,,either show that blocked person in the searched list with a text that ythis person cant be added bcz its blocked.. i like this way better as compared to throw a popup to unblock the person right there,,,,implement whatever is easy[show a popup that go to blocklist and unloack to add this member to group]
 - [done]do not show yourself in the search list of users
 
 
 
 # Defects
-- for member list in groupifo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
-- when connection who is deleted texts again than he is not shown in req listb dynamicaaly,, i dont think req list is working in real time [solution: either we have snapshot for every conecction and request (have to get all the ids by connection and put it in a snapshot query), so that whenever a msg is there from any of the user, than the i will get notified,,,also this can be helpful to show msg on the chatlist window,, to show latest msg]
-- hide the author name if its private chat,,,only show when its group
+- for member list in groupinfo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
 
