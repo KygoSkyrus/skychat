@@ -349,22 +349,21 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
     }
 
 
-    // let connectionId = '';                                                                       
     //connection is deleted from connection list or req list / messages are not deleted
     console.log('exit group', id)
-    //current only connection list is handled here
     if (userData?.connections?.hasOwnProperty(id)) {
-        // connectionId = userData.connections[id]?.id;
-        delete userData.connections[id];
+        userData.connections[id].exitAt = serverTimestamp();
+        // delete userData.connections[id];
         updateUserDoc();
     } else if (userData?.requests?.hasOwnProperty(id)) {
-        // connectionId = userData.requests[id]?.id;
-        delete userData.requests[id];
+        // delete userData.requests[id];
+        userData.requests[id].exitAt = serverTimestamp();
         updateUserDoc();
     }
 
 
     async function updateUserDoc() {
+        console.log('uddududuududud',userData)
 
         //deleting connection req from req list 
         const docRef = doc(db, "users", userData?.id);

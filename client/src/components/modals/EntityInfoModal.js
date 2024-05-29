@@ -42,20 +42,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
             dispatch({ type: SET_TOAST, payload: { toastContent: "Only group admin can perform this action", isError: true } })
             return;
         }
-
-        //removing member from group list 
-        const docRef = doc(db, "group", selectedUserToChat);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            // console.log("Document data:", docSnap.data());
-            let data = docSnap.data();
-            let newMemberList = data.members.filter(x => x.name !== userName)
-            data.members = newMemberList;
-
-            await updateDoc(docRef, data);// updating document
-            setGroupInfo(data);
-        }
-
+        
         // deleting group from user's connection/req list 
         console.log('username', userName)
         let q = query(collection(db, "users"), where("username", "==", userName));
@@ -101,14 +88,14 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // CASE:?? if the admin leaves than there is no admin, hence no members can be added.. possible solution>> is to have createdBy as an array.. which initailly will have one(creator) user.. and if that user leaves than push the next member from memberlist to that array,, this array will be like stack,, the top user is the current admin,,,and the first ever user will be the creator. 
   
     //ADDED:> when a user is added to group by admin(using btn in groupinfo after the group has been already created),, than a deletedTill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
-    //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the group will me deleted from connection list 
+    //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the exitAt date will me added to group connection 
     // GROUP has basicalaly three actions,, 
     // accept; which means user accespts to be in group,, [avaiallabe in req list]
     // delete; means the user exits the group... [this is avaiallabe in both connection and req list]
     // clearChat; means the chat is cleared... [ avaialable in connection list only]
     // Add/remove member: only admin can perfrom this action( let this action be displayed but throw a notifiction if anyone other than admin tries to perform these actions)
 
-    // first when a user is removed from group or he leaves himself than the chat should not disappear ,,as it should show the group but messaging should be disabled.... (if this is time taking than leave it).... [solution]this can be done by adding a key the users connection list of that group,,along with groupname and connection-id,, a key of removedAt should be added on removal of group of when leaving..by this key we will hide and show the text input  field on chat wondow.. if this key is there than hide the input as the user is no longer a member,,, and when user is added again,,it will be check if the user already has the group connection id(bcz there might be a case that user has cleared the chat),,,if yes than this key will be deleted and everything will be same as usual... also note that when this key is avaialbe than it  should not show the exit group button to user
+    // first when a user is removed from group or he leaves himself than the chat should not disappear ,,as it should show the group but messaging should be disabled.... (if this is time taking than leave it).... [solution]this can be done by adding a key the users connection list of that group,,along with groupname and connection-id,, a key of removedAt should be added on removal of group of when leaving instead of deleting the group connection..by this key we will hide and show the text input  field on chat wondow.. if this key is there than hide the input as the user is no longer a member,,, and when user is added again,,it will be check if the user already has the group connection id(bcz there might be a case that user has cleared the chat),,,if yes than this key will be deleted and everything will be same as usual... also note that when this key is avaialbe than it  should not show the exit group button to user
 
     
     return (
