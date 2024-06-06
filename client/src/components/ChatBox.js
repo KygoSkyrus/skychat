@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -31,22 +31,45 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
         if (selectedUserToChat) {
             console.log('useEffect in chatbox--', selectedUserToChat)
 
+            // const isRealtimeListenerNeeded = hasUserHasLeftGroup(selectedUserToChat);// checks if the current opened chat is of a group from which user has exited
+
+            // if (isRealtimeListenerNeeded) realtimeListener(selectedUserToChat)
             realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
         }
 
     }, [selectedUserToChat])
 
-    
+
+    // NOTE: [resolved (now also checking if the connection is a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
     // added to handle closing of group chat window when user is removed 
-    useEffect(()=>{
+    useEffect(() => {
         console.log('new useefect')
-        if(!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat)){
+        if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && (userData?.connections?.selectedUserToChat?.hasOwnProperty('groupName') || userData?.requests?.selectedUserToChat?.hasOwnProperty('groupName'))) {
             setSelectedUserToChat(undefined);
         }
-    },[userData])
+    }, [userData])
 
-    console.log('messageList->>>>>>>>>>>>>>>>>', messageList)
+    function hasUserHasLeftGroup(selectedUser) {
+        if (userData.connections.hasOwnProperty(selectedUser)) {
+            if (userData.connections[selectedUser].hasOwnProperty('exitAt')) {
+                console.log('1')
+                return false;
+            }
+            else {
+                console.log('2')
+                return true;
+            }
+        } else if (userData.requests.hasOwnProperty(selectedUser)) {
+            if (userData.requests[selectedUser].hasOwnProperty('exitAt')) {
+                console.log('3')
+                return false;
+            } else {
+                console.log('4')
+                return true;
+            }
+        }
+    }
 
 
     function getConnectionId(userName) {
@@ -80,11 +103,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
 
     async function retrieveTexts(userToChat, loadMoreTexts = false) {
         console.log('__retrieveTexts', userData, userToChat)
-        const { connectionId, chatsTill } = getConnectionId(userToChat)
-        getTexts(connectionId, chatsTill, loadMoreTexts)
+        const { connectionId, chatsTill, exitAt } = getConnectionId(userToChat)
+        getTexts(connectionId, chatsTill, exitAt)
     }
 
-    async function getTexts(connectionId, chatsTill, loadMoreTexts) {
+    async function getTexts(connectionId, chatsTill, exitAt) {
         console.log('__gettexts', connectionId, selectedUserToChat, userData, chatsTill)
 
         if (connectionId) {
@@ -96,6 +119,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             //msgs after deleted chats only
             if (chatsTill) {
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
+            }
+
+            //msgs before exiting group only
+            if (exitAt) {
+                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", "<", exitAt), orderBy("time", "desc"), limit(2));
             }
 
             if (lastVisible.current) {
@@ -137,6 +165,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
 
     let isRealTimeUpdate = true;
     function realtimeListener(selectedUser, id) {
+        console.log('isRealtimeListener running')
 
         isRealTimeUpdate = false;
 
@@ -333,8 +362,8 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                                             </span>
                                         </div>
                                         :
-                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName} 
-                                        isGroupSelected={isGroupSelected} />
+                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
+                                            isGroupSelected={isGroupSelected} />
                                     }
                                 </div>
                             )
@@ -347,7 +376,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
 
             {userData?.requests[selectedUserToChat] ?
                 // when request chat is opened
-                <div className="req_btn">
+                (<div className="req_btn">
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat].groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat].groupName ?
@@ -359,22 +388,26 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                             </>
                         }
                     </div>
-                </div>
+                </div>)
                 :
-                <div className="msg-input form-control border-0">
-                    <input
-                        type="text"
-                        name="msg"
-                        id="theText"
-                        placeholder="...type"
-                        className="my-1"
-                        value={currentText}
-                        onChange={e => setcurrentText(e.target.value)}
-                        onKeyUp={(e) => e.key === "Enter" && sendText()}
-                        autoComplete="off"
-                    />
-                    <button onClick={() => sendText()} className="rounded-2" style={{ background: "#4b4b4b" }}><Send /></button>
-                </div>
+                (userData?.connections[selectedUserToChat]?.exitAt ?
+                    // when user has left group
+                    <div className="p-3 fs-12 text-center">You are no longer a member of group</div>
+                    :
+                    <div className="msg-input form-control border-0">
+                        <input
+                            type="text"
+                            name="msg"
+                            id="theText"
+                            placeholder="...type"
+                            className="my-1"
+                            value={currentText}
+                            onChange={e => setcurrentText(e.target.value)}
+                            onKeyUp={(e) => e.key === "Enter" && sendText()}
+                            autoComplete="off"
+                        />
+                        <button onClick={() => sendText()} className="rounded-2" style={{ background: "#4b4b4b" }}><Send /></button>
+                    </div>)
             }
         </div>
     )

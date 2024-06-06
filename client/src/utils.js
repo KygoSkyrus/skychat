@@ -351,13 +351,14 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
 
     //connection is deleted from connection list or req list / messages are not deleted
     console.log('exit group', id)
+    // NOW DELETING the group connection when user leaves the group
     if (userData?.connections?.hasOwnProperty(id)) {
-        userData.connections[id].exitAt = serverTimestamp();
-        // delete userData.connections[id];
+        // userData.connections[id].exitAt = serverTimestamp();
+        delete userData.connections[id];
         updateUserDoc();
     } else if (userData?.requests?.hasOwnProperty(id)) {
-        // delete userData.requests[id];
-        userData.requests[id].exitAt = serverTimestamp();
+        delete userData.requests[id];
+        // userData.requests[id].exitAt = serverTimestamp();
         updateUserDoc();
     }
 
@@ -374,7 +375,7 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
         });
 
         if (setSelectedUserToChat) setSelectedUserToChat(undefined);
-        // setIsGroupSelected(false);
+        // setIsGroupSelected(false);8
     }
 
     if(!isTriggeredByAdmin){
@@ -396,7 +397,8 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
 export function populateConnectionId(obj) {
     let connectionId = obj?.id || undefined;
     let chatsTill = obj?.deletedTill || null;
-    return { connectionId, chatsTill };
+    let exitAt = obj?.exitAt || null;
+    return { connectionId, chatsTill, exitAt };
 }
 
 export function getFormattedNotification(msgData, myName) {

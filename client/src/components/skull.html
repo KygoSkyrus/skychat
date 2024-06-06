@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>skull</title>
+    <style>
+      .container {
+        width: 500px;
+        height: 500px;
+        background-color: rgb(26, 26, 26);
+        border-radius: 6px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+      .holder {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      /* skeleton */
+      .s-top {
+        width: 50px;
+        height: 40px;
+        border-radius: 20px 20px 12px 12px;
+        background-color: rgb(255, 255, 255);
+        position: relative;
+      }
+      .s-top::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        position: absolute;
+        top: 60%;
+        left: 30%;
+        transform: translate(-50%, -50%);
+        background-color: rgb(0, 0, 0);
+      }
+      .s-top::after {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        position: absolute;
+        top: 60%;
+        right: 10%;
+        transform: translate(-50%, -50%);
+        background-color: rgb(0, 0, 0);
+      }
+      .s-bottom {
+        width: 30px;
+        height: 20px;
+        border-radius: 0 0 12px 12px;
+        background-color: rgb(255, 255, 255);
+        position: relative;
+      }
+      .s-bottom::before {
+        content: "";
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 14px;
+        height: 14px;
+        border-radius: 0 0 4px 4px;
+        background-color: rgb(0, 0, 0);
+        animation: laugh 300ms infinite ease-in-out;
+      }
+      @keyframes laugh {
+        from {
+          height: 6px;
+        }
+        to {
+          height: 14px;
+        }
+      }
+
+      /* face */
+      .face{
+        width: 50px;
+        height: 50px;
+        background-color: white;
+        border-radius: 50%;
+        position: relative;
+      }
+      .eyes{
+        width: 36px;
+        height: 10px;
+        background: rgb(0, 0, 0);
+        border-radius: 8px;
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .eyes::after{
+        content: "";
+        position: absolute;
+        top: 51%;
+        left: 25%;
+        transform: translate(-50%, -50%);
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: rgb(255, 255, 255);
+      }
+      .eyes::before{
+        content: "";
+        position: absolute;
+        top: 51%;
+        left: 75%;
+        transform: translate(-50%, -50%);
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background-color: rgb(255, 255, 255);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="holder">
+        <div class="s-top"></div>
+        <div class="s-bottom"></div>
+      </div>
+      <div class="holder">
+        <div class="face">
+          <div class="eyes"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

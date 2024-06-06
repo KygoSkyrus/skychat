@@ -122,7 +122,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
     const handleSelectedGroupMember = (member) => {
 
         // prevent user from added blocked connections
-        if(userData?.blockList.hasOwnProperty(member)) {
+        if (userData?.blockList.hasOwnProperty(member)) {
             dispatch({ type: SET_TOAST, payload: { toastContent: "Selected user is blocked. Unblock to add in group", isError: true } })
             return;
         }
@@ -132,7 +132,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
             dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
             return;
         }
-        
+
         // checks if user is already selected
         if (selectedUsersForGroup.includes(member)) {
             dispatch({ type: SET_TOAST, payload: { toastContent: "User already selected", isError: true } })
@@ -183,19 +183,37 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                     temp = doc.data()
                     temp.id = doc.id;
                     receiversDoc.push(temp)
-                    console.log('tempp', temp)
+                    // console.log('tempp', temp)
                     members.push({ name: temp.username, avatar: temp.avatar })
                 });
             }
-            console.log('receiversDoc', receiversDoc)
+            // console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
             for (let x of receiversDoc) {
-                console.log("x", x)
+                console.log("x", receiversDoc.connections)
                 const receiverDocRef = doc(db, "users", x.id);
+
+                /* group will always be deleted on exit so no need of below code
+                // if the user still has the group connection (IN CASE: he hasn't deleted the group)
+                if (x.connections.hasOwnProperty(groupInfo?.id)) {
+                    delete x.connections[groupInfo?.id]; // deleting group from connection list and moving to req list with new timestamp
+                    // await updateDoc(receiverDocRef, {
+                    //     connections: {
+                    //         ...x.connections,
+                    //         [groupInfo?.id]: {
+                    //             id: groupInfo?.id,
+                    //             groupName: groupInfo?.groupName,
+                    //             deletedTill: serverTimestamp(),
+                    //         },
+                    //     }
+                    // });
+                }
+                    */
                 await updateDoc(receiverDocRef, {
+                    // connections: { ...x.connections },
                     requests: {
-                        ...receiversDoc.requests,
+                        ...x.requests,
                         [groupInfo?.id]: {
                             id: groupInfo?.id,
                             groupName: groupInfo?.groupName,
@@ -203,6 +221,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                         },
                     }
                 });
+                // }
 
                 // SENDING NOTIFICATION (USER ADDED)
                 const msgData = {

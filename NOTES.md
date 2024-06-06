@@ -59,6 +59,8 @@
 
 # Defects
 - for member list in groupinfo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
+- if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
+- add a notification when a connection is accepted "connection added" something like that
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
 
