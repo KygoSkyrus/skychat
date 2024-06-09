@@ -1,5 +1,5 @@
 import { Timestamp, addDoc, collection, doc, getFirestore, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
-import { useSelector } from "react-redux"
+import { SET_TOAST } from "./redux/actionTypes"
 
 export const dbUsers = {
     "test1": {
@@ -220,7 +220,7 @@ export const defaultAvatar = 'https://firebasestorage.googleapis.com/v0/b/shopp-
 // }
 
 
-export async function acceptConnectionReq(db, userData, userName) {
+export async function acceptConnectionReq(db, userData, userName, dispatch) {
     console.log('acceptConnectionReq', userName)
 
     if (userData?.requests?.hasOwnProperty(userName)) {
@@ -245,6 +245,7 @@ export async function acceptConnectionReq(db, userData, userName) {
                 },
             }
         });
+        dispatch({ type: SET_TOAST, payload: { toastContent: "Request accepted", isError: false } })
     }
 }
 

@@ -1,10 +1,10 @@
-import { SET_CURRENT_USER, SET_USERS_LIST } from "./../actionTypes";
-import { SET_USER_INFO } from "./../actionTypes";
+import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO, SET_REQUEST_LIST } from "./../actionTypes";
 
 const initialState = {
   currentUser: null,
   userInfo: null,
   usersList: null,
+  requestList: null,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -25,6 +25,12 @@ export const userReducer = (state = initialState, action) => {
       return {
         ...state,
         usersList: action.payload
+      }
+    }
+    case SET_REQUEST_LIST: {
+      return {
+        ...state,
+        requestList: action.payload
       }
     }
 

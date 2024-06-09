@@ -265,7 +265,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
 
                     <div className='d-flex align-items-center justify-content-between bg-dark p-3 text-white'>
                         <ArrowLeft size="20" className='text-secondary pointer' onClick={() => setShowGroupModal(false)} />
-                        <span className={`text-secondary fs-12`} >Create Group</span>
+                        <span className={`text-secondary fs-12`} >{type === "add_member" ? 'Add Member' : 'Create Group'}</span>
                         {/* <X size="20" className='btn-close' onClick={() => setShowGroupModal(false)} /> */}
                     </div>
 

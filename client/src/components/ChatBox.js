@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
 import MessageWrapper from './MessageWrapper';
@@ -23,9 +23,12 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
     const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
 
+    const dispatch = useDispatch();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
+    const requestList = useSelector(state => state.user.requestList)// has request list connections (connections to show)
 
+    console.log('rrrrrrrrrrr',requestList, requestList[selectedUserToChat])
 
     useEffect(() => {
         if (selectedUserToChat) {
@@ -41,11 +44,12 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
     }, [selectedUserToChat])
 
 
-    // NOTE: [resolved (now also checking if the connection is a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
+    // NOTE: [resolved (now also checking if the opened connection was a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
     // added to handle closing of group chat window when user is removed 
     useEffect(() => {
         console.log('new useefect')
-        if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && (userData?.connections?.selectedUserToChat?.hasOwnProperty('groupName') || userData?.requests?.selectedUserToChat?.hasOwnProperty('groupName'))) {
+        if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && isGroupSelected ) {
+            console.log('iffff')
             setSelectedUserToChat(undefined);
         }
     }, [userData])
@@ -272,7 +276,23 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
 
             // check if userdata has the connection already and if not than add the connection in user collection
             if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
-                connectionId = userData?.connections[selectedUserToChat]?.id
+                connectionId = userData?.connections[selectedUserToChat]?.id;
+            }else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
+                connectionId = userData?.requests[selectedUserToChat]?.id;
+                // NOTE:::: when a msg is sent and selected user is from request list than it means it is one of the removed connection, so we have to move this connection from req list to connection
+                delete userData.requests[selectedUserToChat];
+                const userDocRef = doc(db, "users", userData.id);
+                await updateDoc(userDocRef, {
+                    connections: {
+                        ...userData.connections,
+                        [selectedUserToChat]: {
+                            id: connectionId,
+                        },
+                    },
+                    requests: {
+                        ...userData.requests
+                    }
+                });
             } else {
                 connectionId = uuidv4(); // creating a new connection id
                 const userDocRef = doc(db, "users", userData.id);
@@ -374,12 +394,13 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                 <div ref={dummy}></div>
             </div>
 
-            {userData?.requests[selectedUserToChat] ?
+            {/* {userData?.requests[selectedUserToChat] ? */}
+            {requestList?.includes(selectedUserToChat) ?// only show these action for action the reqList conections
                 // when request chat is opened
                 (<div className="req_btn">
-                    <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat].groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat)} >Accept</section>
+                    <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat,dispatch)} >Accept</section>
                     <div className="d-flex gap-1">
-                        {userData?.requests[selectedUserToChat].groupName ?
+                        {userData?.requests[selectedUserToChat]?.groupName ?
                             <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}>Leave group</section>
                             :
                             <>

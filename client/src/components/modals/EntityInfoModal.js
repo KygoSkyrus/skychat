@@ -18,20 +18,82 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     const [groupInfo, setGroupInfo] = useState();
 
     const [showGroupModal, setShowGroupModal] = useState(false)
+    const [memberList, setMemberList] = useState([])
 
 
     useEffect(() => {
         const docRef = doc(db, "group", selectedUserToChat);
-
+        let groupMembers;
         const unsubscribe = onSnapshot(docRef, (doc) => {
             console.log("Document data:", doc.data());
-            setGroupInfo(doc.data());
+            groupMembers = doc.data()?.members;
+            setGroupInfo(doc.data());// setting basic info
+            setInfo(groupMembers, doc.id); //handles group member's list
         });
+        // get the group memebers name and by that fetch their avatar... save the data in localstoreage with the timesatamp..
+        // now this function will only run if the timestamps of data in the locastorge is more than 2 or 3 hours ago        
 
         // snapshot cleanup
         return () => unsubscribe();
     }, [])
 
+    async function setInfo(groupMembers, groupId) {
+        let localGroupInfo = localStorage.getItem('groupInfo');
+        console.log('localGroupInfo', localGroupInfo)
+
+        let parsedInfo = {};
+        if (localGroupInfo) {
+            parsedInfo = JSON.parse(localGroupInfo);
+        }
+
+        // if there is already info stored 
+        if (parsedInfo?.hasOwnProperty(groupId)) {
+            console.log('ifff111', parsedInfo)
+            // compare the unix times(in ms) with current time
+            let lastUpdatedAt = parsedInfo[groupId].updatedAt;
+            let currTime = new Date().getTime();
+            console.log('time difff', ((currTime - lastUpdatedAt) / 60 / 1000))
+            // if last updated before 6 hours than get fresh data  (the below equation returns time in min)
+            if (((currTime - lastUpdatedAt) / 60 / 1000) > 360) {
+                console.log('ifff222',parsedInfo[groupId]?.info)
+                getAndSetFreshData();
+            } else {
+                console.log('ifff111else 22',parsedInfo[groupId]?.info)
+                setMemberList(parsedInfo[groupId]?.info);
+            }
+        } else {
+            console.log('elseeeee22',)
+            // info needed to be added
+            getAndSetFreshData();
+        }
+
+        // calling this only when the groupInfo is not availalble or when the info is outdate(more than 6hrs old)
+        async function getAndSetFreshData(){
+            let info = await getGroupInfo(groupMembers);
+            let data = {
+                info,
+                updatedAt: new Date().getTime(),
+            }
+
+            // appending the group info in localstorage
+            parsedInfo[groupId] = data;
+            localStorage.setItem('groupInfo', JSON.stringify(parsedInfo))
+            setMemberList(parsedInfo[groupId]?.info)
+        }
+    }
+
+    async function getGroupInfo(groupMembers) {
+        let info = [];
+        for (let x of groupMembers) {
+            let q = query(collection(db, "users"), where("username", "==", x.name));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                info.push({ name: x.name, avatar: doc.data()?.avatar });
+            });
+        }
+        console.log('info', info)
+        return info;
+    }
 
     const removeMember = async (userName) => {
         // here you remove this user from the group collection
@@ -39,10 +101,10 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
         // NOTE: ONLY ADMIN CAN REMOVE A MEMBER
         if (userData.username !== groupInfo?.createdBy) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Only group admin can perform this action", isError: true } })
+            dispatch({ type: SET_TOAST, payload: { toastContent: "Only group admin can perform this action", isError: true } });
             return;
         }
-        
+
         // deleting group from user's connection/req list 
         console.log('username', userName)
         let q = query(collection(db, "users"), where("username", "==", userName));
@@ -84,9 +146,10 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // [done]..second important thing is that u need to check if the msg if recieved by the members only,, not by the removed members 
     // [done]..user cant add more than 25 members in group
     // [done]..when user leaves it should show right than in the groupmemberlist,,,can we do something like this that if we are groupinfo page and right then if someone leaves,,,we see the chnage in member list,,, can add a snapshot for groupinfo,,,maybe that will work in real time
+    // [done]on add member modal its showing create group at the top 
 
     // CASE:?? if the admin leaves than there is no admin, hence no members can be added.. possible solution>> is to have createdBy as an array.. which initailly will have one(creator) user.. and if that user leaves than push the next member from memberlist to that array,, this array will be like stack,, the top user is the current admin,,,and the first ever user will be the creator. 
-  
+
     //ADDED:> when a user is added to group by admin(using btn in groupinfo after the group has been already created),, than a deletedTill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
     //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the exitAt date will me added to group connection 
     // GROUP has basicalaly three actions,, 
@@ -102,10 +165,8 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // CASE: if a person is added in group and that person hasnt accepted the group req and the req is still in req list while he is removed from grooup,, then unlike being in connection list the group connection will be deleted from req list
 
     // if user exit/removed from group and when he is added again then msgs are not showing in realtime,, if he reopens the chat than its working,, this may be bcz of the condiion if exitAT
-    // realtime msgs is not woring when fresh req is recieved
-    // on add member modal its showing create group at the top 
 
-    
+
     return (
         <>
             <div className="" id="entityInfoModal" >
@@ -135,7 +196,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                         </div>
 
                         <div className="member_list w-100">{
-                            groupInfo?.members?.map(x => (
+                            memberList?.map(x => (
                                 <div className="list" key={x.name}>
                                     <section className="chat_list_item" >
                                         <img src={x.avatar} className="me-2" alt="" />
@@ -172,7 +233,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                         searchedUserList={searchedUserList}
                         setSearchedUserList={setSearchedUserList}
                         type="add_member"
-                        memberList={groupInfo?.members}
+                        memberList={memberList}
                         groupInfo={groupInfo}
                         setGroupInfo={setGroupInfo}
                     />

@@ -58,19 +58,19 @@
 
 
 # Defects
-- for member list in groupinfo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
-- if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
-- add a notification when a connection is accepted "connection added" something like that
+- [done](sol:added the memberlist with avatar in localstorage, only updating data if its lastUpdated before 6hrs otherwise just get data from localstorage and show)for member list in groupinfo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
+- [done](sol:now showing the req realted actions to only those requests which are visible in request list,, not to the removed connections{which are hidden})if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
+- [done]add a notification when a connection is accepted "connection added" something like that
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
 
 # Todo 
--implement group chat/option to create a group and add members 
-- implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much
+- [done]implement group chat/option to create a group and add members 
 -delete msg
 - **** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
+- [done]add list icon on dp inside chatbox
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 
 - encrypt messages/passwords
@@ -97,7 +97,7 @@
 - set the users usernsme in displayname of firebase and avatar in photourl
 - add professional and other versions
 - add a option to share the app with your frnds,, create links to share on social media apps
-
+- implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much (show this only for connections)
 
 
 

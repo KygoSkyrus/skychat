@@ -5,9 +5,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, hideSearchedUsersList, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
@@ -72,6 +72,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       }
     }
     setConnectionsToShow(connections);
+    dispatch({ type: SET_REQUEST_LIST, payload: connections })
   };
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export const NewRTCA = ({ firebaseApp }) => {
     sidebarVisibility(false, setSearchedUserList)//closing sidebar
     setSelectedUserToChat(username);//setting selected user
 
-    console.log('handleSelectedUserToChat  clicked',username, groupName)
+    console.log('handleSelectedUserToChat  clicked', username, groupName)
     if (groupName) {
       setIsGroupSelected(true);
       setSelectedGroupName(groupName)
@@ -217,13 +218,18 @@ export const NewRTCA = ({ firebaseApp }) => {
                 <section id="chatWith">{isGroupSelected ? selectedGroupName : selectedUserToChat}</section>
 
                 <div className="dropdown">
-                  {isGroupSelected ?
-                    <span className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" alt="" >
-                      <Users size={18} />
+                  <span className="position-relative cwp" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {isGroupSelected ?
+                      <span className="chatWithProfile ms-1" >
+                        <Users size={18} />
+                      </span>
+                      :
+                      <img src={usersList[selectedUserToChat]?.avatar} className="chatWithProfile ms-1" alt="" />
+                    }
+                    <span className="list-icon">
+                      <List size={18} />
                     </span>
-                    :
-                    <img src={usersList[selectedUserToChat]?.avatar} className="chatWithProfile ms-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" alt="" />
-                  }
+                  </span>
                   {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                     <ul className="dropdown-menu p-2">
                       <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chat</li>
@@ -232,9 +238,9 @@ export const NewRTCA = ({ firebaseApp }) => {
                           Delete Group
                         </li>
                         : */}
-                        <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false) : deleteConnection(selectedUserToChat)}>
-                          {isGroupSelected ? 'Exit Group' : 'Remove connection'}
-                        </li>
+                      <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false) : deleteConnection(selectedUserToChat)}>
+                        {isGroupSelected ? 'Exit Group' : 'Remove connection'}
+                      </li>
                       {/* } */}
                       {isGroupSelected ?
                         <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
@@ -310,10 +316,10 @@ export const NewRTCA = ({ firebaseApp }) => {
                             //     <Trash size={18} /> 
                             //   </section>
                             //   :
-                              <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat, false, false)} title="Exit group">
-                                <LogOut size={18} />
-                              </section>
-                              // )
+                            <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat, false, false)} title="Exit group">
+                              <LogOut size={18} />
+                            </section>
+                            // )
                             :
                             <>
                               <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
@@ -359,7 +365,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
                           {/* ACTIONS */}
                           <section className={`acceptReq ${uName?.groupName && ' overrideClrGreen'}`} onClick={() =>
-                            uName?.groupName ? acceptGroupReq(db, userData, id) : acceptConnectionReq(db, userData, id)} title="Accept connection">
+                            uName?.groupName ? acceptGroupReq(db, userData, id) : acceptConnectionReq(db, userData, id, dispatch)} title="Accept connection">
                             <UserCheck2 size={18} />
                           </section>
                           {uName?.groupName ?
