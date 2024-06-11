@@ -39,6 +39,8 @@ const UserModal = ({ setShowUserModal }) => {
 
                         <ul className='list mt-3'>
                             <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Blocked connections</li>
+                            <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Themes</li>
+                            <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Privacy</li>
                         </ul>
 
 
