@@ -66,14 +66,14 @@
 
 # Todo 
 - [done]implement group chat/option to create a group and add members 
--delete msg
+- delete msg
 - **** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
 - there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]add list icon on dp inside chatbox
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - add dummy accounts 
-
+- add lazy loading in pattern images
 - encrypt messages/passwords
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
