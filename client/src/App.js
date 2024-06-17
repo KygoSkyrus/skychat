@@ -73,6 +73,7 @@ function App({ firebaseApp }) {
 
   return (
     <div className="App">
+      <div className="layer"></div>
       <>
         <Routes>
           <Route exact path="/" element={<Authenticate firebaseApp={firebaseApp} />} />

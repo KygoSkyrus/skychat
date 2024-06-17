@@ -282,7 +282,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           
           
           {/***** NEW HEADER START ******/}
-          <label for="filter" class="switch" aria-label="Toggle Filter">
+          <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev=>!prev)}>
             <input type="checkbox" id="filter"/>
               <span>C</span>
               <span>R</span>

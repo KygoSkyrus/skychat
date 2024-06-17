@@ -3,126 +3,144 @@ import { SET_TOAST } from "./redux/actionTypes"
 
 export const dbUsers = {
     "test1": {
-        "username": "test1",
-        "blockList": {},
-        "time": {
-            "seconds": 1704899512,
-            "nanoseconds": 878000000
+        "blockList": {
+            "test6": {
+                "id": "5ea00230-b709-4049-8e67-2703bff76ee9",
+                "blockedAt": {
+                    "seconds": 1715866673,
+                    "nanoseconds": 70000000
+                }
+            }
         },
+        "username": "test1",
         "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2Favatar%20(8).png?alt=media&token=4c4b0ea3-519f-430c-9f0f-8c24df8d163c",
         "connections": {
             "test2": {
                 "deletedTill": {
-                    "seconds": 1706379058,
-                    "nanoseconds": 133000000
+                    "seconds": 1717784032,
+                    "nanoseconds": 193000000
                 },
-                "id": "22e318c9-f125-4e07-9b14-1f74e9047eb2"
+                "id": "9afbe648-40f3-4f49-a574-873be66338d0"
+            },
+            "90bd529e-a8e1-4667-8607-b6dda7356641": {
+                "groupName": "i2",
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641"
+            },
+            "76a3aaec-0a4f-4901-b25a-5b4a6795ad28": {
+                "groupName": "iii",
+                "id": "76a3aaec-0a4f-4901-b25a-5b4a6795ad28"
             }
+        },
+        "privacy": true,
+        "time": {
+            "seconds": 1704899512,
+            "nanoseconds": 878000000
         },
         "email": "test1@email.com",
-        "requests": {
-            "test3": {
-                "id": "1ec282e6-f95d-4dab-ad61-c5e79fc16283",
-                "deletedTill": {
-                    "seconds": 1711532411,
-                    "nanoseconds": 849000000
-                }
-            }
-        },
+        "requests": {},
         "id": "AMaRvZRYFUMabQKINmNF"
     },
     "test6": {
-        "email": "test6@email.com",
-        "connections": {},
-        "requests": {},
         "username": "test6",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "blockList": {},
+        "requests": {
+            "test2": {
+                "id": "1162eb04-dd2d-49af-b0b3-6aee795bef32"
+            }
+        },
         "time": {
             "seconds": 1711534119,
             "nanoseconds": 748000000
         },
+        "privacy": true,
+        "blockList": {},
+        "email": "test6@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "connections": {},
         "id": "DIJJjPqUTPoYddxY2TcT"
     },
     "test3": {
         "email": "test3@email.com",
-        "username": "test3",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "requests": {},
+        "blockList": {},
         "connections": {
-            "test2": {
-                "id": "0930b102-9779-4b3c-9b59-6fba1f006b55"
+            "test1": {
+                "id": "1ec282e6-f95d-4dab-ad61-c5e79fc16283"
             },
             "test5": {
                 "id": "5a5af813-6c6d-4f2c-b46f-d023dd865f7e"
             },
-            "test1": {
-                "id": "1ec282e6-f95d-4dab-ad61-c5e79fc16283"
+            "test2": {
+                "id": "0930b102-9779-4b3c-9b59-6fba1f006b55"
+            }
+        },
+        "username": "test3",
+        "requests": {
+            "90bd529e-a8e1-4667-8607-b6dda7356641": {
+                "groupName": "i2",
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
+                "deletedTill": {
+                    "seconds": 1717927718,
+                    "nanoseconds": 560000000
+                }
             }
         },
         "time": {
             "seconds": 1705165774,
             "nanoseconds": 289000000
         },
-        "blockList": {},
+        "privacy": false,
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
         "id": "I5q047QCTEAgMowlYLBE"
     },
     "test2": {
-        "time": {
-            "seconds": 1704899556,
-            "nanoseconds": 460000000
-        },
-        "email": "test2@email.com",
-        "requests": {
-            "test3": {
-                "id": "0930b102-9779-4b3c-9b59-6fba1f006b55",
-                "deletedTill": {
-                    "seconds": 1706718051,
-                    "nanoseconds": 882000000
-                }
+        "connections": {
+            "test6": {
+                "id": "1162eb04-dd2d-49af-b0b3-6aee795bef32"
+            },
+            "test1": {
+                "id": "9afbe648-40f3-4f49-a574-873be66338d0"
             }
         },
         "blockList": {},
         "username": "test2",
         "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "connections": {
-            "test1": {
+        "privacy": true,
+        "requests": {
+            "90bd529e-a8e1-4667-8607-b6dda7356641": {
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
                 "deletedTill": {
-                    "seconds": 1706023143,
-                    "nanoseconds": 296000000
+                    "seconds": 1717927718,
+                    "nanoseconds": 143000000
                 },
-                "id": "22e318c9-f125-4e07-9b14-1f74e9047eb2"
+                "groupName": "i2"
             }
+        },
+        "email": "test2@email.com",
+        "time": {
+            "seconds": 1704899556,
+            "nanoseconds": 460000000
         },
         "id": "MSOGk7iP40CehhYW5x5I"
     },
-    "k 1": {
-        "email": "k1@gmail.com",
-        "blockList": {},
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "username": "k 1",
-        "time": {
-            "seconds": 1706549446,
-            "nanoseconds": 270000000
-        },
-        "requests": {},
-        "connections": {},
-        "id": "bt3zYWzkcFYRJI1qanMK"
-    },
     "test5": {
-        "requests": {
-            "test3": {
-                "id": "5a5af813-6c6d-4f2c-b46f-d023dd865f7e"
-            }
-        },
-        "username": "test5",
+        "connections": {},
+        "email": "test5@email.com",
+        "privacy": true,
         "time": {
             "seconds": 1706630048,
             "nanoseconds": 445000000
         },
-        "connections": {},
         "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "email": "test5@email.com",
+        "username": "test5",
+        "requests": {
+            "90bd529e-a8e1-4667-8607-b6dda7356641": {
+                "groupName": "i2",
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
+                "deletedTill": {
+                    "seconds": 1717927717,
+                    "nanoseconds": 715000000
+                }
+            }
+        },
         "blockList": {},
         "id": "tkKDVsww5962mnrHBhec"
     }
@@ -180,10 +198,10 @@ export const sidebarVisibility = (val, setSearchedUserList) => {
 
     if (val) {
         sidebar.style.display = "flex";
-        overlay.classList.remove('d-none');
+        overlay?.classList.remove('d-none');
     } else {
         sidebar.style.display = "none";
-        overlay.classList.add('d-none');
+        overlay?.classList.add('d-none');
 
         clearSearchList(setSearchedUserList);
     }
@@ -213,6 +231,9 @@ export function getAvatarUrl(i) {
 export const defaultAvatar = 'https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a'
 
 
+export function getPatternUrl(i) {
+    return `https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(${i}).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d`
+}
 
 // export async function updateUserDoc(db, id, newValue) {
 //     const docRef = doc(db, "users", id);

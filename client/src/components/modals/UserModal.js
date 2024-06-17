@@ -3,14 +3,25 @@ import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import EditAvatarModal from './EditAvatarModal'
 import BlockedConnectionsModal from './BlockedConnectionsModal'
+import ThemeModal from './ThemeModal'
+import { doc, getFirestore, updateDoc } from 'firebase/firestore'
 
 const UserModal = ({ setShowUserModal }) => {
 
     const userData = useSelector(state => state.user.userInfo)
+    const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+    const db = getFirestore(firebaseApp);
 
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
     const [showBlockedConnections, setShowBlockedConnections] = useState(false)
+    const [showThemeModal, setShowThemeModal] = useState(false)
 
+    const togglePrivacy = async (e) => {
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            privacy: e.target.checked
+        });
+    }
 
     return (
         <>
@@ -38,12 +49,16 @@ const UserModal = ({ setShowUserModal }) => {
                         <section className='email fs-10 text-secondary'>{userData?.email}</section>
 
                         <ul className='list mt-3'>
-                            <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Blocked connections</li>
-                            <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Themes</li>
-                            <li className='chat_list_item ' onClick={()=>setShowBlockedConnections(true)}>Privacy</li>
+                            <li className='chat_list_item ' onClick={() => setShowBlockedConnections(true)}>Blocked connections</li>
+                            <li className='chat_list_item ' onClick={() => setShowThemeModal(true)}>Themes</li>
+                            <li className='chat_list_item privacy'>
+                                <span>Privacy</span>
+                                <span className='d-flex justify-content-end'>
+                                    <input type="checkbox" id='privacy' checked={userData.privacy} onChange={(e)=>togglePrivacy(e)} />
+                                    <label htmlFor="privacy"></label>
+                                </span>
+                            </li>
                         </ul>
-
-
 
                     </div>
 
@@ -64,6 +79,12 @@ const UserModal = ({ setShowUserModal }) => {
                 </>
             }
 
+            {showThemeModal &&
+                <>
+                    <ThemeModal setShowThemeModal={setShowThemeModal} />
+                    {/* <div className="overlay pointer zIndex4" onClick={() => setShowEditAvatarModal(false)}></div> */}
+                </>
+            }
         </>
     )
 }

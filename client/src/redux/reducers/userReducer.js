@@ -1,10 +1,11 @@
-import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO, SET_REQUEST_LIST } from "./../actionTypes";
+import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO, SET_REQUEST_LIST, SET_THEME } from "./../actionTypes";
 
 const initialState = {
   currentUser: null,
   userInfo: null,
   usersList: null,
   requestList: null,
+  theme: null,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -31,6 +32,12 @@ export const userReducer = (state = initialState, action) => {
       return {
         ...state,
         requestList: action.payload
+      }
+    }
+    case SET_THEME: {
+      return {
+        ...state,
+        theme: action.payload
       }
     }
 

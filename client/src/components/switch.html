@@ -6,130 +6,131 @@
     <title></title>
     <style>
       body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  transition: background-color 0.3s, color 0.3s;
-}
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        transition: background-color 0.3s, color 0.3s;
+      }
 
-input[type="checkbox"] {
-  height: 0;
-  width: 0;
-  visibility: hidden;
-}
+      input[type="checkbox"] {
+        height: 0;
+        width: 0;
+        visibility: hidden;
+      }
 
-label {
-  cursor: pointer;
-  text-indent: -9999px;
-  width: 190px;
-  height: 100px;
-  background: #999;
-  display: block;
-  border-radius: 100px;
-  position: relative;
-  transform: scale(0.3);
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
-    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
+      label {
+        cursor: pointer;
+        text-indent: -9999px;
+        width: 190px;
+        height: 100px;
+        background: #999;
+        display: block;
+        border-radius: 100px;
+        position: relative;
+        transform: scale(0.3);
+        -webkit-tap-highlight-color: transparent;
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+          rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
 
-label:after {
-  content: "";
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 90px;
-  height: 90px;
-  background: #fff;
-  border-radius: 90px;
-  transition: 0.3s;
-  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
-    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
-}
+      label:after {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: 90px;
+        height: 90px;
+        background: #fff;
+        border-radius: 90px;
+        transition: 0.3s;
+        box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+          rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+      }
 
-input:checked + label {
-  background: #666;
-}
+      input:checked + label {
+        background: #666;
+      }
 
-input:checked + label:after {
-  left: calc(100% - 5px);
-  transform: translateX(-100%);
-}
+      input:checked + label:after {
+        left: calc(100% - 5px);
+        transform: translateX(-100%);
+      }
 
-label:active:after {
-  width: 130px;
-}
+      label:active:after {
+        width: 130px;
+      }
 
-[data-theme="light"] {
-  color: #1f2028;
-  background-color: #fff;
-}
+      [data-theme="light"] {
+        color: #1f2028;
+        background-color: #fff;
+      }
 
-[data-theme="dark"] {
-  color: #fff;
-  background-color: #1f2028;
-}
-
+      [data-theme="dark"] {
+        color: #fff;
+        background-color: #1f2028;
+      }
     </style>
   </head>
   <body>
-    <input type="checkbox" id="darkModeToggle">
-<label for="darkModeToggle"></label>
+    <input type="checkbox" id="darkModeToggle" />
+    <label for="darkModeToggle"></label>
 
-<script>
-  // adapted from https://github.com/coliff/dark-mode-switch
+    <script>
+      // adapted from https://github.com/coliff/dark-mode-switch
 
-loadTheme =
-  typeof loadTheme === "function" ?
-  loadTheme :
-  () => localStorage.getItem("theme");
-saveTheme =
-  typeof saveTheme === "function" ?
-  saveTheme :
-  (theme) => localStorage.setItem("theme", theme);
+      loadTheme =
+        typeof loadTheme === "function"
+          ? loadTheme
+          : () => localStorage.getItem("theme");
+      saveTheme =
+        typeof saveTheme === "function"
+          ? saveTheme
+          : (theme) => localStorage.setItem("theme", theme);
 
-const themeChangeHandlers = [];
+      const themeChangeHandlers = [];
 
-initTheme();
+      initTheme();
 
-function initTheme() {
-  displayTheme(getTheme());
-}
+      function initTheme() {
+        displayTheme(getTheme());
+      }
 
-function getTheme() {
-  return (
-    loadTheme() ||
-    (window.matchMedia("(prefers-color-scheme: dark)").matches ?
-      "dark" :
-      "light")
-  );
-}
+      function getTheme() {
+        return (
+          loadTheme() ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light")
+        );
+      }
 
-function setTheme(theme) {
-  saveTheme(theme);
-  displayTheme(theme);
-}
+      function setTheme(theme) {
+        saveTheme(theme);
+        displayTheme(theme);
+      }
 
-function displayTheme(theme) {
-  document.body.setAttribute("data-theme", theme);
-  for (let handler of themeChangeHandlers) {
-    handler(theme);
-  }
-}
+      function displayTheme(theme) {
+        document.body.setAttribute("data-theme", theme);
+        for (let handler of themeChangeHandlers) {
+          handler(theme);
+        }
+      }
 
-const darkSwitch = document.getElementById("darkModeToggle");
-darkSwitch.checked = getTheme() === "dark";
-darkSwitch.onchange = () => {
-  setTheme(darkSwitch.checked ? "dark" : "light");
-};
-themeChangeHandlers.push((theme) => (darkSwitch.checked = theme === "dark"));
-</script>
+      const darkSwitch = document.getElementById("darkModeToggle");
+      darkSwitch.checked = getTheme() === "dark";
+      darkSwitch.onchange = () => {
+        setTheme(darkSwitch.checked ? "dark" : "light");
+      };
+      themeChangeHandlers.push(
+        (theme) => (darkSwitch.checked = theme === "dark")
+      );
+    </script>
   </body>
 </html>

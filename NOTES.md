@@ -65,20 +65,25 @@
 - add loading more msgs feature, only showing latest 20 rn
 
 # Todo 
-- [done]implement group chat/option to create a group and add members 
 - delete msg
-- **** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
-- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,try push notifications
+- [done]implement group chat/option to create a group and add members 
+- [done]**** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
+- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]add list icon on dp inside chatbox
 - username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
 - add dummy accounts 
+- in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
+- add your on acc as creator
+- try push notifications
 - add lazy loading in pattern images
 - encrypt messages/passwords
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - try firebase push notifications
-
+- maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
+- add a fallback component on error,,,, 
+- optimize code... check if there is unnecessary prop drilling.. create another branch to do this
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
@@ -175,6 +180,13 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
   - the messsage doc will have a field deletedBy[array] which will have the username of the persom who has deleted the msg
   - this way we can handle delete msg for a group too
   - on this action, connection wont be deleted or moved anywhere
+  - maybe below "Message deleted" note the time of deletion can be shown
+  - *Cases*
+   - One on one (A-B): 
+    1. for connection if A deletes a msg of himself than for both A and B it should show "deleted msg". [this can be done by checking the author of msg and deletedBy, if both have same username than it means the sender has deleted his msg]
+    2. if A delets msg of B, than this should only reflect for the A as he has deleted msg for himself. [this can be done by checking for deletedBy, if it has the user's self name than than he has deleted that msg but if the sender of that msgs is someone else than it means we will just skip that msg and not even show "deleted msg" note]
+    **NOTE**: One cannot delete someone else's msgs for both parties.
+  - Group (A-B-C-D): 
 
 - # Delete Connection
   - messages will be deleted and the connection will be moved to the request list (so that the other person sends a text again it will show in req list, as he is not a connection anymore),, why did we moved him to req list instead of removing him from connection list?? bcz that's the case of blocking
@@ -198,7 +210,17 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
   - all of them.. why? test one by one to check why not
   - dont let user search the person who are in the request list, and which has a deletedTill (this is why bcz if we dont do this than on search it will show that the request thing with accept and decline button even if the user has declined him earlier,, so better not show it)
   
+- # Settings
+ setting consists of the following actions
+ - Blocklist
+ - Theme / (dark mode)
+ - Privacy: allows user to make the account private(by default its true). No one can text and add you to a group
+   - on search all users will be displayed but onCLick it will show that user has a private account
+   - while creating or adding in group, show a lock sign on the right to portray that its a private account and also show a popup
 
+- # About
+ SKYCHAT comes with a various unique features to enhance the messaging experience
+ - **Privacy** : We have a privacy setting (turned on by default) which let users to controll who can text them and add them to a group. Even though the msg sent by someone or if you are added to a group, in both case connection-req/group-req will be shown in request list. But we have considered user's privacy to control who can text them by this feature.
 
 
 

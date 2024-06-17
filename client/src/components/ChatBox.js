@@ -27,8 +27,10 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
     const requestList = useSelector(state => state.user.requestList)// has request list connections (connections to show)
+    const appliedTheme = useSelector(state => state.user.theme)
 
-    console.log('rrrrrrrrrrr',requestList, requestList[selectedUserToChat])
+    const [refreshMessageList, setRefreshMessageList] = useState(false)
+    console.log('rrrrrrrrrrr', requestList, requestList[selectedUserToChat])
 
     useEffect(() => {
         if (selectedUserToChat) {
@@ -41,14 +43,21 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             retrieveTexts(selectedUserToChat);
         }
 
+
     }, [selectedUserToChat])
 
+    useEffect(() => {
+        // setting theme
+        const theme = localStorage.getItem('theme') || 'https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(36).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d';
+        // const chatBox = document.getElementById('chatBox');
+        chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
+    }, [appliedTheme])
 
     // NOTE: [resolved (now also checking if the opened connection was a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
     // added to handle closing of group chat window when user is removed 
     useEffect(() => {
         console.log('new useefect')
-        if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && isGroupSelected ) {
+        if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && isGroupSelected) {
             console.log('iffff')
             setSelectedUserToChat(undefined);
         }
@@ -203,12 +212,24 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                 if (isRealTimeUpdate) {
                     console.log('isRealTimeUpdate ---newMessage', snapshot, newMessage)
 
+                    // setMessageList((prevArray) => {
+                    //     const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
+                    //     if (snapshot.metadata.hasPendingWrites) { //(tells if the doc has been written at server)
+                    //         const time = new Date().toISOString()
+                    //         newMessage.time = time;
+                    //     }
+                    //     return isDuplicate ? prevArray : [...prevArray, newMessage];
+                    // })
+                    // updated to get realtime update for deleted msgs
                     setMessageList((prevArray) => {
                         const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
                         if (snapshot.metadata.hasPendingWrites) { //(tells if the doc has been written at server)
                             const time = new Date().toISOString()
                             newMessage.time = time;
                         }
+                        // console.log('11111111')
+                        // if(newMessage?.deletedBy.length) return prevArray;
+                        // console.log('22222222')
                         return isDuplicate ? prevArray : [...prevArray, newMessage];
                     })
 
@@ -277,7 +298,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             // check if userdata has the connection already and if not than add the connection in user collection
             if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
                 connectionId = userData?.connections[selectedUserToChat]?.id;
-            }else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
+            } else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
                 connectionId = userData?.requests[selectedUserToChat]?.id;
                 // NOTE:::: when a msg is sent and selected user is from request list than it means it is one of the removed connection, so we have to move this connection from req list to connection
                 delete userData.requests[selectedUserToChat];
@@ -338,6 +359,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                 author: currentUser.displayName,
                 message: currentText,
                 time: serverTimestamp(),
+                deletedBy: [],
             };
 
             writeToDb(db, msgData);
@@ -345,11 +367,14 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
         }
     }
 
+    console.log('messageLIST',messageList)
+
 
     console.log('------->>>>>>>>-----------chat box ends------------------------')
 
     return (
-        <div className="chat-body" >
+        <div className="chat-body" id="chatBody">
+            {/* <div className='layer'></div> */}
             <div className="chat-box" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
                 {loading &&
                     <div className="text-center">
@@ -382,8 +407,10 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                                             </span>
                                         </div>
                                         :
-                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
-                                            isGroupSelected={isGroupSelected} />
+                                        // dont show if the msg is deleted by me but i am not its author
+                                        (!(msgData?.deletedBy?.includes(userData?.username) && msgData?.author !== userData?.username) && 
+                                            <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
+                                            isGroupSelected={isGroupSelected} setRefreshMessageList={setRefreshMessageList} setMessageList={setMessageList} />)
                                     }
                                 </div>
                             )
@@ -398,7 +425,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             {requestList?.includes(selectedUserToChat) ?// only show these action for action the reqList conections
                 // when request chat is opened
                 (<div className="req_btn">
-                    <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat,dispatch)} >Accept</section>
+                    <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat, dispatch)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat]?.groupName ?
                             <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}>Leave group</section>

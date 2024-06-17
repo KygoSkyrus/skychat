@@ -14,6 +14,12 @@ body {
   background: #1b1b1b;
   background: var(--black1);
 }
+.layer{
+  position: absolute;
+  background: #000000b8;
+  width: 100vw;
+  height: 100vh;
+}
 .body-bg{
   position: absolute;
   /* left: 50%;
@@ -394,7 +400,10 @@ body {
   position: relative;
   padding: 6px 8px;
   margin: 4px;
-  height: 200px;
+  /* transform: translateX(0); */
+  transition: var(--transition);
+  position: relative;
+  /* height: 200px; */
 }
 
 .chat-body .chat-box .msg-block .msg {
@@ -415,6 +424,40 @@ body {
   border-radius: 6px 6px 0 6px;
   color: #f0f0f0;
   align-self: flex-end;
+}
+
+/* msg delete icon */
+.chat-body .chat-box .msg-delete{
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #fff;
+  background-color: #5c5b5bb5;
+  border-radius: 0 6px 6px 0;
+  width: 30px;
+  /* height: 30px; */
+  height: 100%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: -1;
+}
+.chat-body .chat-box .msg-block:has(.msg-delete):hover {
+  transform: translateX(-30px);
+  border-top-right-radius: 0px;
+}
+.chat-body .chat-box .msg-block:hover .msg-delete {
+  transform: translateX(30px);
+}
+
+/* deleted msg */
+.chat-body .chat-box .msg-block:has(.deleted-msg) {
+  background: #a2a2a2bf;
+  color: darkslategrey;
+  text-decoration: underline;
+  font-style: italic;
+  padding: 2px 8px;
 }
 
 .chat-body .chat-box .msg-block.me .msg-arrow {
@@ -743,6 +786,7 @@ input[type="search"] {
 #entityInfoModal,
 #groupModal,
 #avatarModal,
+#themeModal,
 #blockedConnModal {
   width: 90%;
   height: 100%;
@@ -909,7 +953,7 @@ input[type="search"] {
 }
 .slectedAvatar {
   transform: scale(1.2) !important;
-  border: 2px solid var(--violet);
+  border: 2px solid var(--green);
 }
 /* upload profile */
 .custom-input-file {
@@ -954,6 +998,38 @@ input[type="search"] {
 
 
 
+/* THEME MODAL */
+#themeModal .avatar_grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 5px 10px 12px 10px;
+  margin-top: 25px;
+  /* height: calc(100% - 3.5rem); */
+  overflow: auto;
+  z-index: 2;
+}
+#themeModal img {
+  width: 100%;
+  height: 80px;
+  transform: scale(1);
+  box-shadow: 0 0 10px #191818;
+  /* transition: all ease-in 0.2s; */
+  cursor: pointer;
+}
+#themeModal .avatar_grid:hover img{
+  filter: blur(2px);
+}
+#themeModal .avatar_grid img:hover {
+  /* transform: scale(1.5) !important; */
+  filter: blur(0px);
+  border: 2px solid rgb(255, 255, 255);
+}
+
+#themeModal .avatar_grid img[class^="selectedPattern"] {
+  border: 2px solid var(--green);
+  filter: blur(0px);
+}
 
 /* GROUP MODAL */
 #groupModal .m-dialog{
@@ -1096,9 +1172,9 @@ input[type="search"] {
 
 /* NEW HEADER SWITCH */
 
-html {
+/* html {
   color-scheme: dark;
-}
+} */
 /* body {
   min-height: 100svh;
   padding: 2rem;
@@ -1193,4 +1269,76 @@ html {
 }
 .switch > input:checked ~ span:last-of-type {
   opacity: 1;
+}
+
+/* PRIVACY SWITCH */
+.privacy{
+  display: flex;
+  justify-content: space-between;
+}
+.privacy> span{
+  width: 40px;
+  height: 21px;
+}
+.privacy input[type="checkbox"] {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+.privacy label {
+  cursor: pointer;
+  text-indent: -9999px;
+  width: 100%;
+  height: 100%;
+  background: #999;
+  display: block;
+  border-radius: 100px;
+  position: relative;
+  /* transform: scale(0.7); */
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.privacy label:after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 17px;
+  height: 17px;
+  background: #fff;
+  border-radius: 90px;
+  transition: 0.3s;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+}
+
+.privacy input:checked + label {
+  background: var(--green);
+}
+
+.privacy input:checked + label:after {
+  left: calc(100% - 2px);
+  transform: translateX(-100%);
+}
+
+.privacy label:active:after {
+  width: calc(100% - 11%);
+}
+
+[data-theme="light"] {
+  color: #1f2028;
+  background-color: #fff;
+}
+
+[data-theme="dark"] {
+  color: #fff;
+  background-color: #1f2028;
 }
