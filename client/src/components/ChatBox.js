@@ -29,7 +29,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
     const requestList = useSelector(state => state.user.requestList)// has request list connections (connections to show)
     const appliedTheme = useSelector(state => state.user.theme)
 
-    const [refreshMessageList, setRefreshMessageList] = useState(false)
     console.log('rrrrrrrrrrr', requestList, requestList[selectedUserToChat])
 
     useEffect(() => {
@@ -227,9 +226,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                             const time = new Date().toISOString()
                             newMessage.time = time;
                         }
-                        // console.log('11111111')
-                        // if(newMessage?.deletedBy.length) return prevArray;
-                        // console.log('22222222')
                         return isDuplicate ? prevArray : [...prevArray, newMessage];
                     })
 
@@ -407,10 +403,11 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                                             </span>
                                         </div>
                                         :
-                                        // dont show if the msg is deleted by me but i am not its author
-                                        (!(msgData?.deletedBy?.includes(userData?.username) && msgData?.author !== userData?.username) && 
+                                        // dont show if the msg is deleted by me but i am not its author (for v3)
+                                        // (!(msgData?.deletedBy?.includes(userData?.username) && msgData?.author !== userData?.username) && 
                                             <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
-                                            isGroupSelected={isGroupSelected} setRefreshMessageList={setRefreshMessageList} setMessageList={setMessageList} />)
+                                            isGroupSelected={isGroupSelected} setMessageList={setMessageList} />
+                                        // )
                                     }
                                 </div>
                             )

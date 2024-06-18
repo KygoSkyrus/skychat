@@ -63,17 +63,19 @@
 - [done]add a notification when a connection is accepted "connection added" something like that
 - there is a memory leak error on signinform
 - add loading more msgs feature, only showing latest 20 rn
+- fix theme and add layer
 
 # Todo 
 - delete msg
 - [done]implement group chat/option to create a group and add members 
 - [done]**** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
-- there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
+- [done]there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]add list icon on dp inside chatbox
-- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters)
-- add dummy accounts 
+- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters) [add a info icon next to username field on signup to tell user that username cannot be changed ever]
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
+- maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
+- add dummy accounts 
 - add your on acc as creator
 - try push notifications
 - add lazy loading in pattern images
@@ -81,7 +83,6 @@
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - try firebase push notifications
-- maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
 - add a fallback component on error,,,, 
 - optimize code... check if there is unnecessary prop drilling.. create another branch to do this
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
@@ -93,7 +94,7 @@
 - increase the width of overall chatbody
 - u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - add a search icon next to user serch input
-- create the chat buuble like it was in v1,, the body and the top will be darkewr whoch will have senders name an d time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
+- create the chat buuble like it was in v1,, the body and the top will be darker which will have senders name and time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - create a text like hovered toast if toasts are ever neeeded
 
 
@@ -121,8 +122,11 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 - delete a SINGLE MSG
 - add msgs copy and reply feature (least pripority)
 - msg delete option for both parties if the msg was sent in between a specific hour 
-- when sqwitcinh between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
+- when switching between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
 
+
+# Things to implement in version #3
+- add a single snapshot to get the msgs and to handle realtime changes, this will also help with the delete msg(for both participant). currently we just have a snapshot for single msg as it dont listen to every document in the collection, so the feature(delete for both) is not available in this version
 
 
 ## Components
@@ -230,3 +234,4 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 
 ### forever notes
 - setU(u=>[...u,user]);,,,,use spread operator to append in exisiting array,,and while using setter function,,use it this way
+- if there is a state whhich is object of object or an array of object,, and if you update a key in the object,, than the state wont be updated bcz for react the object is same as the reference is same ,, so in order to get the changes reflected you have to create another object with same data,,this can be done by suing spread operator,,, [...arr ]

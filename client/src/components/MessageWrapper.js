@@ -4,7 +4,7 @@ import { Trash } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
 
-const MessageWrapper = ({ msgData, myself, isGroupSelected, setRefreshMessageList, setMessageList }) => {
+const MessageWrapper = ({ msgData, myself, isGroupSelected, setMessageList }) => {
 
   const firebaseApp = useSelector(state => state.firebase.firebaseApp)
   const userData = useSelector(state => state.user.userInfo)
@@ -26,21 +26,27 @@ const MessageWrapper = ({ msgData, myself, isGroupSelected, setRefreshMessageLis
         deletedBy: [...docSnap.data()?.deletedBy, userData.username]
       });
     }
-    // none of the below is working
-    // setRefreshMessageList(prev=>!prev)
-    setMessageList(prev=>{
-      console.log('prev',prev, docSnap.id)
-      // update the state here and set it with new array using spread
-      prev.filter(x=>x.id!==docSnap.id)
-      prev.map(x=> {
-        console.log('xid',x.id)
-        if(x.id === docSnap.id){
-          x.deletedBy = [...docSnap.data()?.deletedBy, userData.username]
+
+    // setMessageList(prev => {
+    //   console.log('prev', prev, docSnap.id)
+    //   prev.filter(x => x.id !== docSnap.id)
+    //   prev.map(x => {
+    //     console.log('xid', x.id)
+    //     if (x.id === docSnap.id) {
+    //       x.deletedBy = [...docSnap.data()?.deletedBy, userData.username]
+    //     }
+    //   })
+    //   let arr = [...prev];
+    //   console.log('after prev', arr)
+    //   return arr;
+    // })
+    setMessageList(prev => {
+      return  prev.map(x => {
+        if (x.id === id) {
+          return {...x, deletedBy: [...x.deletedBy, userData.username]}
         }
+        return x;
       })
-      let arr = [...prev];
-      console.log('after prev',arr)
-      return arr;
     })
   }
 
@@ -48,8 +54,10 @@ const MessageWrapper = ({ msgData, myself, isGroupSelected, setRefreshMessageLis
     <>
       <div key={msgData.id} className={myself === msgData.author ? "msg-block me" : "msg-block other"} >
 
-        {msgData?.deletedBy?.includes(msgData?.author) ?
-          <span className='fs-12 deleted-msg'>Message deleted</span>
+        {/* {msgData?.deletedBy?.includes(msgData?.author) ? (for v3) */}
+        {msgData?.deletedBy?.includes(myself) ?
+          // <span className='fs-12 deleted-msg'>Message deleted by you</span>
+          <span className='fs-12 deleted-msg'><small>You deleted this message</small></span>
           :
           <>
             <section className="msg">
