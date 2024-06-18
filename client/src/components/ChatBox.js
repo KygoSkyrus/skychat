@@ -50,7 +50,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
         // setting theme
         const theme = localStorage.getItem('theme') || 'https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(36).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d';
         // const chatBox = document.getElementById('chatBox');
-        chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
+        // chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
     }, [appliedTheme])
 
     // NOTE: [resolved (now also checking if the opened connection was a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
@@ -127,25 +127,25 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
 
             const newMessages = [];
             const messagesRef = collection(db, 'v2');
-            let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(2));
+            let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(10));
 
             //msgs after deleted chats only
             if (chatsTill) {
-                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(2));
+                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), limit(10));
             }
 
             //msgs before exiting group only
             if (exitAt) {
-                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", "<", exitAt), orderBy("time", "desc"), limit(2));
+                queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", "<", exitAt), orderBy("time", "desc"), limit(10));
             }
 
             if (lastVisible.current) {
                 // console.log('lastVisible.current', lastVisible.current)
-                queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+                queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(10));
 
                 //to prevent loading msgs before chatsTill
                 if (chatsTill) {
-                    queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), startAfter(lastVisible.current), limit(2));
+                    queryRef = query(messagesRef, where("connectionId", "==", connectionId), where("time", ">", chatsTill), orderBy("time", "desc"), startAfter(lastVisible.current), limit(10));
                 }
             }
 

@@ -443,8 +443,12 @@ body {
   transition: var(--transition);
   z-index: -1;
 }
-.chat-body .chat-box .msg-block:has(.msg-delete):hover {
+.chat-body .chat-box .me:has(.msg-delete):hover {
   transform: translateX(-30px);
+  border-top-right-radius: 0px;
+}
+.chat-body .chat-box .other:has(.msg-delete):hover {
+  transform: translateX(0);
   border-top-right-radius: 0px;
 }
 .chat-body .chat-box .msg-block:hover .msg-delete {

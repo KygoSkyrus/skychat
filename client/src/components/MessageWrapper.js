@@ -27,17 +27,20 @@ const MessageWrapper = ({ msgData, myself, isGroupSelected, setRefreshMessageLis
       });
     }
     // none of the below is working
-    setRefreshMessageList(prev=>!prev)
+    // setRefreshMessageList(prev=>!prev)
     setMessageList(prev=>{
       console.log('prev',prev, docSnap.id)
+      // update the state here and set it with new array using spread
+      prev.filter(x=>x.id!==docSnap.id)
       prev.map(x=> {
         console.log('xid',x.id)
         if(x.id === docSnap.id){
           x.deletedBy = [...docSnap.data()?.deletedBy, userData.username]
         }
       })
-      console.log('after prev',prev)
-      return prev;
+      let arr = [...prev];
+      console.log('after prev',arr)
+      return arr;
     })
   }
 
