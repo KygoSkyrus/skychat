@@ -10,9 +10,8 @@
 
 ## IMPORTANT NOTE:whenever you try to add orderBy make sure that indexing is enabled in firestore
 
-# NOTE : connection are only made when user sends someone a text
+# NOTE :
 - ALWAYS in your app add how the app works,,
-- in this one , on any corner show the feature your provide , like security, functionalities etc
 
 
 
@@ -21,10 +20,6 @@
 - for msgs their will be cache,, maybe with a cron job
 
 
-
-
-### Edge cases:
-- can user send himself texts? NO, as this will create confusion bcz the user itself will recieve request and also it is not that important
 
 
 
@@ -43,7 +38,7 @@
 - make sure username is unique
 - when user declines a request, the person is removed from request list,, and, now when the sender will send msg again to this user than the msgs will not be sent to receiver as the sender already has the receievrr as the connection,,NEED SOLUTION
 - whenever a request is declined,, set the selectedusertochat to undef so that that the request should not be kept showing
-- // when i send a msg to a unknown user,, the msg doesnt show in ui right then
+- when i send a msg to a unknown user,, the msg doesnt show in ui in realtime
 - scroll down is not working
 - show err msg on incorrect login
 - hide the author name if its private chat,,,only show when its group
@@ -61,9 +56,9 @@
 - [done](sol:added the memberlist with avatar in localstorage, only updating data if its lastUpdated before 6hrs otherwise just get data from localstorage and show)for member list in groupinfo, we stored the images while creating group,,,but the images should be latest,, what if user changes their profile after he as been added to group,,, get latest image on groupInfo
 - [done](sol:now showing the req realted actions to only those requests which are visible in request list,, not to the removed connections{which are hidden})if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
 - [done]add a notification when a connection is accepted "connection added" something like that
-- there is a memory leak error on signinform
-- add loading more msgs feature, only showing latest 20 rn
-- fix theme and add layer
+- [done]there is a memory leak error on signinform
+- it dosent show text to start up on fresh account,, need to call "getCurrentUserData" function in signup function.. pass it from app to signinform
+
 
 # Todo 
 - delete msg
@@ -72,13 +67,16 @@
 - [done]there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
 - on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]add list icon on dp inside chatbox
-- username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase, cannot start with digits and characters) [add a info icon next to username field on signup to tell user that username cannot be changed ever]
+- [done]username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase and number, cannot have characters)
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
 - maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
 - add dummy accounts 
 - add your on acc as creator
 - try push notifications
+- fix theme and add layer
+- add a layer or loader on loading action
 - add lazy loading in pattern images
+- in this one , on any corner show the feature your provide , like security, functionalities etc
 - encrypt messages/passwords
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
@@ -96,6 +94,12 @@
 - add a search icon next to user serch input
 - create the chat buuble like it was in v1,, the body and the top will be darker which will have senders name and time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
 - create a text like hovered toast if toasts are ever neeeded
+
+
+**things to do before deploying**
+- add loading more msgs feature, only showing latest 20 rn
+
+
 
 
 - **least priority**
@@ -210,7 +214,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
     - the one who are deleted;
     - the one who are blocked?
     - the one who's request is declined?
-    - user himself?// cant have user texting himself,, as it would try to send a request to hisself
+    - user himself?// cant have user texting himself,, as it would try to send a request to himself
   - all of them.. why? test one by one to check why not
   - dont let user search the person who are in the request list, and which has a deletedTill (this is why bcz if we dont do this than on search it will show that the request thing with accept and decline button even if the user has declined him earlier,, so better not show it)
   

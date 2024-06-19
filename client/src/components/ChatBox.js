@@ -42,7 +42,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             retrieveTexts(selectedUserToChat);
         }
 
-
+        document.getElementById('theText').focus();// focus on input field
     }, [selectedUserToChat])
 
     useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
@@ -35,6 +35,14 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     //     });
     // }, [])
 
+    
+    useEffect(() => {
+        if(signInOrSignUp==="signup")
+          document.getElementById('username').focus();// focus on input field
+        else
+          document.getElementById('email1').focus();
+    }, [signInOrSignUp])
+
 
 
     function handleClick(e) {
@@ -47,42 +55,27 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     }
 
     async function createUserAccountFirebase() {
-        /*
-        // for breaking firstname and lastname from username
-        //to trim firstname and username from a single input field
-        let name = userCredentials?.username?.trim();
-        if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
-            // dispatch(invokeToast({ isSuccess: false, message: 'Name is a mandatory field, Enter your name to proceed further' }))
-            setUserCredentials({ ...userCredentials, username: '' })
+        if (userCredentials?.username?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
+            alert('please fill out all required fields')
             return;
         }
-        // inProgressLoader(dispatch, true)
-        name = name.split(' ')
-        let firstname = '';
-        let lastname = '';
-        for (const str of name) {
-            if (!firstname) {
-                firstname = str;
-            } else if (!lastname) {
-                lastname = str;
-                break;
-            }
-        }
-        */
 
         //for validating username
         let name = userCredentials?.username?.trim();
-        //uncomment this later//commented for testing username duplication
-        // if (name?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0) {
-        //     alert('please fill out all required fields')
-        //     //setUserCredentials({ ...userCredentials, username: '' })
-        //     return;
-        // }
-
         if (name.includes(" ")) {
-            // alert('user name can not contain blank spaces')
             dispatch({ type: SET_TOAST, payload: { toastContent: "user name can not contain blank spaces", isError: true } })
             return;
+        }
+
+        if (name.length < 4) {
+            dispatch({ type: SET_TOAST, payload: { toastContent: "user name should be atleast 4 characters long", isError: true } })
+            return;
+        }
+
+        const validUsername = name.match(/^(?![0-9]*$)[a-z0-9]+$/); // /^[a-z0-9]+$/
+        if(validUsername == null){
+            dispatch({ type: SET_TOAST, payload: { toastContent: "Invalid username. Only characters a-z and numbers are  acceptable.", isError: true } })
+            return false;
         }
 
         //checks if username already exists or not
@@ -134,6 +127,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     }
 
     function loginUserFirebase() {
+        console.log('login')
         // inProgressLoader(dispatch, true)
         signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
             .then(
@@ -143,7 +137,6 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                     // signinAPI(user?.email, "", "", user?.photoURL, dispatch)//not needed 
                     // inProgressLoader(dispatch, false)
-                    setUserCredentials({ email: '', password: '', username: '' })
                     navigate('/chat')
                 }
             )
@@ -284,11 +277,11 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
             <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e=>handleClick(e)}>
                 {signInOrSignUp === "signup" &&
-                    <input type="text" className="form-control mt-2" name="username" id="username" placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
+                    <input type="text" className="form-control mt-2" name="username" id="username" required placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
                 }
 
                 <input
-                    type="email"
+                    type="email" required
                     className="form-control my-2"
                     name="email"
                     id="email1"
@@ -300,7 +293,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 />
 
                 <input
-                    type="password"
+                    type="password" required
                     className="form-control"
                     id="password1"
                     name="password"

@@ -127,10 +127,10 @@ body {
   border-top: 5px solid #712cf9;
   border-width: 6px;
 }
-.toast.error{
+.error>.toast{
   background: #ec407a;
 }
-.toast.error::before{
+.error>.toast::before{
   border-top: 5px solid #ec407a;
 }
 .toast_animation{
