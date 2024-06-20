@@ -1,5 +1,6 @@
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import { combineReducers } from 'redux'
+import { thunk } from 'redux-thunk'
 
 //reducers
 import { userReducer } from './reducers/userReducer'
@@ -7,16 +8,13 @@ import { toastReducer } from './reducers/toastReducer'
 import { messageReducer } from './reducers/messageReducer'
 import { firebaseReducer } from './reducers/firebaseReducer'
 
-
 const rootReducer = combineReducers({
-  // Define a top-level state field named `user`, handled by `userReducer`
   user: userReducer,
   toast: toastReducer,
   firebase: firebaseReducer,
   message: messageReducer,
 })
 
-let store = createStore(rootReducer)
-
+let store = createStore(rootReducer, applyMiddleware(thunk))
 
 export default store;

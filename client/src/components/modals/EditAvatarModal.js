@@ -5,14 +5,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../firebaseConfig';
+// import { firebaseConfig } from '../../firebaseConfig';
 import { useSelector } from 'react-redux';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
 
 
 const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
-    const firebaseApp = initializeApp(firebaseConfig);// need to make it gloabl
+    // const firebaseApp = initializeApp(firebaseConfig);// need to make it gloabl
+    const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
     const db = getFirestore(firebaseApp);
     const storage = getStorage(firebaseApp);
 

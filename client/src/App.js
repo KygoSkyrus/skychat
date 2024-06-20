@@ -13,24 +13,26 @@ import Error from "./components/Error"
 import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
 import { Info } from "lucide-react";
 import Toast from "./components/Toast";
+import { fetchUserData } from "./redux/thunk/userDataThunk";
+import { firebaseApp, db } from "./firebaseConfig";
 
 
-
-function App({ firebaseApp }) {
+function App() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // const firebaseApp = firebase.initializeApp(firebaseConfig);
   const auth = getAuth();
-  const db = getFirestore(firebaseApp);
+  // const db = getFirestore(firebaseApp);
 
 
 
-  dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })
+  // dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })// moved into useeffect
 
-
+  
   useEffect(() => {
+    dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })
     checkAuthStatus();
   }, [])
 
@@ -42,7 +44,8 @@ function App({ firebaseApp }) {
         navigate('/chat')
 
         //have to store the result of this query in cache 
-        getCurrentUserData(user.displayName);
+        // getCurrentUserData(user.displayName);
+        dispatch(fetchUserData(user.displayName,db));
       } else {
         dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
@@ -50,6 +53,7 @@ function App({ firebaseApp }) {
     });
   }
 
+  /* // converted this function in thunk
   async function getCurrentUserData(username) {
     //when the connection is not found in cached data only then go further and query db to check if the connection is created recently
     let userObj;
@@ -69,7 +73,7 @@ function App({ firebaseApp }) {
 
     return userObj;
   }
-
+  */
 
   return (
     <div className="App">

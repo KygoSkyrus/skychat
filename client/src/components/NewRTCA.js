@@ -58,7 +58,7 @@ export const NewRTCA = ({ firebaseApp }) => {
       fetchData();
       // if (selectedUserToChat) retrieveTexts(selectedUserToChat) //added bcz without this onsnapshot wont work  // commented for issue #1
     }
-  }, [userData])
+  }, [userData, connectionHeader])// feetching req list whenever userData changes and connection header is toggled
 
   async function fetchData() {
     // this function filters the requests which are recent(fresh ones and the one which has new msgs after deleted earlier)
@@ -75,9 +75,10 @@ export const NewRTCA = ({ firebaseApp }) => {
     dispatch({ type: SET_REQUEST_LIST, payload: connections })
   };
 
-  useEffect(() => {
-    if (!connectionHeader) fetchData(); // to load the request list when requests window is opened
-  }, [connectionHeader])
+  // removed this and appened the logic in above useefect where fetchData was called (updated depenedency array with connectionHeader)
+  // useEffect(() => {
+  //   if (!connectionHeader) fetchData(); // to load the request list when requests window is opened
+  // }, [connectionHeader])
 
   console.log('connextions sto show', connectionsToShow)
 
@@ -88,7 +89,7 @@ export const NewRTCA = ({ firebaseApp }) => {
 
     dispatch({ type: SET_USERS_LIST, payload: dbUsers })
 
-    //commented for testing 
+    // commented for testing 
     // await getDocs(collection(db, "users"))
     // .then((querySnapshot) => {
     //   let userList={};

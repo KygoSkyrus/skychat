@@ -6,6 +6,8 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 
 import { SET_CURRENT_USER, SET_TOAST } from '../redux/actionTypes';
 import { defaultAvatar } from '../utils';
+import { fetchUserData } from '../redux/thunk/userDataThunk';
+import { db } from '../firebaseConfig';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
 
@@ -16,7 +18,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     const dispatch = useDispatch()
     const [userCredentials, setUserCredentials] = useState({ email: '', password: '', username: '' });
 
-    const firestore = getFirestore(firebaseApp);
+    // const firestore = getFirestore(firebaseApp);
 
 
     // useEffect(() => {
@@ -35,18 +37,18 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     //     });
     // }, [])
 
-    
+
     useEffect(() => {
-        if(signInOrSignUp==="signup")
-          document.getElementById('username').focus();// focus on input field
+        if (signInOrSignUp === "signup")
+            document.getElementById('username').focus();// focus on input field
         else
-          document.getElementById('email1').focus();
+            document.getElementById('email1').focus();
     }, [signInOrSignUp])
 
 
 
     function handleClick(e) {
-        e.preventDefault();  
+        e?.preventDefault();
         if (signInOrSignUp === "signup") {
             createUserAccountFirebase()
         } else if (signInOrSignUp === "signin") {
@@ -73,7 +75,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         }
 
         const validUsername = name.match(/^(?![0-9]*$)[a-z0-9]+$/); // /^[a-z0-9]+$/
-        if(validUsername == null){
+        if (validUsername == null) {
             dispatch({ type: SET_TOAST, payload: { toastContent: "Invalid username. Only characters a-z and numbers are  acceptable.", isError: true } })
             return false;
         }
@@ -120,6 +122,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     );
 
                 //setting user and redirecting to chats
+                dispatch(fetchUserData(userCredentials?.username, db));
                 dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                 navigate('/chat')
             }
@@ -161,7 +164,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             blockList: {},
             time: serverTimestamp(),
         };
-        await addDoc(collection(firestore, "users"), userData);
+        await addDoc(collection(db, "users"), userData);
 
         return true;
         // for adding the custom document id (here username is used as document ID)
@@ -275,9 +278,17 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             <h5 className='text-dark text-center fw-bold'>{title}</h5>
             <section className='text-center'>{description}</section>
 
-            <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e=>handleClick(e)}>
+            <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e => handleClick(e)}>
                 {signInOrSignUp === "signup" &&
-                    <input type="text" className="form-control mt-2" name="username" id="username" required placeholder="Username" value={userCredentials?.username} onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })} />
+                    <input
+                        type="text" required
+                        className="form-control mt-2"
+                        name="username" id="username"
+                        placeholder="Username"
+                        value={userCredentials?.username}
+                        onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
+                        onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
+                    />
                 }
 
                 <input
@@ -289,7 +300,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     aria-describedby="emailHelp"
                     value={userCredentials?.email}
                     onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
-                    onKeyUp={(e) => e.key === "Enter" && document.getElementById('password1').focus()}
+                    onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('password1').focus()}
                 />
 
                 <input
@@ -300,12 +311,10 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     placeholder="Password*"
                     value={userCredentials?.password}
                     onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
-                    onKeyUp={(e) => e.key === "Enter" && handleClick()}
+                    onKeyUp={(e) => e.key === "Enter" && e.target.value && handleClick(e)}
                 />
 
-                <button type='submit' className='btn btn-outline-warning w-100 my-2' 
-                // onClick={() => handleClick()}
-                >{btnText}</button>
+                <button type='submit' className='btn btn-outline-warning w-100 my-2'>{btnText}</button>
 
                 <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
 

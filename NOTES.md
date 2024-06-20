@@ -58,7 +58,7 @@
 - [done]add a notification when a connection is accepted "connection added" something like that
 - [done]there is a memory leak error on signinform
 - it dosent show text to start up on fresh account,, need to call "getCurrentUserData" function in signup function.. pass it from app to signinform
-
+- NEWrtc is rendering two times on few actions such as toggling header, or on loading
 
 # Todo 
 - delete msg
@@ -239,3 +239,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 ### forever notes
 - setU(u=>[...u,user]);,,,,use spread operator to append in exisiting array,,and while using setter function,,use it this way
 - if there is a state whhich is object of object or an array of object,, and if you update a key in the object,, than the state wont be updated bcz for react the object is same as the reference is same ,, so in order to get the changes reflected you have to create another object with same data,,this can be done by suing spread operator,,, [...arr ]
+- **Redux thunk**: Redux-Thunk is a middleware that allows you to write asynchronous logic that interacts with the Redux store. It is used to handle asynchronous actions in Redux, such as fetching data from an API or dispatching multiple actions in a sequence.
+  - what `middleware` is in the context of Redux? Middleware provides a way to interact with actions dispatched to the Redux store before they reach the reducer. It sits between the action dispatch and the reducer, allowing you to intercept, modify, or delay actions as needed. It provides a way to extend Redux's functionality by intercepting and potentially modifying actions before they reach the reducers.
+  - what are `asynchronous actions`? Asynchronous actions in Redux are actions that perform asynchronous operations, such as fetching data from an API, saving data to a server, or compressing images. These actions are often used to update the Redux store with the response, allowing the application to display up-to-date data to the user without requiring a page refresh.
+  - `Writing thunk functions` in Redux involves defining asynchronous action creators that return a function instead of a plain action object. These functions have access to the dispatch and getState methods of the Redux store, allowing you to perform asynchronous operations and dispatch actions based on the results.
