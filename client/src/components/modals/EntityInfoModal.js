@@ -1,19 +1,21 @@
 import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query, serverTimestamp, onSnapshot } from 'firebase/firestore'
 import { ArrowLeft, Edit, LogOut, MessageSquareX, UserRoundPlus, Users, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr, writeToDb } from '../../utils'
 import GroupModal from './GroupModal'
 import { SET_TOAST } from '../../redux/actionTypes'
+import { FirebaseContext } from '../../firebaseContext'
 
 
 const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedGroupName, searchedUserList, setSearchedUserList }) => {
 
     const dispatch = useDispatch();
+    const { firebaseApp, db } = useContext(FirebaseContext);
 
     const userData = useSelector(state => state.user.userInfo)
-    const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
-    const db = getFirestore(firebaseApp);
+    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
+    // const db = getFirestore(firebaseApp);
 
     const [groupInfo, setGroupInfo] = useState();
 

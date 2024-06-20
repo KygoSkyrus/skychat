@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { getExactTimeStr } from '../utils';
 import { Trash } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
+import { FirebaseContext } from '../firebaseContext';
 
-const MessageWrapper = ({ msgData, myself, isGroupSelected, setMessageList }) => {
+  const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessageList }) => {
 
-  const firebaseApp = useSelector(state => state.firebase.firebaseApp)
   const userData = useSelector(state => state.user.userInfo)
-  const db = getFirestore(firebaseApp);
+  // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+  // const db = getFirestore(firebaseApp);
+  const { firebaseApp, db } = useContext(FirebaseContext);
+
 
   const deriveDate = (d) => {
     let date = new Date(d);
@@ -86,6 +89,6 @@ const MessageWrapper = ({ msgData, myself, isGroupSelected, setMessageList }) =>
       }
     </>
   );
-}
+});
 
 export default MessageWrapper

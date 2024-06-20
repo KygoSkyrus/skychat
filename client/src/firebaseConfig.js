@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from "firebase/firestore";
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBUwUDMBV60Bo_EAUcXuPV4Xk7SkVmnVMo",
   authDomain: "skyrus-3416b.firebaseapp.com",
   databaseURL: "https://skyrus-3416b-default-rtdb.firebaseio.com",
@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
+// const firebaseApp = initializeApp(firebaseConfig);
+// const db = getFirestore(firebaseApp);
 
-export { firebaseApp, db };
+// export { firebaseApp, db };

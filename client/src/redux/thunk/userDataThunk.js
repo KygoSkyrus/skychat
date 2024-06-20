@@ -3,7 +3,7 @@ import { SET_TOAST, SET_USER_INFO } from "../actionTypes";
 
 
 // Thunk Action Creator
-export const fetchUserData = (username,db) => async (dispatch) => {
+export const setUserData = (username,db) => async (dispatch) => {
 
     try {
         const q = query(collection(db, 'users'), where('username', '==', username));

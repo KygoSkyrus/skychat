@@ -57,8 +57,7 @@
 - [done](sol:now showing the req realted actions to only those requests which are visible in request list,, not to the removed connections{which are hidden})if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
 - [done]add a notification when a connection is accepted "connection added" something like that
 - [done]there is a memory leak error on signinform
-- it dosent show text to start up on fresh account,, need to call "getCurrentUserData" function in signup function.. pass it from app to signinform
-- NEWrtc is rendering two times on few actions such as toggling header, or on loading
+- NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect)
 
 # Todo 
 - delete msg
@@ -243,3 +242,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
   - what `middleware` is in the context of Redux? Middleware provides a way to interact with actions dispatched to the Redux store before they reach the reducer. It sits between the action dispatch and the reducer, allowing you to intercept, modify, or delay actions as needed. It provides a way to extend Redux's functionality by intercepting and potentially modifying actions before they reach the reducers.
   - what are `asynchronous actions`? Asynchronous actions in Redux are actions that perform asynchronous operations, such as fetching data from an API, saving data to a server, or compressing images. These actions are often used to update the Redux store with the response, allowing the application to display up-to-date data to the user without requiring a page refresh.
   - `Writing thunk functions` in Redux involves defining asynchronous action creators that return a function instead of a plain action object. These functions have access to the dispatch and getState methods of the Redux store, allowing you to perform asynchronous operations and dispatch actions based on the results.
+
+- dont pass dispatch and other unnecessary stuff in functions parameter if you have a function that calls an api and then dispatch to store,,, just use thunk in those case
+- use usecontext whenever there are mutiple data that needed to passed down to child,,, u can create context of functions also
+- if you have onchange which is setting a state in parent component than on every key press the child componnet will rerender,, to avoid this either wrap the child component in `React.memo` or use useRef for the input field instead of dstate

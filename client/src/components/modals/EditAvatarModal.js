@@ -1,5 +1,5 @@
 import { Trash, Upload, X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { getAvatarUrl } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,13 +8,15 @@ import { initializeApp } from 'firebase/app';
 // import { firebaseConfig } from '../../firebaseConfig';
 import { useSelector } from 'react-redux';
 import { doc, getFirestore, updateDoc } from 'firebase/firestore';
+import { FirebaseContext } from '../../firebaseContext';
 
 
 const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
     // const firebaseApp = initializeApp(firebaseConfig);// need to make it gloabl
-    const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
-    const db = getFirestore(firebaseApp);
+    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
+    // const db = getFirestore(firebaseApp);
+    const { firebaseApp, db } = useContext(FirebaseContext);
     const storage = getStorage(firebaseApp);
 
     const userData = useSelector(state => state.user.userInfo)

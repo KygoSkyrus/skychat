@@ -1,16 +1,19 @@
 import { ArrowLeft, Edit, X } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useSelector } from 'react-redux'
 import EditAvatarModal from './EditAvatarModal'
 import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, getFirestore, updateDoc } from 'firebase/firestore'
+import { FirebaseContext } from '../../firebaseContext'
 
 const UserModal = ({ setShowUserModal }) => {
 
     const userData = useSelector(state => state.user.userInfo)
-    const firebaseApp = useSelector(state => state.firebase.firebaseApp)
-    const db = getFirestore(firebaseApp);
+    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+    // const db = getFirestore(firebaseApp);
+    const { firebaseApp, db } = useContext(FirebaseContext);
+
 
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
     const [showBlockedConnections, setShowBlockedConnections] = useState(false)

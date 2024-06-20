@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useDispatch, useSelector } from 'react-redux'
 
 
@@ -14,12 +14,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import Toast from "./Toast";
 import EntityInfoModal from "./modals/EntityInfoModal";
+import { FirebaseContext } from "../firebaseContext";
 
 
+export const NewRTCA = () => {
 
-export const NewRTCA = ({ firebaseApp }) => {
-
-  const db = getFirestore(firebaseApp);
+  const { firebaseApp, db } = useContext(FirebaseContext);
+  // const db = getFirestore(firebaseApp);  
   const dispatch = useDispatch()
 
 
@@ -44,6 +45,7 @@ export const NewRTCA = ({ firebaseApp }) => {
   // console.log('connectionsToShow-', connectionsToShow)
 
 
+  //NOTE:: try merging these two useeffects..Also try to optimize getAllUsersList function
   useEffect(() => {
 
     //getting all users (have to move it somewhere where it wont run on every stsate chnages, as its calling db on every state changes decreasing the reads per day... add in usememo, usecallback)
@@ -294,7 +296,7 @@ export const NewRTCA = ({ firebaseApp }) => {
           {/***** CHAT BODY STARTS ******/}
           {selectedUserToChat ?
             <ChatBox
-              firebaseApp={firebaseApp}
+              // firebaseApp={firebaseApp}
               selectedUserToChat={selectedUserToChat}
               setSelectedUserToChat={setSelectedUserToChat}
               isGroupSelected={isGroupSelected}

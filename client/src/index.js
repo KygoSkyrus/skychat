@@ -12,14 +12,19 @@ import store from './redux/store';
 
 // const firebaseApp = initializeApp(firebaseConfig);
 
+
+import { FirebaseProvider } from './firebaseContext';
+
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <Provider store={store}>
-        <App 
-        // firebaseApp={firebaseApp}
-        />
-      </Provider>
+      <FirebaseProvider>
+        <Provider store={store}>
+          <App
+          // firebaseApp={firebaseApp}
+          />
+        </Provider>
+      </FirebaseProvider>
     </Router>
   </React.StrictMode>,
   document.getElementById('root')

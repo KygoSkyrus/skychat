@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
@@ -6,12 +6,12 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 
 import { SET_CURRENT_USER, SET_TOAST } from '../redux/actionTypes';
 import { defaultAvatar } from '../utils';
-import { fetchUserData } from '../redux/thunk/userDataThunk';
-import { db } from '../firebaseConfig';
+import { setUserData } from '../redux/thunk/userDataThunk';
+import { FirebaseContext } from '../firebaseContext';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
 
-const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, currAuthMethod, setCurrAuthMethod, firebaseApp }) => {
+const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, currAuthMethod, setCurrAuthMethod }) => {
 
     const auth = getAuth();
     const navigate = useNavigate()
@@ -19,6 +19,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     const [userCredentials, setUserCredentials] = useState({ email: '', password: '', username: '' });
 
     // const firestore = getFirestore(firebaseApp);
+    const { firebaseApp, db } = useContext(FirebaseContext);
 
 
     // useEffect(() => {
@@ -122,7 +123,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     );
 
                 //setting user and redirecting to chats
-                dispatch(fetchUserData(userCredentials?.username, db));
+                dispatch(setUserData(userCredentials?.username, db));
                 dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                 navigate('/chat')
             }

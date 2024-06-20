@@ -1,16 +1,18 @@
 import { ArrowLeft, UserCheck, UserCheck2, X } from 'lucide-react'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { updateUserDoc } from '../../utils'
 import { doc, getFirestore, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { FirebaseContext } from '../../firebaseContext'
 
 const BlockedConnectionsModal = ({ setShowBlockedConnections }) => {
 
     const userData = useSelector(state => state.user.userInfo)
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
 
-    const firebaseApp = useSelector(state => state.firebase.firebaseApp)
-    const db = getFirestore(firebaseApp);
+    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+    // const db = getFirestore(firebaseApp);
+    const { firebaseApp, db } = useContext(FirebaseContext);
 
     async function unblockSelectedUser(id) {
 

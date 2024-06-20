@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,19 +8,22 @@ import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDat
 
 import { PlusSquare, Send } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter } from "firebase/firestore";
+import { FirebaseContext } from '../firebaseContext';
 
 
-const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGroupSelected }) => {
+const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected }) => {
     let prevDate = '';
 
-    const db = getFirestore(firebaseApp);
+    // const db = getFirestore(firebaseApp);
+    const { db } = useContext(FirebaseContext);
 
     const dummy = useRef(); // responsible to scroll into view whenever msgs are recieved/sent
     const chatBoxRef = useRef(null);
+    const inputRef = useRef(null); // ref to input field
     const lastVisible = useRef(null); //reference to the last loaded text
 
     const [loading, setLoading] = useState(false);
-    const [currentText, setcurrentText] = useState('') // currently typed text
+    // const [currentText, setcurrentText] = useState('') // currently typed text
     const [messageList, setMessageList] = useState([]) //messages with the current user
 
     const dispatch = useDispatch();
@@ -35,9 +38,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
         if (selectedUserToChat) {
             console.log('useEffect in chatbox--', selectedUserToChat)
 
-            // const isRealtimeListenerNeeded = hasUserHasLeftGroup(selectedUserToChat);// checks if the current opened chat is of a group from which user has exited
-
-            // if (isRealtimeListenerNeeded) realtimeListener(selectedUserToChat)
             realtimeListener(selectedUserToChat)
             retrieveTexts(selectedUserToChat);
         }
@@ -61,27 +61,6 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             setSelectedUserToChat(undefined);
         }
     }, [userData])
-
-    function hasUserHasLeftGroup(selectedUser) {
-        if (userData.connections.hasOwnProperty(selectedUser)) {
-            if (userData.connections[selectedUser].hasOwnProperty('exitAt')) {
-                console.log('1')
-                return false;
-            }
-            else {
-                console.log('2')
-                return true;
-            }
-        } else if (userData.requests.hasOwnProperty(selectedUser)) {
-            if (userData.requests[selectedUser].hasOwnProperty('exitAt')) {
-                console.log('3')
-                return false;
-            } else {
-                console.log('4')
-                return true;
-            }
-        }
-    }
 
 
     function getConnectionId(userName) {
@@ -288,7 +267,7 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
     }
 
     async function sendText() {
-        if (currentText !== "") {
+        if (inputRef?.current?.value !== "") {
             let connectionId;
 
             // check if userdata has the connection already and if not than add the connection in user collection
@@ -353,13 +332,14 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
             const msgData = {
                 connectionId: connectionId,
                 author: currentUser.displayName,
-                message: currentText,
+                message: inputRef?.current?.value,
                 time: serverTimestamp(),
                 deletedBy: [],
             };
 
             writeToDb(db, msgData);
-            setcurrentText(''); // resetting input text field
+            // setcurrentText(''); // resetting input text field
+            inputRef.current.value = '';
         }
     }
 
@@ -442,12 +422,13 @@ const ChatBox = ({ firebaseApp, selectedUserToChat, setSelectedUserToChat, isGro
                     <div className="msg-input form-control border-0">
                         <input
                             type="text"
+                            ref={inputRef}
                             name="msg"
                             id="theText"
                             placeholder="...type"
                             className="my-1"
-                            value={currentText}
-                            onChange={e => setcurrentText(e.target.value)}
+                            // value={currentText}
+                            // onChange={e => setcurrentText(e.target.value)}
                             onKeyUp={(e) => e.key === "Enter" && sendText()}
                             autoComplete="off"
                         />

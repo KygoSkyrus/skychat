@@ -1,5 +1,5 @@
 import { ArrowLeft, Edit, X, Check } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import SearchComponent from '../SearchComponent'
 import { SET_CURRENT_USER, SET_TOAST } from '../../redux/actionTypes';
@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import { writeToDb } from '../../utils';
+import { FirebaseContext } from '../../firebaseContext';
 
 const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserList, setSearchedUserList, type, memberList, groupInfo, setGroupInfo }) => {
 
@@ -15,13 +16,15 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
 
     const userData = useSelector(state => state.user.userInfo)
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
-    const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
+    // const db = getFirestore(firebaseApp);
+    const { firebaseApp, db } = useContext(FirebaseContext);
+
 
     const [selectedUsersForGroup, setSelectedUsersForGroup] = useState([])
     const [firstPage, setFirstPage] = useState(type !== "add_member");
     const [groupName, setGroupName] = useState('');
 
-    const db = getFirestore(firebaseApp);
     console.log('ud', userData)
 
     // NOTE:: CLOSE THIS GROUP MODAL WHEN CCLICKED ON CHECK>>>>

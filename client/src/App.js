@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
@@ -13,8 +13,9 @@ import Error from "./components/Error"
 import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
 import { Info } from "lucide-react";
 import Toast from "./components/Toast";
-import { fetchUserData } from "./redux/thunk/userDataThunk";
-import { firebaseApp, db } from "./firebaseConfig";
+import { setUserData } from "./redux/thunk/userDataThunk";
+import { FirebaseContext } from "./firebaseContext";
+// import { firebaseApp, db } from "./firebaseConfig";
 
 
 function App() {
@@ -25,6 +26,9 @@ function App() {
   // const firebaseApp = firebase.initializeApp(firebaseConfig);
   const auth = getAuth();
   // const db = getFirestore(firebaseApp);
+  // console.log('firebaseApp',firebaseApp)
+
+  const { firebaseApp, db } = useContext(FirebaseContext);
 
 
 
@@ -32,7 +36,7 @@ function App() {
 
   
   useEffect(() => {
-    dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })
+    // dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })// passing through context
     checkAuthStatus();
   }, [])
 
@@ -45,7 +49,7 @@ function App() {
 
         //have to store the result of this query in cache 
         // getCurrentUserData(user.displayName);
-        dispatch(fetchUserData(user.displayName,db));
+        dispatch(setUserData(user.displayName,db));
       } else {
         dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
@@ -80,8 +84,12 @@ function App() {
       <div className="layer"></div>
       <>
         <Routes>
-          <Route exact path="/" element={<Authenticate firebaseApp={firebaseApp} />} />
-          <Route exact path="/chat" element={<NewRTCA firebaseApp={firebaseApp} />} />
+          <Route exact path="/" element={<Authenticate 
+          // firebaseApp={firebaseApp}
+           />} />
+          <Route exact path="/chat" element={<NewRTCA
+          //  firebaseApp={firebaseApp}
+          />} />
 
           <Route exact path="*" element={<Error />} />
         </Routes>
