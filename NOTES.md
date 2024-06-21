@@ -63,9 +63,9 @@
 - NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect) [investigating about this.. is it really a problem or is normal behaviour]
 - on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
 
-- [done]have to do something about onchange in search compnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc [removed setSearchduserlist from newrtc,, it was passed down the line,now the state in serch component itself]
+- [done]have to do something about onchange in search comopnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc [removed setSearchduserlist from newrtc,, it was passed down the line,now the state in serch component itself]
+- [done]maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
 
-- maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
 
 
 # Todo 

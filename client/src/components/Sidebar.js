@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
@@ -8,7 +8,7 @@ import { sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
 import GroupModal from './modals/GroupModal'
 import SearchComponent from './SearchComponent'
-import { RESET_USERS_LIST } from '../redux/actionTypes'
+import { RESET_USERS_LIST, SET_SIDEBAR } from '../redux/actionTypes'
 
 
 const Sidebar = ({ handleSelectedUserToChat }) => {
@@ -21,7 +21,6 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
 
 
     const [showUserModal, setShowUserModal] = useState(false)
-
     const [showGroupModal, setShowGroupModal] = useState(false)
 
 
@@ -67,10 +66,12 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
 
     return (
         <>
-            <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
+            <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" 
+            // style={{ display: "none" }} 
+            id="mySidebar" >
                 <div style={{ height: "75%" }}>
 
-                    <span onClick={() => {sidebarVisibility(false); dispatch({ type: RESET_USERS_LIST, payload: true });}} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
+                    <span onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true });}} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
                         {/* <X size="20" /> */}
                         <Tally1 strokeWidth={4} />
                     </span>
@@ -106,6 +107,8 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
                 </div>
 
             </div>
+            {/* <div className="overlay pointer d-none" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div> */}
+
 
             {showUserModal &&
                 <>

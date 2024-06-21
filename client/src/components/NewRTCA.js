@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
@@ -148,7 +148,8 @@ export const NewRTCA = () => {
   function handleSelectedUserToChat(username, groupName) {
     //dispatch an event and set the state there (may or may not be required)
     // sidebarVisibility(false, setSearchedUserList)//closing sidebar
-    sidebarVisibility(false)//closing sidebar
+    // sidebarVisibility(false)//closing sidebar
+    dispatch({ type: SET_SIDEBAR, payload: false })
     dispatch({ type: RESET_USERS_LIST, payload: true })//clearing all records of search list
     setSelectedUserToChat(username);//setting selected user
 
@@ -218,19 +219,22 @@ export const NewRTCA = () => {
 
           {/***** SIDEBAR STARTS ******/}
           {/* maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use */}
-          {/* {sidebar && */}
-            <Sidebar
-              // searchedUserList={searchedUserList}
-              // setSearchedUserList={setSearchedUserList}
-              handleSelectedUserToChat={handleSelectedUserToChat}
-            />
-          {/* } */}
+          {sidebar &&
+            <>
+              <Sidebar
+                // searchedUserList={searchedUserList}
+                // setSearchedUserList={setSearchedUserList}
+                handleSelectedUserToChat={handleSelectedUserToChat}
+              />
+              <div className="overlay pointer" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div>
+            </>
+          }
           {/***** SIDEBAR ENDS ******/}
 
 
           {/***** CHAT HEADER STARTS ******/}
           <div className="chat-head">
-            <div className="hamburger" onClick={() => { sidebarVisibility(true); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
+            <div className="hamburger" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: true }); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
               <img src={hamburger} alt="." />
             </div>
             {selectedUserToChat &&
@@ -438,7 +442,7 @@ export const NewRTCA = () => {
           {/***** CHAT BODY ENDS ******/}
 
 
-          <div className="overlay pointer d-none" onClick={() => { sidebarVisibility(false); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div>
+          {/* <div className="overlay pointer d-none" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div> */}
 
           {showEntityInfoModal &&
             <>

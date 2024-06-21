@@ -8,6 +8,7 @@ const initialState = {
 export const uiReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_SIDEBAR: {
+      console.log('sety side bar', action)
       return {
         ...state,
         sidebar: action.payload,

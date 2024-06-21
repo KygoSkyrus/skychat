@@ -187,13 +187,14 @@ export async function writeToDb(db, msgObj) {
     }
 }
 
-
+// i think its not used anywhere
 export function hideSearchedUsersList(setSearchedUserList) {
     console.log('hideSearchedUsersList')
     clearSearchList(setSearchedUserList)
     // document.getElementById('userSearchDropdown').classList.toggle('d-none')//hiding the dropdown
 }
 
+// i think its not used anywhere
 export const sidebarVisibility = (val) => {
 // export const sidebarVisibility = (val, setSearchedUserList) => {
     let sidebar = document.getElementById("mySidebar");
