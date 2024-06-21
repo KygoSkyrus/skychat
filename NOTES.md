@@ -57,7 +57,11 @@
 - [done](sol:now showing the req realted actions to only those requests which are visible in request list,, not to the removed connections{which are hidden})if a conenction is removed he is sent to req lis,, what if the same is done by the other user too,, than none of them will ever be able to text each other (if req list connections are removed from searchlist),, if they are not removed from search lisy than on opening those connections it will show the requset ui in chatBOX
 - [done]add a notification when a connection is accepted "connection added" something like that
 - [done]there is a memory leak error on signinform
+- [done]about getalluserlist,,,we have implemented onsnapshot instead of getdocs for now, bcz if a new user is created than it was not showing in other peoples search list,, people would need to refrresh in order to see all users list...Also solved the problem of getting this function called multiple times on any state change as its on top most level and will only run when component is initially rendered. 
 - NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect)
+- on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
+- or we can try and put this getalluserlist func in search compo only,,, it will be called with username constraint search by user,,,, this way this function will only be called when necessary,,, for other place we need only avatar and we can save the avatar[problem here,, if we save avatar and user change his avatar than its a stale data,,, so `rejecting this approach`]
+- have to do something about onchange in search compnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc
 
 # Todo 
 - delete msg

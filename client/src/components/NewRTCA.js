@@ -48,9 +48,18 @@ export const NewRTCA = () => {
   //NOTE:: try merging these two useeffects..Also try to optimize getAllUsersList function
   useEffect(() => {
 
-    //getting all users (have to move it somewhere where it wont run on every stsate chnages, as its calling db on every state changes decreasing the reads per day... add in usememo, usecallback)
-    getAllUsersList()
+    // getAllUsersList()// using snapshot instead
+    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+      console.log('+++++++++++++++++++++getAllUsersList',snapshot)
+      let userList = {};
+      snapshot.docs.forEach((doc) => {
+        // let data = {...doc.data(),id:doc.id};
+        userList[doc.data()?.username] = {...doc.data(),id:doc.id};
+      });
+      dispatch({ type: SET_USERS_LIST, payload: userList });
+    });
 
+    return () => unsubscribe();
   }, [])
 
   useEffect(() => {
@@ -88,8 +97,9 @@ export const NewRTCA = () => {
 
   //getting alluser may not be needed,, just query the user when user search,,...its only needed bcz of avatar,,we have only stored username in the connecction list,,if we can also store the image than this willbe not needed at all... and if its still needed than create a snapshot at the topmost level so that it wont be trigggered in any case,, also cache this and this will only run when a new user is created(snapshot will handle that)...
   async function getAllUsersList() {
+    console.log('+++++++++++++++++++++getAllUsersList')
 
-    dispatch({ type: SET_USERS_LIST, payload: dbUsers })
+    // dispatch({ type: SET_USERS_LIST, payload: dbUsers })
 
     // commented for testing 
     // await getDocs(collection(db, "users"))
@@ -282,13 +292,13 @@ export const NewRTCA = () => {
           }
           {/***** CHAT HEADER ENDS ******/}
 
-          
-          
+
+
           {/***** NEW HEADER START ******/}
-          <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev=>!prev)}>
-            <input type="checkbox" id="filter"/>
-              <span>C</span>
-              <span>R</span>
+          <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev => !prev)}>
+            <input type="checkbox" id="filter" />
+            <span>C</span>
+            <span>R</span>
           </label>
           {/***** NEW HEADER ENDS ******/}
 
