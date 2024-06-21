@@ -7,11 +7,13 @@ import { userReducer } from './reducers/userReducer'
 import { toastReducer } from './reducers/toastReducer'
 import { messageReducer } from './reducers/messageReducer'
 import { firebaseReducer } from './reducers/firebaseReducer'
+import { uiReducer } from './reducers/uiReducer'
 
 const rootReducer = combineReducers({
   user: userReducer,
   toast: toastReducer,
   firebase: firebaseReducer,
+  ui: uiReducer,
   message: messageReducer,
 })
 

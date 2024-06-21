@@ -1,18 +1,20 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
 import { Cog, LogOut, Plus, Search, SearchCheck, Settings, Tally1, Users2, X } from 'lucide-react'
 
-import { debounce, hideSearchedUsersList, sidebarVisibility } from '../utils'
+import { sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
 import GroupModal from './modals/GroupModal'
 import SearchComponent from './SearchComponent'
+import { RESET_USERS_LIST } from '../redux/actionTypes'
 
 
-const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserList }) => {
+const Sidebar = ({ handleSelectedUserToChat }) => {
 
     const auth = getAuth();
+    const dispatch = useDispatch();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo)
     // const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
@@ -68,7 +70,7 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
             <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" style={{ display: "none" }} id="mySidebar" >
                 <div style={{ height: "75%" }}>
 
-                    <span onClick={() => sidebarVisibility(false, setSearchedUserList)} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
+                    <span onClick={() => {sidebarVisibility(false); dispatch({ type: RESET_USERS_LIST, payload: true });}} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
                         {/* <X size="20" /> */}
                         <Tally1 strokeWidth={4} />
                     </span>
@@ -76,8 +78,8 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                     <SearchComponent
                         id={"userSearchDropdown"}
                         handleSelectedUserToChat={handleSelectedUserToChat}
-                        searchedUserList={searchedUserList}
-                        setSearchedUserList={setSearchedUserList}
+                        // searchedUserList={searchedUserList}
+                        // setSearchedUserList={setSearchedUserList}
                     />
 
                 </div>
@@ -117,8 +119,8 @@ const Sidebar = ({ handleSelectedUserToChat, searchedUserList, setSearchedUserLi
                     <GroupModal
                         setShowGroupModal={setShowGroupModal}
                         handleSelectedUserToChat={handleSelectedUserToChat}
-                        searchedUserList={searchedUserList}
-                        setSearchedUserList={setSearchedUserList}
+                        // searchedUserList={searchedUserList}
+                        // setSearchedUserList={setSearchedUserList}
                         type="create_group"
                     />
                     <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>

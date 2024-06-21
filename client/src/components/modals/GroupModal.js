@@ -10,7 +10,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';
 
-const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserList, setSearchedUserList, type, memberList, groupInfo, setGroupInfo }) => {
+const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, memberList, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
 
@@ -297,8 +297,8 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, searchedUserL
                             <SearchComponent
                                 id={"userSearchDropdownGroup"}
                                 handleSelectedGroupMember={handleSelectedGroupMember}
-                                searchedUserList={searchedUserList}
-                                setSearchedUserList={setSearchedUserList}
+                                // searchedUserList={searchedUserList}
+                                // setSearchedUserList={}setSearchedUserList
                             />
 
                             {selectedUsersForGroup.length > 0 &&

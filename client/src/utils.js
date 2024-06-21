@@ -189,11 +189,13 @@ export async function writeToDb(db, msgObj) {
 
 
 export function hideSearchedUsersList(setSearchedUserList) {
+    console.log('hideSearchedUsersList')
     clearSearchList(setSearchedUserList)
     // document.getElementById('userSearchDropdown').classList.toggle('d-none')//hiding the dropdown
 }
 
-export const sidebarVisibility = (val, setSearchedUserList) => {
+export const sidebarVisibility = (val) => {
+// export const sidebarVisibility = (val, setSearchedUserList) => {
     let sidebar = document.getElementById("mySidebar");
     let overlay = document.querySelector('.overlay');
 
@@ -204,7 +206,7 @@ export const sidebarVisibility = (val, setSearchedUserList) => {
         sidebar.style.display = "none";
         overlay?.classList.add('d-none');
 
-        clearSearchList(setSearchedUserList);
+        // clearSearchList(setSearchedUserList);//getting rid of this setSearchedUserList state
     }
 };
 

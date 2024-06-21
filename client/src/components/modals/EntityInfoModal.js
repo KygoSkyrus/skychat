@@ -8,10 +8,10 @@ import { SET_TOAST } from '../../redux/actionTypes'
 import { FirebaseContext } from '../../firebaseContext'
 
 
-const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedGroupName, searchedUserList, setSearchedUserList }) => {
+const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedGroupName }) => {
 
     const dispatch = useDispatch();
-    const { firebaseApp, db } = useContext(FirebaseContext);
+    const { db } = useContext(FirebaseContext);
 
     const userData = useSelector(state => state.user.userInfo)
     // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
@@ -232,8 +232,8 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                     <GroupModal
                         setShowGroupModal={setShowGroupModal}
                         // handleSelectedUserToChat={handleSelectedUserToChat}
-                        searchedUserList={searchedUserList}
-                        setSearchedUserList={setSearchedUserList}
+                        // searchedUserList={searchedUserList}
+                        // setSearchedUserList={setSearchedUserList}
                         type="add_member"
                         memberList={memberList}
                         groupInfo={groupInfo}

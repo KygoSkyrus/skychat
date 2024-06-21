@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
-import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, hideSearchedUsersList, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
+import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
 
@@ -24,7 +24,7 @@ export const NewRTCA = () => {
   const dispatch = useDispatch()
 
 
-  const [searchedUserList, setSearchedUserList] = useState() // queries user list
+  // const [searchedUserList, setSearchedUserList] = useState() // queries user list
   const [selectedUserToChat, setSelectedUserToChat] = useState()
   // const [selectedGroupToChat, setSelectedGroupToChat] = useState(null)
   const [isGroupSelected, setIsGroupSelected] = useState(false)
@@ -39,6 +39,7 @@ export const NewRTCA = () => {
   const currentUser = useSelector(state => state.user.currentUser)
   const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
+  const sidebar = useSelector(state => state.ui.sidebar);
 
   console.log('===============================================================================userData', userData)
   // console.log('currentUser', currentUser)
@@ -49,17 +50,19 @@ export const NewRTCA = () => {
   useEffect(() => {
 
     // getAllUsersList()// using snapshot instead
-    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-      console.log('+++++++++++++++++++++getAllUsersList',snapshot)
-      let userList = {};
-      snapshot.docs.forEach((doc) => {
-        // let data = {...doc.data(),id:doc.id};
-        userList[doc.data()?.username] = {...doc.data(),id:doc.id};
-      });
-      dispatch({ type: SET_USERS_LIST, payload: userList });
-    });
+    dispatch({ type: SET_USERS_LIST, payload: dbUsers });
+    //commented for testing
+    // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+    //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
+    //   let userList = {};
+    //   snapshot.docs.forEach((doc) => {
+    //     // let data = {...doc.data(),id:doc.id};
+    //     userList[doc.data()?.username] = {...doc.data(),id:doc.id};
+    //   });
+    //   dispatch({ type: SET_USERS_LIST, payload: userList });
+    // });
 
-    return () => unsubscribe();
+    // return () => unsubscribe();
   }, [])
 
   useEffect(() => {
@@ -144,7 +147,9 @@ export const NewRTCA = () => {
 
   function handleSelectedUserToChat(username, groupName) {
     //dispatch an event and set the state there (may or may not be required)
-    sidebarVisibility(false, setSearchedUserList)//closing sidebar
+    // sidebarVisibility(false, setSearchedUserList)//closing sidebar
+    sidebarVisibility(false)//closing sidebar
+    dispatch({ type: RESET_USERS_LIST, payload: true })//clearing all records of search list
     setSelectedUserToChat(username);//setting selected user
 
     console.log('handleSelectedUserToChat  clicked', username, groupName)
@@ -212,17 +217,20 @@ export const NewRTCA = () => {
         <div className="outer">
 
           {/***** SIDEBAR STARTS ******/}
-          <Sidebar
-            searchedUserList={searchedUserList}
-            setSearchedUserList={setSearchedUserList}
-            handleSelectedUserToChat={handleSelectedUserToChat}
-          />
+          {/* maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use */}
+          {/* {sidebar && */}
+            <Sidebar
+              // searchedUserList={searchedUserList}
+              // setSearchedUserList={setSearchedUserList}
+              handleSelectedUserToChat={handleSelectedUserToChat}
+            />
+          {/* } */}
           {/***** SIDEBAR ENDS ******/}
 
 
           {/***** CHAT HEADER STARTS ******/}
           <div className="chat-head">
-            <div className="hamburger" onClick={() => sidebarVisibility(true, setSearchedUserList)}>
+            <div className="hamburger" onClick={() => { sidebarVisibility(true); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
               <img src={hamburger} alt="." />
             </div>
             {selectedUserToChat &&
@@ -361,7 +369,7 @@ export const NewRTCA = () => {
                   </div>
                   :
                   <div className="noOneToChat">
-                    <section onClick={() => dispatch({ type: "MESSAGE", payload: 4 })}>Add/search friends to start a chat or start a group</section>
+                    <section>Add/search friends to start a chat or start a group</section>
                   </div>
                 :
                 <div className="noOneToChat">fetching connections...</div>)
@@ -430,7 +438,7 @@ export const NewRTCA = () => {
           {/***** CHAT BODY ENDS ******/}
 
 
-          <div className="overlay pointer d-none" onClick={() => sidebarVisibility(false, setSearchedUserList)}></div>
+          <div className="overlay pointer d-none" onClick={() => { sidebarVisibility(false); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div>
 
           {showEntityInfoModal &&
             <>
@@ -438,8 +446,8 @@ export const NewRTCA = () => {
                 setShowEntityInfoModal={setShowEntityInfoModal}
                 selectedUserToChat={selectedUserToChat}
                 selectedGroupName={selectedGroupName}
-                searchedUserList={searchedUserList}
-                setSearchedUserList={setSearchedUserList}
+              // searchedUserList={searchedUserList}
+              // setSearchedUserList={setSearchedUserList}
               />
               <div className="overlay pointer zIndex4" onClick={() => setShowEntityInfoModal(false)}></div>
             </>

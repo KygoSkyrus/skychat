@@ -1,18 +1,31 @@
 import { Lock, LockIcon, LockKeyhole, LockKeyholeIcon, Search } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { debounce, hideSearchedUsersList } from '../utils'
+import { debounce } from '../utils'
 import { SET_TOAST } from '../redux/actionTypes';
 
 
-const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, searchedUserList, setSearchedUserList, id }) => {
+const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, id }) => {
+    console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~SearchComponent')
 
     
     const dispatch = useDispatch();
+    const searchInputRef = useRef();
+
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
     const userData = useSelector(state => state.user.userInfo)
+    const resetUserSearchList = useSelector(state => state.ui.resetUserSearchList)
+    const [searchedUserList, setSearchedUserList] = useState(undefined) // queries user list
 
-    const handleSearchUser = debounce(searchUser, 1000);
+    console.log('testtststss',resetUserSearchList)
+    useEffect(()=>{
+        if(resetUserSearchList) {
+            setSearchedUserList(undefined)  //clearing all records
+            searchInputRef.current.value=""; 
+        }
+    },[resetUserSearchList])
+
+    const handleSearchUser = debounce(searchUser, 1500);
 
     const handleChangeUserSearch = (e) => {
         setSearchedUserList(undefined)  //clearing all records
@@ -63,7 +76,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
             <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
                 <span><Search /></span>
                 {/* <span>Search a connection</span> */}
-                <input type="search" onChange={e => handleChangeUserSearch(e)} className={`rounded-3 p-1 px-2 w-100 ${id === 'userSearchDropdownGroup' && ' bg-dark text-light'}`} placeholder="find friends" />
+                <input type="search" ref={searchInputRef} onChange={e => handleChangeUserSearch(e)} className={`rounded-3 p-1 px-2 w-100 ${id === 'userSearchDropdownGroup' && ' bg-dark text-light'}`} placeholder="find friends" />
             </div>
 
             <div className="d-none" id={id}>
@@ -81,7 +94,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
                     )
                 })}
                 <div className="no-user d-none text-center">No user found</div>
-                <div className="custom-loader d-none" onClick={() => hideSearchedUsersList(setSearchedUserList)} ></div>
+                <div className="custom-loader d-none"></div>
             </div>
         </>
 

@@ -58,13 +58,18 @@
 - [done]add a notification when a connection is accepted "connection added" something like that
 - [done]there is a memory leak error on signinform
 - [done]about getalluserlist,,,we have implemented onsnapshot instead of getdocs for now, bcz if a new user is created than it was not showing in other peoples search list,, people would need to refrresh in order to see all users list...Also solved the problem of getting this function called multiple times on any state change as its on top most level and will only run when component is initially rendered. 
-- NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect)
+- [done]or we can try and put this getalluserlist func in search compo only,,, it will be called with username constraint search by user,,,, this way this function will only be called when necessary,,, for other place we need only avatar and we can save the avatar[problem here,, if we save avatar and user change his avatar than its a stale data,,, so `rejecting this approach`]
+
+- NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect) [investigating about this.. is it really a problem or is normal behaviour]
 - on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
-- or we can try and put this getalluserlist func in search compo only,,, it will be called with username constraint search by user,,,, this way this function will only be called when necessary,,, for other place we need only avatar and we can save the avatar[problem here,, if we save avatar and user change his avatar than its a stale data,,, so `rejecting this approach`]
-- have to do something about onchange in search compnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc
+
+- [done]have to do something about onchange in search compnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc [removed setSearchduserlist from newrtc,, it was passed down the line,now the state in serch component itself]
+
+- maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
+
 
 # Todo 
-- delete msg
+- [done]delete msg
 - [done]implement group chat/option to create a group and add members 
 - [done]**** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
 - [done]there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
@@ -102,6 +107,8 @@
 **things to do before deploying**
 - add loading more msgs feature, only showing latest 20 rn
 
+## OPTIMIZATION
+- at end when defects are cleared ,, add console in every compnnets and than check on what actions how many times which compo are rerendering,, should they rerender? are child rendering for no reason?
 
 
 
@@ -236,7 +243,8 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 
 
 
-
+## Questions
+- whats the solution to two time rendering of a component if we have a state updated inside a useeefect?? is it even a bad approach?? are there any alternatives??? is it supposed to be like this??
 
 
 ### forever notes

@@ -10,4 +10,7 @@ export const SET_FIREBASE_APP = "SET/FIREBASE_APP";
 export const SET_TOAST = "SET/TOAST";
 export const RESET_TOAST = "RESET/TOAST";
 
+export const SET_SIDEBAR = "SET/SIDEBAR";
+export const RESET_USERS_LIST = "RESET/USERS_LIST"
+
 // we have avoided using action creators, direct type and payload are dispatched from components
