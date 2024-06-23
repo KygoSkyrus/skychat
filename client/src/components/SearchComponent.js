@@ -73,7 +73,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
 
     return (
         <>
-            <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 rounded-pill">
+            <div className="p-2 py-1 m-2 d-flex align-items-center border border-2 br-16">
                 <span><Search /></span>
                 {/* <span>Search a connection</span> */}
                 <input type="search" ref={searchInputRef} onChange={e => handleChangeUserSearch(e)} className={`rounded-3 p-1 px-2 w-100 ${id === 'userSearchDropdownGroup' && ' bg-dark text-light'}`} placeholder="find friends" />

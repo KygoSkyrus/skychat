@@ -163,6 +163,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             connections: {},
             requests: {},
             blockList: {},
+            privacy: true,
             time: serverTimestamp(),
         };
         await addDoc(collection(db, "users"), userData);

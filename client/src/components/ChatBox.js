@@ -6,9 +6,12 @@ import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
 import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, populateConnectionId, writeToDb, exitGroup, acceptGroupReq, getNotification, getFormattedNotification } from '../utils';
 
-import { PlusSquare, Send } from 'lucide-react';
+import { PlusSquare, Send, Smile, SmilePlus } from 'lucide-react';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter } from "firebase/firestore";
 import { FirebaseContext } from '../firebaseContext';
+
+import EmojiPicker from 'emoji-picker-react';
+
 
 
 const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected }) => {
@@ -34,6 +37,8 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
 
     console.log('rrrrrrrrrrr', requestList, requestList[selectedUserToChat])
 
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
     useEffect(() => {
         if (selectedUserToChat) {
             console.log('useEffect in chatbox--', selectedUserToChat)
@@ -42,14 +47,13 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             retrieveTexts(selectedUserToChat);
         }
 
-        document.getElementById('theText').focus();// focus on input field
+        document.getElementById('theText')?.focus();// focus on input field
     }, [selectedUserToChat])
 
     useEffect(() => {
         // setting theme
         const theme = localStorage.getItem('theme') || 'https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(36).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d';
-        // const chatBox = document.getElementById('chatBox');
-        // chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
+        chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
     }, [appliedTheme])
 
     // NOTE: [resolved (now also checking if the opened connection was a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
@@ -326,7 +330,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 });
 
                 // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
-                realtimeListener(selectedUserToChat, connectionId)
+                if(messageList.length === 0) realtimeListener(selectedUserToChat, connectionId)
             }
 
             const msgData = {
@@ -343,7 +347,16 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         }
     }
 
-    console.log('messageLIST',messageList)
+    const onEmojiClick = (event) => {
+        let sym = event.unified.split("-");
+        let codesArray = [];
+        sym.forEach((el) => codesArray.push("0x" + el));
+        let emoji = String.fromCodePoint(...codesArray);
+        inputRef.current.value += emoji;
+    };
+
+
+    console.log('messageLIST', messageList)
 
 
     console.log('------->>>>>>>>-----------chat box ends------------------------')
@@ -351,7 +364,8 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
     return (
         <div className="chat-body" id="chatBody">
             {/* <div className='layer'></div> */}
-            <div className="chat-box" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
+            <div className="chat-box zIndex1" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
+            <div className='layer'></div>
                 {loading &&
                     <div className="text-center">
                         <div className="spinner-border" role="status">
@@ -367,7 +381,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                         messageList?.map((msgData) => {
                             let currDate = getLocalDateStr(msgData?.time);
                             return (
-                                <div key={msgData.id} className="d-flex flex-column">
+                                <div key={msgData.id} className="d-flex flex-column zIndex1">
                                     {/* show dates */}
                                     {showChatDate(currDate) &&
                                         <div className="text-center date">
@@ -385,7 +399,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                                         :
                                         // dont show if the msg is deleted by me but i am not its author (for v3)
                                         // (!(msgData?.deletedBy?.includes(userData?.username) && msgData?.author !== userData?.username) && 
-                                            <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
+                                        <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
                                             isGroupSelected={isGroupSelected} setMessageList={setMessageList} />
                                         // )
                                     }
@@ -401,7 +415,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             {/* {userData?.requests[selectedUserToChat] ? */}
             {requestList?.includes(selectedUserToChat) ?// only show these action for action the reqList conections
                 // when request chat is opened
-                (<div className="req_btn">
+                (<div className="req_btn zIndex1">
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat, dispatch)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat]?.groupName ?
@@ -417,9 +431,9 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 :
                 (userData?.connections[selectedUserToChat]?.exitAt ?
                     // when user has left group
-                    <div className="p-3 fs-12 text-center">You are no longer a member of group</div>
+                    <div className="p-3 fs-12 text-center zIndex1">You are no longer a member of group</div>
                     :
-                    <div className="msg-input form-control border-0">
+                    <div className="msg-input form-control border-0 zIndex1">
                         <input
                             type="text"
                             ref={inputRef}
@@ -427,13 +441,18 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             id="theText"
                             placeholder="...type"
                             className="my-1"
-                            // value={currentText}
-                            // onChange={e => setcurrentText(e.target.value)}
                             onKeyUp={(e) => e.key === "Enter" && sendText()}
                             autoComplete="off"
                         />
-                        <button onClick={() => sendText()} className="rounded-2" style={{ background: "#4b4b4b" }}><Send /></button>
-                    </div>)
+                        <span className='emoji-picker pointer' onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                            <SmilePlus />
+                            <div>
+                                <EmojiPicker open={showEmojiPicker} onEmojiClick={onEmojiClick} />
+                            </div>
+                        </span>
+                        <button onClick={() => sendText()} className="rounded-2 sendBtn"><Send /></button>
+                    </div>
+                )
             }
         </div>
     )

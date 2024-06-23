@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { doc, getDoc, getFirestore, updateDoc } from 'firebase/firestore';
 import { FirebaseContext } from '../firebaseContext';
 
-  const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessageList }) => {
+const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessageList }) => {
 
   const userData = useSelector(state => state.user.userInfo)
   // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
@@ -30,23 +30,10 @@ import { FirebaseContext } from '../firebaseContext';
       });
     }
 
-    // setMessageList(prev => {
-    //   console.log('prev', prev, docSnap.id)
-    //   prev.filter(x => x.id !== docSnap.id)
-    //   prev.map(x => {
-    //     console.log('xid', x.id)
-    //     if (x.id === docSnap.id) {
-    //       x.deletedBy = [...docSnap.data()?.deletedBy, userData.username]
-    //     }
-    //   })
-    //   let arr = [...prev];
-    //   console.log('after prev', arr)
-    //   return arr;
-    // })
     setMessageList(prev => {
-      return  prev.map(x => {
+      return prev.map(x => {
         if (x.id === id) {
-          return {...x, deletedBy: [...x.deletedBy, userData.username]}
+          return { ...x, deletedBy: [...x.deletedBy, userData.username] }
         }
         return x;
       })
@@ -80,12 +67,8 @@ import { FirebaseContext } from '../firebaseContext';
       </div>
 
       {/* we can remove the sender reciever name for one to one chat */}
-      {isGroupSelected &&
-        <section className={
-          myself === msgData.author
-            ? "authorName me"
-            : "authorName other"
-        }>{msgData.author}</section>
+      {isGroupSelected && myself !== msgData.author &&
+        <section className="authorName other">{msgData.author}</section>
       }
     </>
   );

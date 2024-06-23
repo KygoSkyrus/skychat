@@ -59,53 +59,54 @@
 - [done]there is a memory leak error on signinform
 - [done]about getalluserlist,,,we have implemented onsnapshot instead of getdocs for now, bcz if a new user is created than it was not showing in other peoples search list,, people would need to refrresh in order to see all users list...Also solved the problem of getting this function called multiple times on any state change as its on top most level and will only run when component is initially rendered. 
 - [done]or we can try and put this getalluserlist func in search compo only,,, it will be called with username constraint search by user,,,, this way this function will only be called when necessary,,, for other place we need only avatar and we can save the avatar[problem here,, if we save avatar and user change his avatar than its a stale data,,, so `rejecting this approach`]
-
-- NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect) [investigating about this.. is it really a problem or is normal behaviour]
-- on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
-
+- [done]check that there are scrolling options for every interface,,, like for serchuser list the scrollbar is default{i think i left it like that intentionally}
+- [done]NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect) [investigating about this.. is it really a problem or is normal behaviour]{finding:: its a necessity,, and also its not causing its child to rerender so its not that expensive. also on the second rerender fetchdata is not called as the second ue has dependency array}
 - [done]have to do something about onchange in search comopnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc [removed setSearchduserlist from newrtc,, it was passed down the line,now the state in serch component itself]
 - [done]maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
 
-
+- add a layer to close the emoji picker
+- add custom attribute in emoji picker
+- need to check and optimize chatbox componnet
 
 # Todo 
 - [done]delete msg
 - [done]implement group chat/option to create a group and add members 
 - [done]**** it is very import to add a setting that will let user control who can text them or add to a group,, by default its off
 - [done]there will be a setting optipons for user,, that action will ytabel to a setting page and from where user will be able to see their blocked users, change avatars, change background theme, add the feature to make your account private;;;,,,
-- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]add list icon on dp inside chatbox
 - [done]username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase and number, cannot have characters)
+- [done]fix theme and add layer
+
+- on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
 - maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
-- add dummy accounts 
-- add your on acc as creator
+- on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
 - try push notifications
-- fix theme and add layer
 - add a layer or loader on loading action
+- add a fallback component on error,,,, 
 - add lazy loading in pattern images
 - in this one , on any corner show the feature your provide , like security, functionalities etc
 - encrypt messages/passwords
 - check db security using other domain
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - try firebase push notifications
-- add a fallback component on error,,,, 
 - optimize code... check if there is unnecessary prop drilling.. create another branch to do this
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
 **Style**
-- on desktop show the sidebar..hide it only for mobile
-- the height of chat body changes as we go from connection to req window, and opens a req chat
-- increase the width of overall chatbody
-- u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
-- add a search icon next to user serch input
-- create the chat buuble like it was in v1,, the body and the top will be darker which will have senders name and time,, can try to hide this dark strip and on hover show that, for one to one chat it will have only time 
-- create a text like hovered toast if toasts are ever neeeded
+- [done]u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
+- [done]the height of chat body changes as we go from connection to req window, and opens a req chat
+- [done]increase the width of overall chatbody
+- [done]add a search icon next to user serch input
+- [done]create a text like hovered toast if toasts are ever neeeded
 
 
 **things to do before deploying**
+- add by kygoskyrus at bottom
 - add loading more msgs feature, only showing latest 20 rn
+- add dummy accounts 
+- add your on acc as creator
 
 ## OPTIMIZATION
 - at end when defects are cleared ,, add console in every compnnets and than check on what actions how many times which compo are rerendering,, should they rerender? are child rendering for no reason?
@@ -119,7 +120,7 @@
 - add professional and other versions
 - add a option to share the app with your frnds,, create links to share on social media apps
 - implement that when clicked on profile photo of user/// it zooms up and shows since when you are in touch ... maybe this is too much (show this only for connections)
-
+- add emojis
 
 
 https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimensional-cute-profession_14126497.html
@@ -245,6 +246,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 
 ## Questions
 - whats the solution to two time rendering of a component if we have a state updated inside a useeefect?? is it even a bad approach?? are there any alternatives??? is it supposed to be like this??
+- [answer] If you want to prevent your useEffect from running twice, make sure to list all of its dependencies correctly and avoid changing state inside the effect. With this change, the useEffect will only run when the count changes, and not every time the component re-renders.
 
 
 ### forever notes
@@ -258,3 +260,4 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 - dont pass dispatch and other unnecessary stuff in functions parameter if you have a function that calls an api and then dispatch to store,,, just use thunk in those case
 - use usecontext whenever there are mutiple data that needed to passed down to child,,, u can create context of functions also
 - if you have onchange which is setting a state in parent component than on every key press the child componnet will rerender,, to avoid this either wrap the child component in `React.memo` or use useRef for the input field instead of dstate
+- very important when using img tag to show images instead of backgroundImage... sometimes image gets stretched bcz of specific width and height given(in a grid sometimes all images are not of same ratio),,, to overcome that apply `object-fit: cover;` with width and height `width: 100%; height: 80px;`

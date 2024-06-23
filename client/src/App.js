@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { getAuth } from "firebase/auth";
@@ -15,6 +15,7 @@ import { Info } from "lucide-react";
 import Toast from "./components/Toast";
 import { setUserData } from "./redux/thunk/userDataThunk";
 import { FirebaseContext } from "./firebaseContext";
+import About from "./components/About";
 // import { firebaseApp, db } from "./firebaseConfig";
 
 
@@ -34,7 +35,7 @@ function App() {
 
   // dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })// moved into useeffect
 
-  
+
   useEffect(() => {
     // dispatch({ type: SET_FIREBASE_APP, payload: firebaseApp })// passing through context
     checkAuthStatus();
@@ -49,7 +50,7 @@ function App() {
 
         //have to store the result of this query in cache 
         // getCurrentUserData(user.displayName);
-        dispatch(setUserData(user.displayName,db));
+        dispatch(setUserData(user.displayName, db));
       } else {
         dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
@@ -81,29 +82,35 @@ function App() {
 
   return (
     <div className="App">
-      <div className="layer"></div>
+      {/* <div className="layer"></div> */}
       <>
         <Routes>
-          <Route exact path="/" element={<Authenticate 
+          <Route exact path="/" element={<Authenticate
           // firebaseApp={firebaseApp}
-           />} />
+          />} />
           <Route exact path="/chat" element={<NewRTCA
           //  firebaseApp={firebaseApp}
           />} />
 
+          <Route exact path="/about" element={<About />} />
           <Route exact path="*" element={<Error />} />
         </Routes>
         {/* <div className="body-bg"><span>SKYCHAT</span></div> */}
       </>
 
-      <div className="info" >
+      <Link to={'/about'} className="info">
+        <Info />
+      </Link>
+
+      {/* <div className="info" >
         <Info className="" data-bs-toggle="dropdown" aria-expanded="false" />
         <div className="dropdown-menu p-2">
           <h4>SKYCHAT</h4>
           <p>info</p>
         </div>
-      </div>
+      </div> */}
     </div>
+
   );
 }
 

@@ -59,6 +59,7 @@ export const NewRTCA = () => {
     //     // let data = {...doc.data(),id:doc.id};
     //     userList[doc.data()?.username] = {...doc.data(),id:doc.id};
     //   });
+    //   console.log('ul',userList)
     //   dispatch({ type: SET_USERS_LIST, payload: userList });
     // });
 
@@ -233,7 +234,7 @@ export const NewRTCA = () => {
 
 
           {/***** CHAT HEADER STARTS ******/}
-          <div className="chat-head">
+          <div className="chat-head zIndex2">
             <div className="hamburger" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: true }); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
               <img src={hamburger} alt="." />
             </div>
@@ -251,9 +252,11 @@ export const NewRTCA = () => {
                       :
                       <img src={usersList[selectedUserToChat]?.avatar} className="chatWithProfile ms-1" alt="" />
                     }
-                    <span className="list-icon">
-                      <List size={18} />
-                    </span>
+                    {userData?.connections.hasOwnProperty(selectedUserToChat) &&
+                      <span className="list-icon">
+                        <List size={18} />
+                      </span>
+                    }
                   </span>
                   {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                     <ul className="dropdown-menu p-2">
@@ -307,11 +310,11 @@ export const NewRTCA = () => {
 
 
           {/***** NEW HEADER START ******/}
-          <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev => !prev)}>
+          {/* <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev => !prev)}>
             <input type="checkbox" id="filter" />
             <span>C</span>
             <span>R</span>
-          </label>
+          </label> */}
           {/***** NEW HEADER ENDS ******/}
 
 

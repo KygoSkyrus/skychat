@@ -85,8 +85,8 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
 
                 </div>
                 <div>
-                    <section onClick={() => setShowGroupModal(true)}>
-                        <button className='w-100 px-2 py-2 bg-light d-flex justify-content-between'>
+                    <section className='m-1' onClick={() => setShowGroupModal(true)}>
+                        <button className='w-100 px-2 py-2 br-16 d-flex justify-content-between' style={{background: "linear-gradient(#f8f9fa, #e1e1e1)"}}>
                             <span>Start a group</span>
                             <span>
                                 <Users2 size={16} />
@@ -94,7 +94,7 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
                             </span>
                         </button>
                     </section>
-                    <section className="myProfile px-2">
+                    <section className="myProfile px-2 m-1 br-16">
                         <div>
                             <span onClick={() => setShowUserModal(true)} >
                                 <img src={userData?.avatar} alt="" className="avatar pointer me-2" />

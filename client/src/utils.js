@@ -3,6 +3,19 @@ import { onSnapshot, query, where } from "firebase/firestore";
 import { SET_TOAST } from "./redux/actionTypes"
 
 export const dbUsers = {
+    "test7": {
+        "requests": {},
+        "username": "test7",
+        "email": "test7@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "connections": {},
+        "blockList": {},
+        "time": {
+            "seconds": 1718794109,
+            "nanoseconds": 979000000
+        },
+        "id": "6xMBEu52vxV91YGuvcJs"
+    },
     "test1": {
         "blockList": {
             "test6": {
@@ -13,86 +26,99 @@ export const dbUsers = {
                 }
             }
         },
-        "username": "test1",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2Favatar%20(8).png?alt=media&token=4c4b0ea3-519f-430c-9f0f-8c24df8d163c",
         "connections": {
-            "test2": {
-                "deletedTill": {
-                    "seconds": 1717784032,
-                    "nanoseconds": 193000000
-                },
-                "id": "9afbe648-40f3-4f49-a574-873be66338d0"
-            },
-            "90bd529e-a8e1-4667-8607-b6dda7356641": {
-                "groupName": "i2",
-                "id": "90bd529e-a8e1-4667-8607-b6dda7356641"
+            "e4915541-734d-4318-8e62-a2df2cff6cdc": {
+                "id": "e4915541-734d-4318-8e62-a2df2cff6cdc",
+                "groupName": "xz"
             },
             "76a3aaec-0a4f-4901-b25a-5b4a6795ad28": {
                 "groupName": "iii",
                 "id": "76a3aaec-0a4f-4901-b25a-5b4a6795ad28"
             }
         },
-        "privacy": true,
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2Favatar%20(8).png?alt=media&token=4c4b0ea3-519f-430c-9f0f-8c24df8d163c",
         "time": {
             "seconds": 1704899512,
             "nanoseconds": 878000000
         },
+        "requests": {
+            "test2": {
+                "deletedTill": {
+                    "seconds": 1719072728,
+                    "nanoseconds": 286000000
+                },
+                "id": "9afbe648-40f3-4f49-a574-873be66338d0"
+            }
+        },
+        "username": "test1",
         "email": "test1@email.com",
-        "requests": {},
+        "privacy": false,
         "id": "AMaRvZRYFUMabQKINmNF"
     },
     "test6": {
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "privacy": true,
+        "time": {
+            "seconds": 1711534119,
+            "nanoseconds": 748000000
+        },
         "username": "test6",
+        "email": "test6@email.com",
+        "blockList": {},
+        "connections": {},
         "requests": {
             "test2": {
                 "id": "1162eb04-dd2d-49af-b0b3-6aee795bef32"
             }
         },
-        "time": {
-            "seconds": 1711534119,
-            "nanoseconds": 748000000
-        },
-        "privacy": true,
-        "blockList": {},
-        "email": "test6@email.com",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "connections": {},
         "id": "DIJJjPqUTPoYddxY2TcT"
     },
     "test3": {
+        "username": "test3",
+        "privacy": false,
         "email": "test3@email.com",
         "blockList": {},
-        "connections": {
-            "test1": {
-                "id": "1ec282e6-f95d-4dab-ad61-c5e79fc16283"
-            },
-            "test5": {
-                "id": "5a5af813-6c6d-4f2c-b46f-d023dd865f7e"
-            },
-            "test2": {
-                "id": "0930b102-9779-4b3c-9b59-6fba1f006b55"
-            }
-        },
-        "username": "test3",
-        "requests": {
-            "90bd529e-a8e1-4667-8607-b6dda7356641": {
-                "groupName": "i2",
-                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
-                "deletedTill": {
-                    "seconds": 1717927718,
-                    "nanoseconds": 560000000
-                }
-            }
-        },
         "time": {
             "seconds": 1705165774,
             "nanoseconds": 289000000
         },
-        "privacy": false,
+        "connections": {
+            "test2": {
+                "id": "0930b102-9779-4b3c-9b59-6fba1f006b55"
+            },
+            "test5": {
+                "id": "5a5af813-6c6d-4f2c-b46f-d023dd865f7e"
+            },
+            "test1": {
+                "id": "1ec282e6-f95d-4dab-ad61-c5e79fc16283"
+            }
+        },
+        "requests": {
+            "e4915541-734d-4318-8e62-a2df2cff6cdc": {
+                "id": "e4915541-734d-4318-8e62-a2df2cff6cdc",
+                "deletedTill": {
+                    "seconds": 1718958241,
+                    "nanoseconds": 183000000
+                },
+                "groupName": "xz"
+            }
+        },
         "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
         "id": "I5q047QCTEAgMowlYLBE"
     },
     "test2": {
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "requests": {
+            "90bd529e-a8e1-4667-8607-b6dda7356641": {
+                "groupName": "i2",
+                "deletedTill": {
+                    "seconds": 1717927718,
+                    "nanoseconds": 143000000
+                },
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641"
+            }
+        },
+        "privacy": true,
         "connections": {
             "test6": {
                 "id": "1162eb04-dd2d-49af-b0b3-6aee795bef32"
@@ -101,48 +127,154 @@ export const dbUsers = {
                 "id": "9afbe648-40f3-4f49-a574-873be66338d0"
             }
         },
-        "blockList": {},
-        "username": "test2",
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "privacy": true,
-        "requests": {
-            "90bd529e-a8e1-4667-8607-b6dda7356641": {
-                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
-                "deletedTill": {
-                    "seconds": 1717927718,
-                    "nanoseconds": 143000000
-                },
-                "groupName": "i2"
-            }
-        },
         "email": "test2@email.com",
         "time": {
             "seconds": 1704899556,
             "nanoseconds": 460000000
         },
+        "blockList": {},
+        "username": "test2",
         "id": "MSOGk7iP40CehhYW5x5I"
     },
-    "test5": {
+    "test14": {
+        "username": "test14",
+        "requests": {},
+        "time": {
+            "seconds": 1718877812,
+            "nanoseconds": 239000000
+        },
+        "blockList": {},
+        "email": "test14@email.com",
         "connections": {},
-        "email": "test5@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "id": "Qhp4WEto8fsPIVU0dhRK"
+    },
+    "test18": {
+        "requests": {},
+        "connections": {},
+        "email": "test18@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "username": "test18",
+        "time": {
+            "seconds": 1718965411,
+            "nanoseconds": 272000000
+        },
+        "blockList": {},
+        "id": "T3mWhER5Pnn6dY3eugLZ"
+    },
+    "test15": {
+        "time": {
+            "seconds": 1718878829,
+            "nanoseconds": 380000000
+        },
+        "username": "test15",
+        "connections": {},
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "email": "test15@email.com",
+        "blockList": {},
+        "requests": {},
+        "id": "TkhDlix87oTMbQX55KbX"
+    },
+    "test17": {
+        "email": "test17@email.com",
+        "connections": {},
+        "username": "test17",
+        "requests": {},
+        "blockList": {},
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "time": {
+            "seconds": 1718964895,
+            "nanoseconds": 962000000
+        },
+        "id": "ZikeZb69RzOjBaCVGsep"
+    },
+    "k 1": {
+        "time": {
+            "seconds": 1706549446,
+            "nanoseconds": 270000000
+        },
+        "username": "k 1",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
         "privacy": true,
+        "requests": {},
+        "email": "k1@gmail.com",
+        "connections": {},
+        "blockList": {},
+        "id": "bt3zYWzkcFYRJI1qanMK"
+    },
+    "superuser": {
+        "username": "superuser",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "time": {
+            "seconds": 1718793606,
+            "nanoseconds": 45000000
+        },
+        "connections": {},
+        "email": "test69@email.com",
+        "requests": {},
+        "blockList": {},
+        "id": "mY2vBWmlLyuBHLR6zdew"
+    },
+    "test13": {
+        "blockList": {},
+        "username": "test13",
+        "connections": {},
+        "email": "test13@email.com",
+        "requests": {},
+        "time": {
+            "seconds": 1718813631,
+            "nanoseconds": 379000000
+        },
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "id": "qEKnz7xslEHNhpPdQA5A"
+    },
+    "test12": {
+        "email": "test12@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "time": {
+            "seconds": 1718813413,
+            "nanoseconds": 677000000
+        },
+        "username": "test12",
+        "blockList": {},
+        "requests": {},
+        "connections": {},
+        "id": "rt0EI41Io6rIxpu3hmwF"
+    },
+    "test16": {
+        "requests": {},
+        "blockList": {},
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
+        "connections": {},
+        "email": "test16@email.com",
+        "username": "test16",
+        "time": {
+            "seconds": 1718964189,
+            "nanoseconds": 611000000
+        },
+        "id": "th6PK9fT6gGA5e5o9Ymi"
+    },
+    "test5": {
         "time": {
             "seconds": 1706630048,
             "nanoseconds": 445000000
         },
-        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
-        "username": "test5",
+        "blockList": {},
         "requests": {
             "90bd529e-a8e1-4667-8607-b6dda7356641": {
-                "groupName": "i2",
-                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
                 "deletedTill": {
                     "seconds": 1717927717,
                     "nanoseconds": 715000000
-                }
+                },
+                "id": "90bd529e-a8e1-4667-8607-b6dda7356641",
+                "groupName": "i2"
             }
         },
-        "blockList": {},
+        "username": "test5",
+        "connections": {},
+        "privacy": true,
+        "email": "test5@email.com",
+        "avatar": "https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/avatar%2FuserAvatar%20(6).png?alt=media&token=8fb50e10-daf9-402a-b020-65495494e14a",
         "id": "tkKDVsww5962mnrHBhec"
     }
 }

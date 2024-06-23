@@ -57,7 +57,7 @@ const UserModal = ({ setShowUserModal }) => {
                             <li className='chat_list_item privacy'>
                                 <span>Privacy</span>
                                 <span className='d-flex justify-content-end'>
-                                    <input type="checkbox" id='privacy' checked={userData.privacy} onChange={(e)=>togglePrivacy(e)} />
+                                    <input type="checkbox" id='privacy' checked={userData?.privacy} onChange={(e)=>togglePrivacy(e)} />
                                     <label htmlFor="privacy"></label>
                                 </span>
                             </li>
