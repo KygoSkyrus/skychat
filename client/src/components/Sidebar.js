@@ -120,11 +120,9 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
             {showGroupModal &&
                 <>
                     <GroupModal
-                        setShowGroupModal={setShowGroupModal}
-                        handleSelectedUserToChat={handleSelectedUserToChat}
-                        // searchedUserList={searchedUserList}
-                        // setSearchedUserList={setSearchedUserList}
                         type="create_group"
+                        handleSelectedUserToChat={handleSelectedUserToChat}
+                        setShowGroupModal={setShowGroupModal}
                     />
                     <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div>
                 </>

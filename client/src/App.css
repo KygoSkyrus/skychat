@@ -1113,6 +1113,24 @@ input[type="search"] {
   display: flex;
   flex-direction: column;
 }
+#groupModal .m-dialog > div > form > input[type="text"]{
+  border: 2px solid rgb(157 157 157);
+  border-radius: 12px;
+  background: linear-gradient(rgb(248, 249, 250), rgb(225, 225, 225));
+}
+#groupModal .m-dialog > div > form > input[type="text"]:focus-visible {
+  outline: none !important;
+  /* border: transparent; */
+  /* border-radius: 12px; */
+}
+#groupModal .m-dialog > div > form > button {
+  appearance: none;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(#1b1b1bd4, #1b1b1b);
+  border: 1.2px solid #877e01;
+  letter-spacing: 3px;
+}
 #groupModal .groupMembers:has(section){
   height: 106px;
 }

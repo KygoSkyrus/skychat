@@ -10,7 +10,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';
 
-const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, memberList, groupInfo, setGroupInfo }) => {
+const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
 
@@ -118,6 +118,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, memberL
 
             setGroupName(''); // resetting input text field
             setShowGroupModal(false)// hiding modal
+            handleSelectedUserToChat(connectionId, true);
         }
     }
 
@@ -142,14 +143,14 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, memberL
             return;
         }
 
-        if (memberList) {
-            if (memberList?.length + selectedUsersForGroup.length >= 25) {
+        if (groupInfo?.members) {
+            if (groupInfo?.members?.length + selectedUsersForGroup.length >= 25) {
                 dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
                 return;
             }
             // check if user is already a member
-            for (let i = 0; i < memberList.length; i++) {
-                if (memberList[i].name === member) {
+            for (let i = 0; i < groupInfo?.members?.length; i++) {
+                if (groupInfo?.members[i]?.name === member) {
                     dispatch({ type: SET_TOAST, payload: { toastContent: "User is already a member", isError: true } })
                     return;
                 }
@@ -276,8 +277,8 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, memberL
                         <div className='p-4'>
                             <form onSubmit={e => handleContinue(e)} className='d-flex flex-column gap-2'>
                                 <label>Enter group name</label>
-                                <input type='text' className='rounded-4' value={groupName} onChange={e => setGroupName(e.target.value)} placeholder='enter group name' required />
-                                <button type='submit' className='rounded-4' >continue</button>
+                                <input type='text' className='p-2 px-3 rounded-4' value={groupName} onChange={e => setGroupName(e.target.value)} placeholder='enter group name' required />
+                                <button type='submit' className='p-2 rounded-4' >CONTINUE</button>
                             </form>
                         </div>
                         :

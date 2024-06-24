@@ -18,9 +18,8 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // const db = getFirestore(firebaseApp);
 
     const [groupInfo, setGroupInfo] = useState();
-
+    
     const [showGroupModal, setShowGroupModal] = useState(false)
-    const [memberList, setMemberList] = useState([])
 
 
     useEffect(() => {
@@ -62,12 +61,14 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                 console.log('ifff222',parsedInfo[groupId]?.info)
                 getAndSetFreshData();
             } else {
-                console.log('ifff111else 22',parsedInfo[groupId]?.info)
+                data?.members?.forEach(x=>{
+                    if(parsedInfo[groupId]?.info?.hasOwnProperty(x.name)){
+                        x.avatar = parsedInfo[groupId]?.info[x.name];
+                    }
+                })
                 setGroupInfo(data);
-                setMemberList(parsedInfo[groupId]?.info);
             }
         } else {
-            console.log('elseeeee22',)
             // info needed to be added
             getAndSetFreshData();
         }
@@ -80,21 +81,25 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                 updatedAt: new Date().getTime(),
             }
 
-            // appending the group info in localstorage
-            parsedInfo[groupId] = infoData;
+            parsedInfo[groupId] = infoData; // appending the group info in localstorage
             localStorage.setItem('groupInfo', JSON.stringify(parsedInfo))
+            data?.members?.forEach(x=>{
+                if(parsedInfo[groupId]?.info?.hasOwnProperty(x.name)){
+                    x.avatar = parsedInfo[groupId]?.info[x.name];
+                }
+            })
             setGroupInfo(data);
-            setMemberList(parsedInfo[groupId]?.info)
         }
     }
 
     async function getGroupInfo(groupMembers) {
-        let info = [];
+        let info = {};
         for (let x of groupMembers) {
             let q = query(collection(db, "users"), where("username", "==", x.name));
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
-                info.push({ name: x.name, avatar: doc.data()?.avatar });
+                // info.push({ name: x.name, avatar: doc.data()?.avatar });
+                info[x.name] = doc.data()?.avatar;
             });
         }
         console.log('info', info)
@@ -202,7 +207,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                         </div>
 
                         <div className="member_list w-100">
-                            {memberList?.map(x => (
+                            {groupInfo?.members?.map(x => (
                                 <div className="list" key={x.name}>
                                     <section className="chat_list_item" >
                                         <img src={x.avatar} className="me-2" alt="" />
@@ -233,14 +238,10 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
             {showGroupModal &&
                 <>
                     <GroupModal
-                        setShowGroupModal={setShowGroupModal}
-                        // handleSelectedUserToChat={handleSelectedUserToChat}
-                        // searchedUserList={searchedUserList}
-                        // setSearchedUserList={setSearchedUserList}
                         type="add_member"
-                        memberList={memberList}
                         groupInfo={groupInfo}
                         setGroupInfo={setGroupInfo}
+                        setShowGroupModal={setShowGroupModal}
                     />
                     {/* <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div> */}
                 </>

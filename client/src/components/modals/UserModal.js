@@ -6,15 +6,13 @@ import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, getFirestore, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { SHOW_CONFIMATION_MODAL } from '../../redux/actionTypes'
+import { showConfirmationModal } from '../../redux/actionTypes'
 
 const UserModal = ({ setShowUserModal }) => {
 
     const dispatch = useDispatch()
+    const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
-    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
-    // const db = getFirestore(firebaseApp);
-    const { firebaseApp, db } = useContext(FirebaseContext);
 
 
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
@@ -22,12 +20,16 @@ const UserModal = ({ setShowUserModal }) => {
     const [showThemeModal, setShowThemeModal] = useState(false)
 
     const togglePrivacy = async (e) => {
-        dispatch({ type: SHOW_CONFIMATION_MODAL, payload: true })
-        // const docRef = doc(db, "users", userData?.id);
-        // await updateDoc(docRef, {
-        //     privacy: e.target.checked
-        // });
+        const newPrivacySetting = e.target.checked;
+        dispatch(showConfirmationModal(() => confirmTogglePrivacy(newPrivacySetting)))
     }
+
+    const confirmTogglePrivacy = async (newPrivacySetting) => {
+        const docRef = doc(db, "users", userData?.id);
+        await updateDoc(docRef, {
+            privacy: newPrivacySetting,
+        });
+    };
 
     return (
         <>

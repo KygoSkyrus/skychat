@@ -1,9 +1,10 @@
-import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIMATION_MODAL } from "./../actionTypes";
+import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL } from "./../actionTypes";
 
 const initialState = {
   sidebar: false,
   resetUserSearchList: false,
-  showConfirmationModal: false,
+  isConfirmationModalVisible: false,
+  onConfirm: null,
 };
 
 export const uiReducer = (state = initialState, action) => {
@@ -21,10 +22,19 @@ export const uiReducer = (state = initialState, action) => {
         resetUserSearchList: action.payload
       }
     }
-    case SHOW_CONFIMATION_MODAL: {
+    case SHOW_CONFIRMATION_MODAL: {
+      console.log('SHOW_CONFIRMATION_MODAL',action.payload)
       return {
         ...state,
-        showConfirmationModal: action.payload
+        isConfirmationModalVisible: true,
+        onConfirm: action.payload,
+      }
+    }
+    case HIDE_CONFIRMATION_MODAL: {
+      return {
+        ...state,
+        isConfirmationModalVisible: false,
+        onConfirm: null,
       }
     }
 
