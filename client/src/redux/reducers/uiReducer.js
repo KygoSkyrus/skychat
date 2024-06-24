@@ -1,8 +1,9 @@
-import { SET_SIDEBAR, RESET_USERS_LIST } from "./../actionTypes";
+import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIMATION_MODAL } from "./../actionTypes";
 
 const initialState = {
   sidebar: false,
   resetUserSearchList: false,
+  showConfirmationModal: false,
 };
 
 export const uiReducer = (state = initialState, action) => {
@@ -18,6 +19,12 @@ export const uiReducer = (state = initialState, action) => {
       return {
         ...state,
         resetUserSearchList: action.payload
+      }
+    }
+    case SHOW_CONFIMATION_MODAL: {
+      return {
+        ...state,
+        showConfirmationModal: action.payload
       }
     }
 

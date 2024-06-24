@@ -15,6 +15,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import Toast from "./Toast";
 import EntityInfoModal from "./modals/EntityInfoModal";
 import { FirebaseContext } from "../firebaseContext";
+import ConfirmationModal from "./modals/ConfirmationModal";
 
 
 export const NewRTCA = () => {
@@ -459,6 +460,8 @@ export const NewRTCA = () => {
               <div className="overlay pointer zIndex4" onClick={() => setShowEntityInfoModal(false)}></div>
             </>
           }
+
+          <ConfirmationModal/>
 
         </div>
         <Toast />

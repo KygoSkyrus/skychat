@@ -1,14 +1,16 @@
 import { ArrowLeft, Edit, X } from 'lucide-react'
 import React, { useContext, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import EditAvatarModal from './EditAvatarModal'
 import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, getFirestore, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
+import { SHOW_CONFIMATION_MODAL } from '../../redux/actionTypes'
 
 const UserModal = ({ setShowUserModal }) => {
 
+    const dispatch = useDispatch()
     const userData = useSelector(state => state.user.userInfo)
     // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
     // const db = getFirestore(firebaseApp);
@@ -20,10 +22,11 @@ const UserModal = ({ setShowUserModal }) => {
     const [showThemeModal, setShowThemeModal] = useState(false)
 
     const togglePrivacy = async (e) => {
-        const docRef = doc(db, "users", userData?.id);
-        await updateDoc(docRef, {
-            privacy: e.target.checked
-        });
+        dispatch({ type: SHOW_CONFIMATION_MODAL, payload: true })
+        // const docRef = doc(db, "users", userData?.id);
+        // await updateDoc(docRef, {
+        //     privacy: e.target.checked
+        // });
     }
 
     return (
@@ -57,7 +60,7 @@ const UserModal = ({ setShowUserModal }) => {
                             <li className='chat_list_item privacy'>
                                 <span>Privacy</span>
                                 <span className='d-flex justify-content-end'>
-                                    <input type="checkbox" id='privacy' checked={userData?.privacy} onChange={(e)=>togglePrivacy(e)} />
+                                    <input type="checkbox" id='privacy' checked={userData?.privacy} onChange={(e) => togglePrivacy(e)} />
                                     <label htmlFor="privacy"></label>
                                 </span>
                             </li>

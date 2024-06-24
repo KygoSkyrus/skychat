@@ -82,7 +82,7 @@ function App() {
 
   return (
     <div className="App">
-      {/* <div className="layer"></div> */}
+      {/* <div className="transparent-overlay"></div> */}
       <>
         <Routes>
           <Route exact path="/" element={<Authenticate

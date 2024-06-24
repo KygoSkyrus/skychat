@@ -330,7 +330,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 });
 
                 // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
-                if(messageList.length === 0) realtimeListener(selectedUserToChat, connectionId)
+                if (messageList.length === 0) realtimeListener(selectedUserToChat, connectionId)
             }
 
             const msgData = {
@@ -365,7 +365,10 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         <div className="chat-body" id="chatBody">
             {/* <div className='layer'></div> */}
             <div className="chat-box zIndex1" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
-            <div className='layer'></div>
+                <div className='bg-layer'></div>
+                {showEmojiPicker &&
+                    <div className="transparent-overlay" onClick={() => setShowEmojiPicker(!showEmojiPicker)}></div>
+                }
                 {loading &&
                     <div className="text-center">
                         <div className="spinner-border" role="status">
@@ -446,10 +449,20 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                         />
                         <span className='emoji-picker pointer' onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
                             <SmilePlus />
-                            <div>
-                                <EmojiPicker open={showEmojiPicker} onEmojiClick={onEmojiClick} />
-                            </div>
                         </span>
+                        <div>
+                            <EmojiPicker
+                                open={showEmojiPicker}
+                                onEmojiClick={onEmojiClick}
+                                theme='light'
+                                emojiStyle='native'
+                                lazyLoadEmojis={true}
+                                previewConfig={{
+                                    showPreview: false,
+                                }}
+                            // reactionsDefaultOpen={true}
+                            />
+                        </div>
                         <button onClick={() => sendText()} className="rounded-2 sendBtn"><Send /></button>
                     </div>
                 )

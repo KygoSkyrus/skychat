@@ -25,12 +25,12 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
     useEffect(() => {
         const docRef = doc(db, "group", selectedUserToChat);
-        let groupMembers;
+        // let groupMembers;
         const unsubscribe = onSnapshot(docRef, (doc) => {
             console.log("Document data:", doc.data());
-            groupMembers = doc.data()?.members;
-            setGroupInfo(doc.data());// setting basic info
-            setInfo(groupMembers, doc.id); //handles group member's list
+            // groupMembers = doc.data()?.members;
+            // setGroupInfo(doc.data());// setting basic info (now updating along with memberlist state)
+            setInfo(doc.data(), doc.id); //handles group member's list
         });
         // get the group memebers name and by that fetch their avatar... save the data in localstoreage with the timesatamp..
         // now this function will only run if the timestamps of data in the locastorge is more than 2 or 3 hours ago        
@@ -39,7 +39,9 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
         return () => unsubscribe();
     }, [])
 
-    async function setInfo(groupMembers, groupId) {
+    console.log('-------------setGroupInfo',groupInfo)
+
+    async function setInfo(data, groupId) {
         let localGroupInfo = localStorage.getItem('groupInfo');
         console.log('localGroupInfo', localGroupInfo)
 
@@ -61,6 +63,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                 getAndSetFreshData();
             } else {
                 console.log('ifff111else 22',parsedInfo[groupId]?.info)
+                setGroupInfo(data);
                 setMemberList(parsedInfo[groupId]?.info);
             }
         } else {
@@ -71,15 +74,16 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
         // calling this only when the groupInfo is not availalble or when the info is outdate(more than 6hrs old)
         async function getAndSetFreshData(){
-            let info = await getGroupInfo(groupMembers);
-            let data = {
+            let info = await getGroupInfo(data?.members);
+            let infoData = {
                 info,
                 updatedAt: new Date().getTime(),
             }
 
             // appending the group info in localstorage
-            parsedInfo[groupId] = data;
+            parsedInfo[groupId] = infoData;
             localStorage.setItem('groupInfo', JSON.stringify(parsedInfo))
+            setGroupInfo(data);
             setMemberList(parsedInfo[groupId]?.info)
         }
     }
@@ -197,8 +201,8 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                             </span>
                         </div>
 
-                        <div className="member_list w-100">{
-                            memberList?.map(x => (
+                        <div className="member_list w-100">
+                            {memberList?.map(x => (
                                 <div className="list" key={x.name}>
                                     <section className="chat_list_item" >
                                         <img src={x.avatar} className="me-2" alt="" />
@@ -217,8 +221,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                                         </section>
                                     }
                                 </div>
-                            )
-                            )}
+                            ))}
                         </div>
 
 

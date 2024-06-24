@@ -63,9 +63,12 @@
 - [done]NEWrtc is rendering two times on few actions such as toggling header, or on loading ( it is bcz of two useeffects and also there is a state update in fetchdata in useeffect) [investigating about this.. is it really a problem or is normal behaviour]{finding:: its a necessity,, and also its not causing its child to rerender so its not that expensive. also on the second rerender fetchdata is not called as the second ue has dependency array}
 - [done]have to do something about onchange in search comopnent,, onevery key press its making newrtc rerender,,, maybe we are passing a state from newrtc to searchcomonnent thats why its rerendering,, bcz techinically it shouldnt,, as serchcomp is a child of newrtc [removed setSearchduserlist from newrtc,, it was passed down the line,now the state in serch component itself]
 - [done]maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
+- [done]add custom attribute in emoji picker
+- [done]add a layer to close the emoji picker
 
-- add a layer to close the emoji picker
-- add custom attribute in emoji picker
+- on every modal we have create a state in parent from where the modal will be publised,,, we did this to control visisibility,, this way the parent component itself renders when this state toggles as well as the child,, but what if we dispatch an action from parent,,, and get the state in child only, than maybe we will be able to save parent to rerender,, and from child componnet we can return null if the state is false and the child if its true
+- need to have overlay for few modals(block,entity,editavatar,theme), so that the specif modal is closed,, now whats happening is that if you close editavatar modal than it will close the usermodal too,bcz its using usermodal's overlay,, same with blocked connection modal.. if the above modal approcah is implemented than we can hve[.... maybe not...how will be configure that which modal is supposed to be closeD???9-sol,,, do what is done in confirmation modal]
+
 - need to check and optimize chatbox componnet
 
 # Todo 
@@ -138,6 +141,7 @@ https://pngtree.com/freepng/programmer-computer-3d-character-cartoon-three-dimen
 - add msgs copy and reply feature (least pripority)
 - msg delete option for both parties if the msg was sent in between a specific hour 
 - when switching between users or interfaces in chat body,, add animation like slide in up down when iterface is changed
+- can add reactions on msgs ,, on click add a function that will show reactions ,,a common reaction will be there for all msgs.. or maybe use the exiting picker... that on msg documnet adda key reaction.. which willl hold the reaction value.. one person can only have one reaction on a msg
 
 
 # Things to implement in version #3
