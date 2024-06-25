@@ -423,7 +423,7 @@ body {
   padding: 1px;
   min-width: 88px;
   color: #eaeaea;
-  background: #ababab;
+  background: #ffffff3d;
   border-radius: 3px;
 }
 
@@ -1093,7 +1093,7 @@ input[type="search"] {
   object-fit: cover;
 }
 #themeModal .avatar_grid:hover img{
-  filter: blur(2px);
+  filter: blur(1px);
 }
 #themeModal .avatar_grid img:hover {
   /* transform: scale(1.5) !important; */

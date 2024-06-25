@@ -1,4 +1,4 @@
-import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL } from "./../actionTypes";
+import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL } from "./../actionTypes";
 
 const initialState = {
   sidebar: false,
@@ -6,12 +6,17 @@ const initialState = {
   isConfirmationModalVisible: false,
   onConfirm: null,
   confirmationText: '',
+  isUserModalVisible: false,
+  isThemeModalVisible: false,
+  isGroupModalVisible: false,
+  isEntityInfoModalVisible: false,
+  isEditAvatarModalVisible: false,
+  isBlockedConnectionsModalVisible: false,
 };
 
 export const uiReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_SIDEBAR: {
-      console.log('sety side bar', action)
       return {
         ...state,
         sidebar: action.payload,
@@ -24,7 +29,6 @@ export const uiReducer = (state = initialState, action) => {
       }
     }
     case SHOW_CONFIRMATION_MODAL: {
-      console.log('SHOW_CONFIRMATION_MODAL',action.payload)
       return {
         ...state,
         isConfirmationModalVisible: true,
@@ -37,6 +41,48 @@ export const uiReducer = (state = initialState, action) => {
         ...state,
         isConfirmationModalVisible: false,
         onConfirm: null,
+      }
+    }
+
+    case SHOW_USER_MODAL: {
+      return {
+        ...state,
+        isUserModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_THEME_MODAL: {
+      return {
+        ...state,
+        isThemeModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_GROUP_MODAL: {
+      return {
+        ...state,
+        isGroupModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_ENTITY_INFO_MODAL: {
+      return {
+        ...state,
+        isEntityInfoModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_EDIT_AVATAR_MODAL: {
+      return {
+        ...state,
+        isEditAvatarModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_BLOCKED_CONNECTIONS_MODAL: {
+      return {
+        ...state,
+        isBlockedConnectionsModalVisible: action.payload,
       }
     }
 

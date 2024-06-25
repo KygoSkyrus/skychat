@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO, showConfirmationModal } from "../redux/actionTypes";
+import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { showConfirmationModal } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
@@ -240,22 +241,19 @@ export const NewRTCA = () => {
                   </span>
                   {userData?.connections.hasOwnProperty(selectedUserToChat) &&
                     <ul className="dropdown-menu p-2">
-                      <li className="dropdown-item pointer" onClick={() => clearChat(selectedUserToChat)}>Clear chat</li>
-                      {/* {userData?.connections[selectedUserToChat]?.hasOwnProperty('exitAt') ?
-                        <li className="dropdown-item pointer" onClick={() => deleteConnection(selectedUserToChat)}>
-                          Delete Group
-                        </li>
-                        : */}
-                      <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false) : deleteConnection(selectedUserToChat)}>
-                        {isGroupSelected ? 'Exit Group' : 'Delete connection'}
-                      </li>
-                      {/* } */}
+                      <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Do you want to clear this chat?`, () => clearChat(selectedUserToChat)))}>Clear chat</li>
                       {isGroupSelected ?
-                        <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
+                        <>
+                          <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit this group <code>${selectedGroupName}</code>?`, () => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)))}>Exit Group</li>
+                          <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
+                        </>
                         :
-                        <li className="dropdown-item pointer"
-                          onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${selectedUserToChat}?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
-                        >Block connection</li>
+                        <>
+                          <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to delete connection with <code>${selectedUserToChat}</code>?`, () => deleteConnection(selectedUserToChat)))}>Delete connection</li>
+                          <li className="dropdown-item pointer"
+                            onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
+                          >Block connection</li>
+                        </>
                       }
                     </ul>
                   }
@@ -331,16 +329,16 @@ export const NewRTCA = () => {
 
                           {/* ACTIONS */}
                           {userData?.connections[x]?.groupName ?
-                            <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat, false, false)} title="Exit group">
+                            <section className="blockConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${userData?.connections[x].groupName}</code>?`, () => exitGroup(db, userData, x, setSelectedUserToChat, false, false)))} title="Exit group">
                               <LogOut size={18} />
                             </section>
                             :
                             <>
-                              <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
+                              <section className="deleteConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to delete connection with <code>${x}</code>?`, () => deleteConnection(x)))} title="Delete connection">
                                 <UserRoundX size={18} />
                               </section>
                               <section className="blockConnection"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${x}?`, () => blockConnection(db, userData, x, setSelectedUserToChat)))}
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${x}</code>?`, () => blockConnection(db, userData, x, setSelectedUserToChat)))}
                                 title="Block connection">
                                 <Ban size={18} />
                               </section>
@@ -384,17 +382,17 @@ export const NewRTCA = () => {
                             <UserCheck2 size={18} />
                           </section>
                           {uName?.groupName ?
-                            <section className="declineReq overrideClrRed" onClick={() => exitGroup(db, userData, id, setSelectedUserToChat, false)} title="Decline & exit group">
+                            <section className="declineReq overrideClrRed" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${uName?.groupName}</code>?`, () => exitGroup(db, userData, id, setSelectedUserToChat, false)))} title="Decline & exit group">
                               <UserRoundX size={18} />
                             </section>
                             :
                             <>
-                              <section className="blockReq declineReq" onClick={() => declineConnectionReq(db, userData, id, setSelectedUserToChat)} title="Decline connection">
+                              <section className="blockReq declineReq" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, id, setSelectedUserToChat)))} title="Decline connection">
                                 {/* <Trash size={18} /> */}
                                 <UserRoundX size={18} />
                               </section>
                               <section className="blockReq"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${uName}?`, () => blockConnection(db, userData, id, setSelectedUserToChat)))}
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${uName}</code>?`, () => blockConnection(db, userData, id, setSelectedUserToChat)))}
                                 title="Block connection">
                                 {/* <UserRoundX size={18} /> */}
                                 <Ban size={18} />
@@ -432,8 +430,6 @@ export const NewRTCA = () => {
                 setShowEntityInfoModal={setShowEntityInfoModal}
                 selectedUserToChat={selectedUserToChat}
                 selectedGroupName={selectedGroupName}
-              // searchedUserList={searchedUserList}
-              // setSearchedUserList={setSearchedUserList}
               />
               <div className="overlay pointer zIndex4" onClick={() => setShowEntityInfoModal(false)}></div>
             </>

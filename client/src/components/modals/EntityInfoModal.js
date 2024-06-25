@@ -6,6 +6,7 @@ import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr
 import GroupModal from './GroupModal'
 import { SET_TOAST } from '../../redux/actionTypes'
 import { FirebaseContext } from '../../firebaseContext'
+import { showConfirmationModal } from '../../redux/actionCreators'
 
 
 const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedGroupName }) => {
@@ -18,7 +19,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     // const db = getFirestore(firebaseApp);
 
     const [groupInfo, setGroupInfo] = useState();
-    
+
     const [showGroupModal, setShowGroupModal] = useState(false)
 
 
@@ -38,7 +39,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
         return () => unsubscribe();
     }, [])
 
-    console.log('-------------setGroupInfo',groupInfo)
+    console.log('-------------setGroupInfo', groupInfo)
 
     async function setInfo(data, groupId) {
         let localGroupInfo = localStorage.getItem('groupInfo');
@@ -58,11 +59,11 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
             console.log('time difff', ((currTime - lastUpdatedAt) / 60 / 1000))
             // if last updated before 6 hours than get fresh data  (the below equation returns time in min)
             if (((currTime - lastUpdatedAt) / 60 / 1000) > 360) {
-                console.log('ifff222',parsedInfo[groupId]?.info)
+                console.log('ifff222', parsedInfo[groupId]?.info)
                 getAndSetFreshData();
             } else {
-                data?.members?.forEach(x=>{
-                    if(parsedInfo[groupId]?.info?.hasOwnProperty(x.name)){
+                data?.members?.forEach(x => {
+                    if (parsedInfo[groupId]?.info?.hasOwnProperty(x.name)) {
                         x.avatar = parsedInfo[groupId]?.info[x.name];
                     }
                 })
@@ -74,7 +75,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
         }
 
         // calling this only when the groupInfo is not availalble or when the info is outdate(more than 6hrs old)
-        async function getAndSetFreshData(){
+        async function getAndSetFreshData() {
             let info = await getGroupInfo(data?.members);
             let infoData = {
                 info,
@@ -83,8 +84,8 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
             parsedInfo[groupId] = infoData; // appending the group info in localstorage
             localStorage.setItem('groupInfo', JSON.stringify(parsedInfo))
-            data?.members?.forEach(x=>{
-                if(parsedInfo[groupId]?.info?.hasOwnProperty(x.name)){
+            data?.members?.forEach(x => {
+                if (parsedInfo[groupId]?.info?.hasOwnProperty(x.name)) {
                     x.avatar = parsedInfo[groupId]?.info[x.name];
                 }
             })
@@ -207,26 +208,30 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                         </div>
 
                         <div className="member_list w-100">
-                            {groupInfo?.members?.map(x => (
-                                <div className="list" key={x.name}>
-                                    <section className="chat_list_item" >
-                                        <img src={x.avatar} className="me-2" alt="" />
-                                        <div>
-                                            <span>{x.name}</span>
-                                            {x.name === groupInfo?.createdBy &&
-                                                <section className='fs-10' style={{ color: 'var(--green)', lineHeight: "8px" }}>Admin</section>
-                                            }
-                                        </div>
-                                    </section>
-                                    {x.name !== userData.username &&
-                                        <section className="blockConnection"
-                                            onClick={() => removeMember(x.name)}
-                                            title="Kick out">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-x"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg>
+                            {groupInfo?.members ?
+                                groupInfo?.members?.map(x => (
+                                    <div className="list" key={x.name}>
+                                        <section className="chat_list_item" >
+                                            <img src={x.avatar} className="me-2" alt="" />
+                                            <div>
+                                                <span>{x.name}</span>
+                                                {x.name === groupInfo?.createdBy &&
+                                                    <section className='fs-10' style={{ color: 'var(--green)', lineHeight: "8px" }}>Admin</section>
+                                                }
+                                            </div>
                                         </section>
-                                    }
-                                </div>
-                            ))}
+                                        {x.name !== userData.username &&
+                                            <section className="blockConnection"
+                                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to kick <code>${x.name}</code> out of group?`, () => removeMember(x.name)))}
+                                                title="Kick out">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-x"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6" /><path d="m9 9 6 6" /></svg>
+                                            </section>
+                                        }
+                                    </div>
+                                ))
+                                :
+                                <div className="custom-loader my-3"></div>
+                            }
                         </div>
 
 

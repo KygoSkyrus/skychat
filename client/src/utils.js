@@ -118,7 +118,7 @@ export const dbUsers = {
                 "id": "90bd529e-a8e1-4667-8607-b6dda7356641"
             }
         },
-        "privacy": true,
+        "privacy": false,
         "connections": {
             "test6": {
                 "id": "1162eb04-dd2d-49af-b0b3-6aee795bef32"

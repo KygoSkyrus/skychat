@@ -6,14 +6,14 @@ import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { showConfirmationModal } from '../../redux/actionTypes'
+import { showConfirmationModal, showUserModal } from '../../redux/actionCreators'
 
-const UserModal = ({ setShowUserModal }) => {
+const UserModal = () => {
 
     const dispatch = useDispatch()
     const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
-
+    const { isUserModalVisible } = useSelector((state) => state.ui);
 
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
     const [showBlockedConnections, setShowBlockedConnections] = useState(false)
@@ -21,7 +21,7 @@ const UserModal = ({ setShowUserModal }) => {
 
     const handleTogglePrivacy = async (e) => {
         const newPrivacySetting = e.target.checked;
-        dispatch(showConfirmationModal('Do you want to toggle the privacy?', () => togglePrivacy(newPrivacySetting)))
+        dispatch(showConfirmationModal(`Are you sure you want to turn your account's privacy ${e.target.checked ? 'on' : 'off'}?`, () => togglePrivacy(newPrivacySetting)))
     }
 
     const togglePrivacy = async (newPrivacySetting) => {
@@ -31,14 +31,16 @@ const UserModal = ({ setShowUserModal }) => {
         });
     };
 
+    if (!isUserModalVisible) return null;
+
     return (
         <>
             <div className="" id="userModal" >
                 <div className="m-dialog justify-content-center bg-dark rounded-1">
 
-                    <div className='d-flex align-items-center justify-content-between p-3' style={{position: 'absolute',width: '100%'}}>
-                        {/* <X size="20" className='btn-close' onClick={() => setShowUserModal(false)} /> */}
-                        <ArrowLeft size="16" className='text-secondary '  onClick={() => setShowUserModal(false)} />
+                    <div className='d-flex align-items-center justify-content-between p-3' style={{ position: 'absolute', width: '100%' }}>
+                        {/* <X size="20" className='btn-close' onClick={() => dispatch(showUserModal(false))} /> */}
+                        <ArrowLeft size="16" className='text-secondary ' onClick={() => dispatch(showUserModal(false))} />
                         <span className='text-secondary fs-12'>Settings</span>
                     </div>
 
@@ -72,6 +74,8 @@ const UserModal = ({ setShowUserModal }) => {
 
                 </div>
             </div>
+            <div className="overlay pointer zIndex4" onClick={() => dispatch(showUserModal(false))}></div>
+
 
             {showEditAvatarModal &&
                 <>

@@ -15,16 +15,14 @@ export const RESET_TOAST = "RESET/TOAST";
 // UI actions
 export const SET_SIDEBAR = "SET/SIDEBAR";
 export const RESET_USERS_LIST = "RESET/USERS_LIST";
+
+// Modals
 export const SHOW_CONFIRMATION_MODAL = "SHOW/CONFIRMATION_MODAL";
 export const HIDE_CONFIRMATION_MODAL = "HIDE/CONFIRMATION_MODAL";
 
-// we have avoided using action creators, direct type and payload are dispatched from components
-// only following action creators are used for confirmation modal
-export const showConfirmationModal = (confirmationText, onConfirm) => ({
-    type: SHOW_CONFIRMATION_MODAL,
-    payload: { confirmationText, onConfirm },
-});
-
-export const hideConfirmationModal = () => ({
-    type: HIDE_CONFIRMATION_MODAL,
-});
+export const SHOW_USER_MODAL = "SHOW/USER_MODAL";
+export const SHOW_THEME_MODAL = "SHOW/THEME_MODAL";
+export const SHOW_EDIT_AVATAR_MODAL = "SHOW/EDIT_AVATAR_MODAL";
+export const SHOW_GROUP_MODAL = "SHOW/GROUP_MODAL";
+export const SHOW_ENTITY_INFO_MODAL = "SHOW/ENTITY_INFO_MODAL";
+export const SHOW_BLOCKED_CONNECTIONS_MODAL = "SHOW/BLOCKED_CONNECTIONS_MODAL";

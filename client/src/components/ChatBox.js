@@ -11,7 +11,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { FirebaseContext } from '../firebaseContext';
 
 import EmojiPicker from 'emoji-picker-react';
-import { showConfirmationModal } from '../redux/actionTypes';
+import { showConfirmationModal } from '../redux/actionCreators'; 
 
 
 
@@ -36,7 +36,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
     const requestList = useSelector(state => state.user.requestList)// has request list connections (connections to show)
     const appliedTheme = useSelector(state => state.user.theme)
 
-    console.log('rrrrrrrrrrr', requestList, requestList[selectedUserToChat])
+    console.log('rrrrrrrrrrr', requestList)
 
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -416,19 +416,21 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 <div ref={dummy}></div>
             </div>
 
-            {/* {userData?.requests[selectedUserToChat] ? */}
             {requestList?.includes(selectedUserToChat) ?// only show these action for reqList connections
                 // when request chat is opened
                 (<div className="req_btn zIndex1">
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat, dispatch)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat]?.groupName ?
-                            <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}>Leave group</section>
+                            <section className="enq_btn delete mt-1" 
+                            // onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}
+                            onClick={() => dispatch(showConfirmationModal(`Are you sure you want to leave this group?`, () => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)))}
+                            >Leave group</section>
                             :
                             <>
-                                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Decline</section>
-                                <section className="enq_btn delete mt-1" 
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${selectedUserToChat}?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
+                                <section className="enq_btn delete mt-1" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)))}>Decline</section>
+                                <section className="enq_btn delete mt-1"
+                                    onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
                                 >Block</section>
                             </>
                         }
