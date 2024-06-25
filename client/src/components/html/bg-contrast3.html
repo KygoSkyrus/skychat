@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+25&family=Orbitron:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        .overlay {
+            background: #080808;
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+        }
+
+        .name {
+            overflow: hidden;
+            height: 100vh;
+            /* background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/2017/17_04_art_bw_butterfly_bg.jpg) 50%/ cover; */
+            background: url('./bg2.png') 50%/ contain no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            /* to rotate */
+            -webkit-animation: spin 40s linear infinite;
+            -moz-animation: spin 40s linear infinite;
+            animation: spin 40s linear infinite;
+        }
+
+        @-moz-keyframes spin {
+            100% {
+                -moz-transform: rotate(360deg);
+            }
+        }
+
+        @-webkit-keyframes spin {
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            100% {
+                -webkit-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        section {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 70px;
+            font-family: "Jersey 25", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            mix-blend-mode: difference;
+            font: 900 35vmin/35vh cookie, "Jersey 25", sans-serif;
+            text-align: center;
+
+            /*play with these two - color and bg*/
+            /* background: #8e4242;  */
+            color: rgb(209, 209, 209);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="name"></div>
+    <section>
+        CYBERPUNK
+    </section>
+
+
+</body>
+
+</html>

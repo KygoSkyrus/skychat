@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import EditAvatarModal from './EditAvatarModal'
 import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
-import { doc, getFirestore, updateDoc } from 'firebase/firestore'
+import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
 import { showConfirmationModal } from '../../redux/actionTypes'
 
@@ -19,12 +19,12 @@ const UserModal = ({ setShowUserModal }) => {
     const [showBlockedConnections, setShowBlockedConnections] = useState(false)
     const [showThemeModal, setShowThemeModal] = useState(false)
 
-    const togglePrivacy = async (e) => {
+    const handleTogglePrivacy = async (e) => {
         const newPrivacySetting = e.target.checked;
-        dispatch(showConfirmationModal(() => confirmTogglePrivacy(newPrivacySetting)))
+        dispatch(showConfirmationModal('Do you want to toggle the privacy?', () => togglePrivacy(newPrivacySetting)))
     }
 
-    const confirmTogglePrivacy = async (newPrivacySetting) => {
+    const togglePrivacy = async (newPrivacySetting) => {
         const docRef = doc(db, "users", userData?.id);
         await updateDoc(docRef, {
             privacy: newPrivacySetting,
@@ -36,10 +36,10 @@ const UserModal = ({ setShowUserModal }) => {
             <div className="" id="userModal" >
                 <div className="m-dialog justify-content-center bg-dark rounded-1">
 
-                    <div className='d-flex align-items-center justify-content-between'>
-                        <X size="20" className='btn-close' onClick={() => setShowUserModal(false)} />
-                        {/* <ArrowLeft size="20" className='text-secondary '  onClick={() => setShowUserModal(false)} />
-                        <span className='text-secondary fs-12'>Profile</span> */}
+                    <div className='d-flex align-items-center justify-content-between p-3' style={{position: 'absolute',width: '100%'}}>
+                        {/* <X size="20" className='btn-close' onClick={() => setShowUserModal(false)} /> */}
+                        <ArrowLeft size="16" className='text-secondary '  onClick={() => setShowUserModal(false)} />
+                        <span className='text-secondary fs-12'>Settings</span>
                     </div>
 
 
@@ -62,7 +62,7 @@ const UserModal = ({ setShowUserModal }) => {
                             <li className='chat_list_item privacy'>
                                 <span>Privacy</span>
                                 <span className='d-flex justify-content-end'>
-                                    <input type="checkbox" id='privacy' checked={userData?.privacy} onChange={(e) => togglePrivacy(e)} />
+                                    <input type="checkbox" id='privacy' checked={userData?.privacy} onChange={(e) => handleTogglePrivacy(e)} />
                                     <label htmlFor="privacy"></label>
                                 </span>
                             </li>

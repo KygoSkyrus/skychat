@@ -1,21 +1,17 @@
-import { Trash, Upload, X } from 'lucide-react'
 import React, { useContext, useState } from 'react'
-import { getAvatarUrl } from '../../utils'
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
-
+import { Upload, X } from 'lucide-react'
+import { doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
-import { initializeApp } from 'firebase/app';
-// import { firebaseConfig } from '../../firebaseConfig';
-import { useSelector } from 'react-redux';
-import { doc, getFirestore, updateDoc } from 'firebase/firestore';
+
 import { FirebaseContext } from '../../firebaseContext';
+import { SET_TOAST } from '../../redux/actionTypes';
+import { getAvatarUrl } from '../../utils'
 
 
 const EditAvatarModal = ({ setShowEditAvatarModal }) => {
-
-    // const firebaseApp = initializeApp(firebaseConfig);// need to make it gloabl
-    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
-    // const db = getFirestore(firebaseApp);
+    const dispatch = useDispatch();
     const { firebaseApp, db } = useContext(FirebaseContext);
     const storage = getStorage(firebaseApp);
 
@@ -27,6 +23,11 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
     async function changeAvatar(e) {
 
+        if (selectedAvatar === userData?.avatar) {
+            dispatch({ type: SET_TOAST, payload: { toastContent: "Select different avatar or upload new", isError: true } })
+            return;
+        }
+
         let updatedAvatar;
 
         let storageRef = ref(storage, "skychatProfiles/" + uuidv4());
@@ -35,7 +36,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
 
         if (uploadAvatar) {
-            let ref= await uploadBytes(storageRef, uploadAvatar).then((snapshot) => {
+            let ref = await uploadBytes(storageRef, uploadAvatar).then((snapshot) => {
                 console.log('Uploaded a blob or file!', snapshot);
                 console.log('jdjdjdjd', snapshot.ref)
 
@@ -47,16 +48,16 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
             )
 
             let dl = await getDownloadURL(ref)
-                    .then((downloadURL) => {
-                        updatedAvatar = downloadURL
-                        return downloadURL
-                    });
-            console.log('updatedd avatyar',updatedAvatar,dl)
+                .then((downloadURL) => {
+                    updatedAvatar = downloadURL
+                    return downloadURL
+                });
+            console.log('updatedd avatyar', updatedAvatar, dl)
 
             const userDocRef = doc(db, "users", userData.id);
-                await updateDoc(userDocRef, {
-                    avatar: updatedAvatar
-                });
+            await updateDoc(userDocRef, {
+                avatar: updatedAvatar
+            });
             // const uploadTask = uploadBytesResumable(storageRef, uploadAvatar.image[index]);
             // uploadTask.on('state_changed',
             //     (snapshot) => {
@@ -92,6 +93,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
                 });
             }
         }
+        dispatch({ type: SET_TOAST, payload: { toastContent: "Profile updated", isError: false } })
 
     }
 

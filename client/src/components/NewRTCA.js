@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO, showConfirmationModal } from "../redux/actionTypes";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
@@ -79,16 +79,18 @@ export const NewRTCA = () => {
   async function fetchData() {
     // this function filters the requests which are recent(fresh ones and the one which has new msgs after deleted earlier)
     const connections = [];
+    const ids = [];
     if (Object.keys(userData?.requests)) {
       for (const uName of Object.keys(userData?.requests)) {
         const hasNewMessages = await getConnectionRequests(uName);
         if (hasNewMessages) {
           connections.push(userData?.requests[uName].groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
+          ids.push(uName); // for chatbox to hide show the chat input field
         }
       }
     }
     setConnectionsToShow(connections);
-    dispatch({ type: SET_REQUEST_LIST, payload: connections })
+    dispatch({ type: SET_REQUEST_LIST, payload: ids })
   };
 
   // removed this and appened the logic in above useefect where fetchData was called (updated depenedency array with connectionHeader)
@@ -97,29 +99,6 @@ export const NewRTCA = () => {
   // }, [connectionHeader])
 
   console.log('connextions sto show', connectionsToShow)
-
-
-
-  //getting alluser may not be needed,, just query the user when user search,,...its only needed bcz of avatar,,we have only stored username in the connecction list,,if we can also store the image than this willbe not needed at all... and if its still needed than create a snapshot at the topmost level so that it wont be trigggered in any case,, also cache this and this will only run when a new user is created(snapshot will handle that)...
-  async function getAllUsersList() {
-    console.log('+++++++++++++++++++++getAllUsersList')
-
-    // dispatch({ type: SET_USERS_LIST, payload: dbUsers })
-
-    // commented for testing 
-    // await getDocs(collection(db, "users"))
-    // .then((querySnapshot) => {
-    //   let userList={};
-    //   querySnapshot.docs
-    //     .map((doc) => {
-    //       let data= doc.data();
-    //       data.id=doc.id;
-    //       userList[data.username] = data;
-    //     });
-    //     console.log('dddddd',userList)
-    // dispatch({ type: SET_USERS_LIST, payload: userList })
-    //   })
-  }
 
 
   async function getConnectionRequests(uName, i) {
@@ -268,13 +247,15 @@ export const NewRTCA = () => {
                         </li>
                         : */}
                       <li className="dropdown-item pointer" onClick={() => isGroupSelected ? exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false) : deleteConnection(selectedUserToChat)}>
-                        {isGroupSelected ? 'Exit Group' : 'Remove connection'}
+                        {isGroupSelected ? 'Exit Group' : 'Delete connection'}
                       </li>
                       {/* } */}
                       {isGroupSelected ?
                         <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
                         :
-                        <li className="dropdown-item pointer" onClick={() => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)}>Block connection</li>
+                        <li className="dropdown-item pointer"
+                          onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${selectedUserToChat}?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
+                        >Block connection</li>
                       }
                     </ul>
                   }
@@ -350,23 +331,17 @@ export const NewRTCA = () => {
 
                           {/* ACTIONS */}
                           {userData?.connections[x]?.groupName ?
-                            // (userData?.connections[x].hasOwnProperty('exitAt') ?
-                            //   <section className="blockConnection" onClick={() => deleteConnection(x)} title="Delete group">
-                            //     <Trash size={18} /> 
-                            //   </section>
-                            //   :
                             <section className="blockConnection" onClick={() => exitGroup(db, userData, x, setSelectedUserToChat, false, false)} title="Exit group">
                               <LogOut size={18} />
                             </section>
-                            // )
                             :
                             <>
                               <section className="deleteConnection" onClick={() => deleteConnection(x)} title="Delete connection">
-                                {/* <Trash size={18} /> */}
                                 <UserRoundX size={18} />
                               </section>
-                              <section className="blockConnection" onClick={() => blockConnection(db, userData, x, setSelectedUserToChat)} title="Block connection">
-                                {/* <UserRoundX size={18} /> */}
+                              <section className="blockConnection"
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${x}?`, () => blockConnection(db, userData, x, setSelectedUserToChat)))}
+                                title="Block connection">
                                 <Ban size={18} />
                               </section>
                             </>
@@ -386,9 +361,10 @@ export const NewRTCA = () => {
                 Object.keys(userData?.requests)?.length > 0 ?
 
                   <div className="request_list">
-                    {connectionsToShow.map((uName, i) => {
+                    {connectionsToShow?.map((uName, i) => {
                       // uname has just the username for one to one connection,, but it is an object for groups
                       let id = uName?.id || uName;
+                      console.log('````````````````', uName)
                       return (
                         <div className="list" key={i}>
                           <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(id, uName?.groupName || false)}>
@@ -408,20 +384,22 @@ export const NewRTCA = () => {
                             <UserCheck2 size={18} />
                           </section>
                           {uName?.groupName ?
-                            <section className={`declineReq overrideClrRed`} onClick={() => exitGroup(db, userData, id, setSelectedUserToChat, false)} title="Decline & exit group">
+                            <section className="declineReq overrideClrRed" onClick={() => exitGroup(db, userData, id, setSelectedUserToChat, false)} title="Decline & exit group">
                               <UserRoundX size={18} />
                             </section>
                             :
-                            <section className={`blockReq declineReq`} onClick={() => declineConnectionReq(db, userData, id, setSelectedUserToChat)} title="Decline connection">
-                              {/* <Trash size={18} /> */}
-                              <UserRoundX size={18} />
-                            </section>
-                          }
-                          {!uName?.groupName &&
-                            <section className="blockReq" onClick={() => blockConnection(db, userData, id, setSelectedUserToChat)} title="Block connection">
-                              {/* <UserRoundX size={18} /> */}
-                              <Ban size={18} />
-                            </section>
+                            <>
+                              <section className="blockReq declineReq" onClick={() => declineConnectionReq(db, userData, id, setSelectedUserToChat)} title="Decline connection">
+                                {/* <Trash size={18} /> */}
+                                <UserRoundX size={18} />
+                              </section>
+                              <section className="blockReq"
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${uName}?`, () => blockConnection(db, userData, id, setSelectedUserToChat)))}
+                                title="Block connection">
+                                {/* <UserRoundX size={18} /> */}
+                                <Ban size={18} />
+                              </section>
+                            </>
                           }
                         </div>
                       )
@@ -461,7 +439,7 @@ export const NewRTCA = () => {
             </>
           }
 
-          <ConfirmationModal/>
+          <ConfirmationModal />
 
         </div>
         <Toast />

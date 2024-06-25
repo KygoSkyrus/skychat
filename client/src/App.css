@@ -806,11 +806,11 @@ input[type="search"] {
 }
 
 .request_list .list:hover .overrideClrGreen{
-  right: 40px ;
+  right: 39px ;
   background-color: #5ef35e91;
 }
 .request_list .list:hover .overrideClrRed{
-  right: 1px;
+  right: 0px;
   background-color: #dc3545a1;
 }
 
@@ -997,7 +997,7 @@ input[type="search"] {
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 5px 0 12px 0;
+  padding: 5px 10px 12px 10px;
   margin-top: 25px;
   /* height: calc(100% - 3.5rem); */
   overflow: auto;
@@ -1228,10 +1228,11 @@ input[type="search"] {
   gap: 10px;
 }
 #confirmationModal .list li{
-  color: #fff;
-  background-color: rgb(57 57 57);
+  font-weight: 700;
   padding: 10px 34px;
-  border-radius: 15px;
+  color: #212529;
+  background-color: rgb(202 202 202);
+  border-radius: 12px;
   border-bottom: 1px solid #b79900;
   cursor: pointer;
 }

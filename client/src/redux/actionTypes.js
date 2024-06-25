@@ -20,9 +20,9 @@ export const HIDE_CONFIRMATION_MODAL = "HIDE/CONFIRMATION_MODAL";
 
 // we have avoided using action creators, direct type and payload are dispatched from components
 // only following action creators are used for confirmation modal
-export const showConfirmationModal = (onConfirm) => ({
+export const showConfirmationModal = (confirmationText, onConfirm) => ({
     type: SHOW_CONFIRMATION_MODAL,
-    payload: onConfirm,
+    payload: { confirmationText, onConfirm },
 });
 
 export const hideConfirmationModal = () => ({

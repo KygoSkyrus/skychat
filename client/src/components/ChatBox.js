@@ -11,6 +11,7 @@ import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, 
 import { FirebaseContext } from '../firebaseContext';
 
 import EmojiPicker from 'emoji-picker-react';
+import { showConfirmationModal } from '../redux/actionTypes';
 
 
 
@@ -416,7 +417,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             </div>
 
             {/* {userData?.requests[selectedUserToChat] ? */}
-            {requestList?.includes(selectedUserToChat) ?// only show these action for action the reqList conections
+            {requestList?.includes(selectedUserToChat) ?// only show these action for reqList connections
                 // when request chat is opened
                 (<div className="req_btn zIndex1">
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat) : acceptConnectionReq(db, userData, selectedUserToChat, dispatch)} >Accept</section>
@@ -425,8 +426,10 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             <section className="enq_btn delete mt-1" onClick={() => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)}>Leave group</section>
                             :
                             <>
-                                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Delete</section>
-                                <section className="enq_btn delete mt-1" onClick={() => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)}>Block</section>
+                                <section className="enq_btn delete mt-1" onClick={() => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat)}>Decline</section>
+                                <section className="enq_btn delete mt-1" 
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block ${selectedUserToChat}?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
+                                >Block</section>
                             </>
                         }
                     </div>

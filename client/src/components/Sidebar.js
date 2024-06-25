@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { getAuth } from 'firebase/auth'
-import { Cog, LogOut, Plus, Search, SearchCheck, Settings, Tally1, Users2, X } from 'lucide-react'
+import { Cog, LogOut, Plus, Tally1, Users2} from 'lucide-react'
 
-import { sidebarVisibility } from '../utils'
 import UserModal from './modals/UserModal'
 import GroupModal from './modals/GroupModal'
 import SearchComponent from './SearchComponent'
-import { RESET_USERS_LIST, SET_SIDEBAR } from '../redux/actionTypes'
+import { RESET_USERS_LIST, SET_SIDEBAR, showConfirmationModal } from '../redux/actionTypes'
 
 
 const Sidebar = ({ handleSelectedUserToChat }) => {
@@ -17,44 +16,9 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
     const dispatch = useDispatch();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo)
-    // const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
-
 
     const [showUserModal, setShowUserModal] = useState(false)
     const [showGroupModal, setShowGroupModal] = useState(false)
-
-
-    // const handleSearchUser = debounce(searchUser, 1000);
-
-    // const handleChangeUserSearch = (e) => {
-    //     setSearchedUserList(undefined)  //clearing all records
-    //     let userSearchDropdown = document.getElementById('userSearchDropdown')
-
-    //     if (e.target.value.length === 0) {
-    //         userSearchDropdown?.classList.add('d-none')//hide search list
-    //     } else {
-    //         userSearchDropdown?.classList.remove('d-none')//make search result visible
-    //         document.querySelector('.custom-loader').classList.remove('d-none')//showing loader while typing
-    //         document.querySelector('.no-user')?.classList.add('d-none')//hiding no item message while typing
-    //         handleSearchUser(e);
-    //     }
-    // }
-
-    // async function searchUser(e) {
-    //     // let result = usersList.filter(user => user?.username?.includes(e.target.value))
-    //     let result = Object.keys(usersList).filter(user => user.includes(e.target.value))
-
-    //     let noResult = document.querySelector('.no-user')
-    //     document.querySelector('.custom-loader')?.classList.add('d-none')//showing loader while typing
-
-    //     if (result.length === 0) {
-    //         noResult?.classList.remove('d-none')
-    //         setSearchedUserList(undefined)  //clearing all records
-    //     } else {
-    //         noResult?.classList.add('d-none')
-    //         setSearchedUserList(result)
-    //     }
-    // }
 
 
     const signOut = () => {
@@ -66,23 +30,16 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
 
     return (
         <>
-            <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" 
-            // style={{ display: "none" }} 
-            id="mySidebar" >
+            <div className="w3-sidebar w3-animate-left w3-bar-block w3-border-right" id="mySidebar" >
                 <div style={{ height: "75%" }}>
-
                     <span onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true });}} className="pointer" style={{ position: "absolute", right: "-30px", top: "50%", transform: "translateY(-50%)", color: "#fff" }} >
-                        {/* <X size="20" /> */}
                         <Tally1 strokeWidth={4} />
                     </span>
 
                     <SearchComponent
                         id={"userSearchDropdown"}
                         handleSelectedUserToChat={handleSelectedUserToChat}
-                        // searchedUserList={searchedUserList}
-                        // setSearchedUserList={setSearchedUserList}
                     />
-
                 </div>
                 <div>
                     <section className='m-1' onClick={() => setShowGroupModal(true)}>
@@ -102,13 +59,11 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
                             </span>
                             {currentUser?.displayName}
                         </div>
-                        <LogOut size="20" onClick={() => signOut()} className='pointer' />
+                        <LogOut size="20" onClick={() => dispatch(showConfirmationModal('Do you want to logout of your account?', () => signOut()))} className='pointer' />  
                     </section>
                 </div>
 
             </div>
-            {/* <div className="overlay pointer d-none" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div> */}
-
 
             {showUserModal &&
                 <>

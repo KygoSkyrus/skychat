@@ -5,6 +5,7 @@ const initialState = {
   resetUserSearchList: false,
   isConfirmationModalVisible: false,
   onConfirm: null,
+  confirmationText: '',
 };
 
 export const uiReducer = (state = initialState, action) => {
@@ -27,7 +28,8 @@ export const uiReducer = (state = initialState, action) => {
       return {
         ...state,
         isConfirmationModalVisible: true,
-        onConfirm: action.payload,
+        onConfirm: action.payload.onConfirm,
+        confirmationText: action.payload.confirmationText,
       }
     }
     case HIDE_CONFIRMATION_MODAL: {

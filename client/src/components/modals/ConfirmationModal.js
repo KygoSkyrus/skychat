@@ -1,17 +1,12 @@
-import { ArrowLeft, Edit, X } from 'lucide-react'
-import React, { useContext, useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import EditAvatarModal from './EditAvatarModal'
-import BlockedConnectionsModal from './BlockedConnectionsModal'
-import ThemeModal from './ThemeModal'
-import { doc, getFirestore, updateDoc } from 'firebase/firestore'
-import { FirebaseContext } from '../../firebaseContext'
+
 import { hideConfirmationModal } from '../../redux/actionTypes'
 
 const ConfirmationModal = () => {
 
     const dispatch = useDispatch()
-    const { isConfirmationModalVisible, onConfirm } = useSelector((state) => state.ui);
+    const { isConfirmationModalVisible, onConfirm, confirmationText } = useSelector((state) => state.ui);
 
     const handleConfirm = () => {
         if (onConfirm) onConfirm();
@@ -26,7 +21,7 @@ const ConfirmationModal = () => {
                 <div className="m-dialog justify-content-center bg-dark rounded-1">
 
                     <div className="d-flex align-items-center justify-content-center flex-column text-light h-100 p-5">
-                        <section className='text-center'>Do you want to toggle the privacy?</section>
+                        <section className='text-center mb-2'>{confirmationText}</section>
 
                         <ul className='list d-flex mt-3'>
                             <li onClick={() => dispatch(hideConfirmationModal())}>Cancel</li>
