@@ -2,30 +2,31 @@ import { ArrowLeft, Edit, X, Check } from 'lucide-react'
 import React, { useContext, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import SearchComponent from '../SearchComponent'
-import { SET_CURRENT_USER, SET_TOAST } from '../../redux/actionTypes';
 import { v4 as uuidv4 } from 'uuid';
 
 
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';
+import { setToast, showAddMemberModal, showGroupModal } from '../../redux/actionCreators';
 
-const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupInfo, setGroupInfo }) => {
+const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
 
     const userData = useSelector(state => state.user.userInfo)
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
+    const isGroupModalVisible = useSelector((state) => state.ui.isGroupModalVisible);
+    const isAddMemberModalVisible = useSelector((state) => state.ui.isAddMemberModalVisible);
     // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
     // const db = getFirestore(firebaseApp);
-    const { firebaseApp, db } = useContext(FirebaseContext);
+    const { db } = useContext(FirebaseContext);
 
 
     const [selectedUsersForGroup, setSelectedUsersForGroup] = useState([])
     const [firstPage, setFirstPage] = useState(type !== "add_member");
     const [groupName, setGroupName] = useState('');
 
-    console.log('ud', userData)
 
     // NOTE:: CLOSE THIS GROUP MODAL WHEN CCLICKED ON CHECK>>>>
 
@@ -117,7 +118,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupIn
             });
 
             setGroupName(''); // resetting input text field
-            setShowGroupModal(false)// hiding modal
+            dispatch(showGroupModal(false))// hiding modal
             handleSelectedUserToChat(connectionId, true);
         }
     }
@@ -127,31 +128,31 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupIn
 
         // prevent user from added blocked connections
         if (userData?.blockList.hasOwnProperty(member)) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Selected user is blocked. Unblock to add in group", isError: true } })
+            dispatch(setToast(`Selected user is blocked. Unblock to add in group`, true))
             return;
         }
 
         // only 25 members can be added while creating a group
         if (selectedUsersForGroup.length >= 25) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
+            dispatch(setToast(`Group can not have more than 3 members`, true))
             return;
         }
 
         // checks if user is already selected
         if (selectedUsersForGroup.includes(member)) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "User already selected", isError: true } })
+            dispatch(setToast(`User already selected`, true))
             return;
         }
 
         if (groupInfo?.members) {
             if (groupInfo?.members?.length + selectedUsersForGroup.length >= 25) {
-                dispatch({ type: SET_TOAST, payload: { toastContent: "Group can not have more than 3 members", isError: true } })
+                dispatch(setToast(`Group can not have more than 3 members`, true))
                 return;
             }
             // check if user is already a member
             for (let i = 0; i < groupInfo?.members?.length; i++) {
                 if (groupInfo?.members[i]?.name === member) {
-                    dispatch({ type: SET_TOAST, payload: { toastContent: "User is already a member", isError: true } })
+                    dispatch(setToast(`User is already a member`, true))
                     return;
                 }
             }
@@ -253,22 +254,22 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupIn
 
                 await updateDoc(docRef, data);// updating document
                 setGroupInfo(data);
-                setShowGroupModal(false);//closing addmember modal
+                dispatch(showAddMemberModal(false)); // closing addmember modal
             }
 
         }
     }
 
-
-
+    if (type === "add_member" && !isAddMemberModalVisible) return null;
+    if (type === "create_group" && !isGroupModalVisible) return null;
 
     return (
         <>
-            <div className="" id="groupModal" >
+            <div className="zIndex6" id="groupModal" >
                 <div className="m-dialog bg-dark rounded-1">
 
                     <div className='d-flex align-items-center justify-content-between bg-dark p-3 text-white'>
-                        <ArrowLeft size="20" className='text-secondary pointer' onClick={() => setShowGroupModal(false)} />
+                        <ArrowLeft size="20" className='text-secondary pointer' onClick={() => type === "add_member" ? dispatch(showAddMemberModal(false)) : dispatch(showGroupModal(false))} />
                         <span className={`text-secondary fs-12`} >{type === "add_member" ? 'Add Member' : 'Create Group'}</span>
                         {/* <X size="20" className='btn-close' onClick={() => setShowGroupModal(false)} /> */}
                     </div>
@@ -298,8 +299,6 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupIn
                             <SearchComponent
                                 id={"userSearchDropdownGroup"}
                                 handleSelectedGroupMember={handleSelectedGroupMember}
-                                // searchedUserList={searchedUserList}
-                                // setSearchedUserList={}setSearchedUserList
                             />
 
                             {selectedUsersForGroup.length > 0 &&
@@ -312,6 +311,7 @@ const GroupModal = ({ setShowGroupModal, handleSelectedUserToChat, type, groupIn
 
                 </div>
             </div>
+            <div className="overlay pointer zIndex5" onClick={() => type === "add_member" ? dispatch(showAddMemberModal(false)) : dispatch(showGroupModal(false))}></div>
         </>
     )
 }

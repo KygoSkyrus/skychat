@@ -13,6 +13,7 @@ body {
   box-sizing: border-box;
   background: #1b1b1b;
   background: var(--black1);
+  font-family: cursive, sans-serif;
 }
 .body-bg{
   position: absolute;
@@ -81,6 +82,12 @@ body {
 }
 .zIndex4 {
   z-index: 4 !important;
+}
+.zIndex5 {
+  z-index: 5 !important;
+}
+.zIndex6 {
+  z-index: 6 !important;
 }
 /* BASICS */
 
@@ -284,6 +291,7 @@ body {
   position: absolute;
   top: 0;
   z-index: 2;
+  z-index: 3;
   opacity: 1;
   background: rgb(0 0 0/40%);
   -webkit-backdrop-filter: blur(10px) brightness(150%);
@@ -371,6 +379,25 @@ body {
 .chat-body .chat-box::-webkit-scrollbar-thumb {
   background-color: rgb(92, 92, 92);
   border-radius: 4px;
+}
+
+.chat-body .chat-box > section.absolute-centered{
+  width: max-content;
+  color: #fff;
+  background: #b1b1b163;
+  padding: 4px 8px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #b9b9b9;
+}
+.chat-body .chat-box > section.absolute-centered::before {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  right: 15%;
+  border-left: 12px solid transparent;
+  border-top: 12px solid #b1b1b163;
+  border-width: 12px;
 }
 
 .chat-body .chat-box .load_more span{
@@ -640,6 +667,7 @@ body {
   justify-content: space-between;
   overflow: unset !important;
   z-index: 3;
+  z-index: 4;
   width: 35%;
   max-width: 300px;
   min-width: 225px;

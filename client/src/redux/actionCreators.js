@@ -1,8 +1,13 @@
-import { SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL, SET_TOAST } from "./actionTypes";
+import { SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ADD_MEMBER_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL, SET_TOAST, SHOW_SIDEBAR } from "./actionTypes";
 
 export const setToast = (toastContent, isError) => ({
     type: SET_TOAST,
     payload: { toastContent, isError },
+});
+
+export const showSidebar = (payload) => ({
+    type: SHOW_SIDEBAR,
+    payload,
 });
 
 export const showUserModal = (payload) => ({
@@ -25,7 +30,12 @@ export const showGroupModal = (payload) => ({
     payload,
 });
 
-export const showEntityModal = (payload) => ({
+export const showAddMemberModal = (payload) => ({
+    type: SHOW_ADD_MEMBER_MODAL,
+    payload,
+});
+
+export const showEntityInfoModal = (payload) => ({
     type: SHOW_ENTITY_INFO_MODAL,
     payload,
 });

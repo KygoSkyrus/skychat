@@ -1,8 +1,9 @@
-import { Lock, LockIcon, LockKeyhole, LockKeyholeIcon, Search } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
+import { LockIcon, Search } from 'lucide-react'
+
+import { setToast } from '../redux/actionCreators';
 import { debounce } from '../utils'
-import { SET_TOAST } from '../redux/actionTypes';
 
 
 const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, id }) => {
@@ -62,7 +63,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
 
     const handleSelect = (x, privacy) => {
         if (privacy) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: id === "userSearchDropdownGroup"? "Can not add private account to a group *" : "Messaging private account is prohibited *", isError: true } })
+            dispatch(setToast(`${id === "userSearchDropdownGroup"? "Can not add private account to a group *" : "Messaging private account is prohibited *"}`,true))
             return;
         }
         id === "userSearchDropdownGroup" ? handleSelectedGroupMember(x) : handleSelectedUserToChat(x)

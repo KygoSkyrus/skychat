@@ -4,23 +4,21 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr, writeToDb } from '../../utils'
 import GroupModal from './GroupModal'
-import { SET_TOAST } from '../../redux/actionTypes'
 import { FirebaseContext } from '../../firebaseContext'
-import { showConfirmationModal } from '../../redux/actionCreators'
+import { setToast, showAddMemberModal, showConfirmationModal, showEntityInfoModal } from '../../redux/actionCreators'
 
 
-const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedGroupName }) => {
+const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
 
     const dispatch = useDispatch();
     const { db } = useContext(FirebaseContext);
 
     const userData = useSelector(state => state.user.userInfo)
+    const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
     // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
     // const db = getFirestore(firebaseApp);
 
     const [groupInfo, setGroupInfo] = useState();
-
-    const [showGroupModal, setShowGroupModal] = useState(false)
 
 
     useEffect(() => {
@@ -113,7 +111,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
         // NOTE: ONLY ADMIN CAN REMOVE A MEMBER
         if (userData.username !== groupInfo?.createdBy) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Only group admin can perform this action", isError: true } });
+            dispatch(setToast(`Only group admin can perform this action`, true))
             return;
         }
 
@@ -146,9 +144,10 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
     const handleAddMember = () => {
         // NOTE: ONLY ADMIN CAN ADD A MEMBER
         if (userData.username !== groupInfo?.createdBy) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Only group admin can perform this action", isError: true } })
+            dispatch(setToast(`Only group admin can perform this action`, true))
         } else {
-            setShowGroupModal(true);
+            // setShowGroupModal(true);
+            dispatch(showAddMemberModal(true))
         }
     }
 
@@ -178,6 +177,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
     // if user exit/removed from group and when he is added again then msgs are not showing in realtime,, if he reopens the chat than its working,, this may be bcz of the condiion if exitAT
 
+    if (!isEntityInfoModalVisible) return null;
 
     return (
         <>
@@ -185,7 +185,7 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
                 <div className="m-dialog justify-content-center bg-dark rounded-1">
 
                     <div className='d-flex align-items-center justify-content-between'>
-                        <X size="20" className='btn-close' onClick={() => setShowEntityInfoModal(false)} />
+                        <X size="20" className='btn-close' onClick={() => dispatch(showEntityInfoModal(false))} />
                         {/* <ArrowLeft size="20" className='text-secondary '  onClick={() => setShowUserModal(false)} />
                         <span className='text-secondary fs-12'>Profile</span> */}
                     </div>
@@ -239,18 +239,13 @@ const EntityInfoModal = ({ setShowEntityInfoModal, selectedUserToChat, selectedG
 
                 </div>
             </div>
+            <div className="overlay pointer zIndex4" onClick={() => dispatch(showEntityInfoModal(false))}></div>
 
-            {showGroupModal &&
-                <>
-                    <GroupModal
-                        type="add_member"
-                        groupInfo={groupInfo}
-                        setGroupInfo={setGroupInfo}
-                        setShowGroupModal={setShowGroupModal}
-                    />
-                    {/* <div className="overlay pointer zIndex4" onClick={() => setShowGroupModal(false)}></div> */}
-                </>
-            }
+            <GroupModal
+                type="add_member"
+                groupInfo={groupInfo}
+                setGroupInfo={setGroupInfo}
+            />
         </>
     )
 }

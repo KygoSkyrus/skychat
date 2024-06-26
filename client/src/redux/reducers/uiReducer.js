@@ -1,14 +1,15 @@
-import { SET_SIDEBAR, RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL } from "./../actionTypes";
+import { RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL, SHOW_ADD_MEMBER_MODAL, SHOW_SIDEBAR } from "./../actionTypes";
 
 const initialState = {
-  sidebar: false,
+  isSidebarVisible: false,
   resetUserSearchList: false,
-  isConfirmationModalVisible: false,
   onConfirm: null,
   confirmationText: '',
+  isConfirmationModalVisible: false,
   isUserModalVisible: false,
   isThemeModalVisible: false,
   isGroupModalVisible: false,
+  isAddMemberModalVisible: false,
   isEntityInfoModalVisible: false,
   isEditAvatarModalVisible: false,
   isBlockedConnectionsModalVisible: false,
@@ -16,10 +17,10 @@ const initialState = {
 
 export const uiReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_SIDEBAR: {
+    case SHOW_SIDEBAR: {
       return {
         ...state,
-        sidebar: action.payload,
+        isSidebarVisible: action.payload,
       };
     }
     case RESET_USERS_LIST: {
@@ -62,6 +63,13 @@ export const uiReducer = (state = initialState, action) => {
       return {
         ...state,
         isGroupModalVisible: action.payload,
+      }
+    }
+
+    case SHOW_ADD_MEMBER_MODAL: {
+      return {
+        ...state,
+        isAddMemberModalVisible: action.payload,
       }
     }
 

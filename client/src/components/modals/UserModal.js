@@ -6,7 +6,7 @@ import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { setToast, showConfirmationModal, showUserModal } from '../../redux/actionCreators'
+import { setToast, showBlockedConnectionsModal, showConfirmationModal, showEditAvatarModal, showThemeModal, showUserModal } from '../../redux/actionCreators'
 
 const UserModal = () => {
 
@@ -17,9 +17,6 @@ const UserModal = () => {
 
     console.log('``````````usermodal')
 
-    const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
-    const [showBlockedConnections, setShowBlockedConnections] = useState(false)
-    const [showThemeModal, setShowThemeModal] = useState(false)
 
     const handleTogglePrivacy = async (e) => {
         const newPrivacySetting = e.target.checked;
@@ -31,7 +28,7 @@ const UserModal = () => {
         await updateDoc(docRef, {
             privacy: newPrivacySetting,
         });
-        dispatch(setToast(`Account privacy turned ${newPrivacySetting ? 'on' : 'off'}`,false))
+        dispatch(setToast(`Account privacy turned ${newPrivacySetting ? 'on' : 'off'}`, false))
     };
 
     if (!isUserModalVisible) return null;
@@ -53,7 +50,7 @@ const UserModal = () => {
                             <img src={userData?.avatar} className="pointer" alt=""
                             //  onClick={()=>changeAvatar(true)} 
                             />
-                            <div className='avatar_edit_btn' onClick={() => setShowEditAvatarModal(true)}>
+                            <div className='avatar_edit_btn' onClick={() => dispatch(showEditAvatarModal(true))}>
                                 <Edit />
                             </div>
                         </div>
@@ -62,8 +59,8 @@ const UserModal = () => {
                         <section className='email fs-10 text-secondary'>{userData?.email}</section>
 
                         <ul className='list mt-3'>
-                            <li className='chat_list_item ' onClick={() => setShowBlockedConnections(true)}>Blocked connections</li>
-                            <li className='chat_list_item ' onClick={() => setShowThemeModal(true)}>Themes</li>
+                            <li className='chat_list_item ' onClick={() => dispatch(showBlockedConnectionsModal(true))}>Blocked connections</li>
+                            <li className='chat_list_item ' onClick={() => dispatch(showThemeModal(true))}>Themes</li>
                             <li className='chat_list_item privacy'>
                                 <span>Privacy</span>
                                 <span className='d-flex justify-content-end'>
@@ -80,26 +77,9 @@ const UserModal = () => {
             <div className="overlay pointer zIndex4" onClick={() => dispatch(showUserModal(false))}></div>
 
 
-            {showEditAvatarModal &&
-                <>
-                    <EditAvatarModal setShowEditAvatarModal={setShowEditAvatarModal} />
-                    {/* <div className="overlay pointer zIndex4" onClick={() => setShowEditAvatarModal(false)}></div> */}
-                </>
-            }
-
-            {showBlockedConnections &&
-                <>
-                    <BlockedConnectionsModal setShowBlockedConnections={setShowBlockedConnections} />
-                    {/* <div className="overlay pointer zIndex4" onClick={() => setShowEditAvatarModal(false)}></div> */}
-                </>
-            }
-
-            {showThemeModal &&
-                <>
-                    <ThemeModal setShowThemeModal={setShowThemeModal} />
-                    {/* <div className="overlay pointer zIndex4" onClick={() => setShowEditAvatarModal(false)}></div> */}
-                </>
-            }
+            <EditAvatarModal />
+            <BlockedConnectionsModal />
+            <ThemeModal />
         </>
     )
 }

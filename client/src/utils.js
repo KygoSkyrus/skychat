@@ -1,6 +1,4 @@
-import { Timestamp, addDoc, collection, doc, getFirestore, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
-import { onSnapshot, query, where } from "firebase/firestore";
-import { SET_TOAST } from "./redux/actionTypes"
+import { Timestamp, addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
 import { setToast } from "./redux/actionCreators";
 
 export const dbUsers = {
@@ -329,7 +327,7 @@ export function hideSearchedUsersList(setSearchedUserList) {
 
 // i think its not used anywhere
 export const sidebarVisibility = (val) => {
-// export const sidebarVisibility = (val, setSearchedUserList) => {
+    // export const sidebarVisibility = (val, setSearchedUserList) => {
     let sidebar = document.getElementById("mySidebar");
     let overlay = document.querySelector('.overlay');
 
@@ -403,8 +401,7 @@ export async function acceptConnectionReq(db, userData, userName, dispatch) {
                 },
             }
         });
-        // dispatch({ type: SET_TOAST, payload: { toastContent: "Request accepted", isError: false } })
-        dispatch(setToast(`Request accepted`,false))
+        dispatch(setToast(`Request accepted`, false))
     }
 }
 
@@ -493,7 +490,7 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
 }
 
 
-export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTriggeredByAdmin=false) => {
+export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTriggeredByAdmin = false) => {
     // @params: isTriggeredByAdmin-> will be false when this function is triggered by user(who's leaving), and if true it means user is being removed
 
     //removing member from group list 
@@ -524,7 +521,7 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
 
 
     async function updateUserDoc() {
-        console.log('uddududuududud',userData)
+        console.log('uddududuududud', userData)
 
         //deleting connection req from req list 
         const docRef = doc(db, "users", userData?.id);
@@ -538,7 +535,7 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
         // setIsGroupSelected(false);8
     }
 
-    if(!isTriggeredByAdmin){
+    if (!isTriggeredByAdmin) {
         // SENDING NOTIFICATION (USER LEFT)
         const msgData = {
             connectionId: id,

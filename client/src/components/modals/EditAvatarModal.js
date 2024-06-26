@@ -6,16 +6,19 @@ import { doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { FirebaseContext } from '../../firebaseContext';
-import { SET_TOAST } from '../../redux/actionTypes';
 import { getAvatarUrl } from '../../utils'
+import { setToast, showEditAvatarModal } from '../../redux/actionCreators';
 
 
-const EditAvatarModal = ({ setShowEditAvatarModal }) => {
+const EditAvatarModal = () => {
+
     const dispatch = useDispatch();
     const { firebaseApp, db } = useContext(FirebaseContext);
     const storage = getStorage(firebaseApp);
 
     const userData = useSelector(state => state.user.userInfo)
+    const isEditAvatarModalVisible = useSelector((state) => state.ui.isEditAvatarModalVisible);
+
     const [selectedAvatar, setSelectedAvatar] = useState(userData?.avatar)
     const [uploadAvatar, setUploadAvatar] = useState()
 
@@ -24,7 +27,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
     async function changeAvatar(e) {
 
         if (selectedAvatar === userData?.avatar) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Select different avatar or upload new", isError: true } })
+            dispatch(setToast(`Select different avatar or upload new`, true))
             return;
         }
 
@@ -93,8 +96,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
                 });
             }
         }
-        dispatch({ type: SET_TOAST, payload: { toastContent: "Profile updated", isError: false } })
-
+        dispatch(setToast(`Profile updated`, false))
     }
 
 
@@ -126,12 +128,14 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
         setUploadAvatar(null)
     }
 
+    if (!isEditAvatarModalVisible) return null;
+
     return (
         <>
             <div className="" id="avatarModal" >
                 <div className="m-dialog d-flex flex-column justify-content-between bg-dark rounded-1">
                     {/* <button type="button" className="btn-close"></button> */}
-                    <X size="20" className='btn-close' onClick={() => setShowEditAvatarModal(false)} />
+                    <X size="20" className='btn-close' onClick={() => dispatch(showEditAvatarModal(false))} />
 
                     <div className='avatar_grid'>
                         {Array.from(Array(20).keys()).map((x, i) => {
@@ -159,6 +163,7 @@ const EditAvatarModal = ({ setShowEditAvatarModal }) => {
 
                 </div>
             </div>
+            <div className="overlay pointer zIndex4" onClick={() => dispatch(showEditAvatarModal(false))}></div>
         </>
     )
 }

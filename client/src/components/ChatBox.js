@@ -411,7 +411,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             )
                         })
                         :
-                        <section className="absolute-centered">No messages yet...</section>
+                        <section className="absolute-centered">Say 'Hi' to start a conversation</section>
                 }
                 <div ref={dummy}></div>
             </div>

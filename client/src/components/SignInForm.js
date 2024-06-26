@@ -4,10 +4,11 @@ import { useDispatch } from 'react-redux';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
-import { SET_CURRENT_USER, SET_TOAST } from '../redux/actionTypes';
+import { SET_CURRENT_USER } from '../redux/actionTypes';
 import { defaultAvatar } from '../utils';
 import { setUserData } from '../redux/thunk/userDataThunk';
 import { FirebaseContext } from '../firebaseContext';
+import { setToast } from '../redux/actionCreators';
 
 // import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
 
@@ -66,18 +67,18 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         //for validating username
         let name = userCredentials?.username?.trim();
         if (name.includes(" ")) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "user name can not contain blank spaces", isError: true } })
+            dispatch(setToast(`user name can not contain blank spaces`, true))
             return;
         }
 
         if (name.length < 4) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "user name should be atleast 4 characters long", isError: true } })
+            dispatch(setToast(`user name should be atleast 4 characters long`, true))
             return;
         }
 
         const validUsername = name.match(/^(?![0-9]*$)[a-z0-9]+$/); // /^[a-z0-9]+$/
         if (validUsername == null) {
-            dispatch({ type: SET_TOAST, payload: { toastContent: "Invalid username. Only characters a-z and numbers are  acceptable.", isError: true } })
+            dispatch(setToast(`Invalid username. Only characters a-z and numbers are  acceptable.`, true))
             return false;
         }
 
@@ -94,8 +95,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         let data = await res.json()
 
         if (data.userFound) {
-            // alert(data.message)
-            dispatch({ type: SET_TOAST, payload: { toastContent: "username already exists", isError: true } })
+            dispatch(setToast(`username already exists`, true))
         } else {
             let isUserCreated = false;
             await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
@@ -113,7 +113,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     let errMsg = error.message;
                     console.log('error', error)
                     if (error.code === 'auth/email-already-in-use') errMsg = "User already exists!!! Try Signing in instead"
-                    dispatch({ type: SET_TOAST, payload: { toastContent: errMsg, isError: true } })
+                    dispatch(setToast(errMsg, true))
                 });
 
             if (isUserCreated) {
@@ -145,7 +145,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 }
             )
             .catch((error) => {
-                dispatch({ type: SET_TOAST, payload: { toastContent: "Authentication Failed, Invalid email/password", isError: true } })
+                dispatch(setToast(`Authentication Failed, Invalid email/password`, true))
                 // inProgressLoader(dispatch, false)
                 setUserCredentials({ email: '', password: '', username: '' })
                 // dispatch(invokeToast({ isSuccess: false, message: "Authentication Failed, Invalid email/password" }))

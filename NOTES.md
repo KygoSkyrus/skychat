@@ -65,12 +65,13 @@
 - [done]maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use
 - [done]add custom attribute in emoji picker
 - [done]add a layer to close the emoji picker
+- [done]create action creator for toast state
+- [done]on every modal we have created a state in parent from where the modal will be publised,,, we did this to control visisibility,, this way the parent component itself renders when this state toggles as well as the child,, but what if we dispatch an action from parent,,, and get the state in child only, than maybe we will be able to save parent to rerender,, and from child componnet we can return null if the state is false and the child if its true
+- [done]need to have overlay for few modals(block,entity,editavatar,theme), so that the specific modal is closed,, now whats happening is that if you close editavatar modal than it will close the usermodal too,bcz its using usermodal's overlay,, same with blocked connection modal.. if the above modal visibility approcah is implemented than we can hve
+- [done]maybe try the modal thing for sidebar too
 
-- create action creator for toast state
 - there is a need of a loader mostly on every action
 
-- on every modal we have created a state in parent from where the modal will be publised,,, we did this to control visisibility,, this way the parent component itself renders when this state toggles as well as the child,, but what if we dispatch an action from parent,,, and get the state in child only, than maybe we will be able to save parent to rerender,, and from child componnet we can return null if the state is false and the child if its true
-- need to have overlay for few modals(block,entity,editavatar,theme), so that the specific modal is closed,, now whats happening is that if you close editavatar modal than it will close the usermodal too,bcz its using usermodal's overlay,, same with blocked connection modal.. if the above modal approcah is implemented than we can hve[.... maybe not...how will be configure that which modal is supposed to be closeD???9-sol,,, do what is done in confirmation modal]
 - all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
 - fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
@@ -94,6 +95,8 @@
 - add a fallback component on error,,,, 
 - add lazy loading in pattern images
 - change fonts
+- there is screnshot for ui dated 2nd feb
+- create env file for secret keys, like collection name etc
 - in this one , on any corner show the feature your provide , like security, functionalities etc
 - encrypt messages/passwords
 - check db security using other domain
@@ -124,7 +127,6 @@
 
 - **least priority**
 - all the parts like sidebar, chathead etc can go to different component
-- add loader (while loading mssgs or for dates)
 - set the users usernsme in displayname of firebase and avatar in photourl
 - add professional and other versions
 - add a option to share the app with your frnds,, create links to share on social media apps

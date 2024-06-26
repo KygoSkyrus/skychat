@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_SIDEBAR, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
-import { showConfirmationModal } from "../redux/actionCreators";
+import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { showConfirmationModal, showEntityInfoModal, showSidebar } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
@@ -34,14 +34,13 @@ export const NewRTCA = () => {
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
-  const [showEntityInfoModal, setShowEntityInfoModal] = useState(false)// controls user/info modal
 
 
 
   const currentUser = useSelector(state => state.user.currentUser)
   const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
-  const sidebar = useSelector(state => state.ui.sidebar);
+  // const sidebar = useSelector(state => state.ui.sidebar);
 
   console.log('===============================================================================userData', userData)
   // console.log('currentUser', currentUser)
@@ -128,10 +127,7 @@ export const NewRTCA = () => {
   // NOTE:: CHNAGE the state selectedUserToChat to selectedEntityToChat.. this will represent both groups and individual user, this way we wont need selectedGroupToChat too, instead there will be a flag isGroupSelected,, this will tell if selected entity is a group or not
 
   function handleSelectedUserToChat(username, groupName) {
-    //dispatch an event and set the state there (may or may not be required)
-    // sidebarVisibility(false, setSearchedUserList)//closing sidebar
-    // sidebarVisibility(false)//closing sidebar
-    dispatch({ type: SET_SIDEBAR, payload: false })
+    dispatch(showSidebar(false))
     dispatch({ type: RESET_USERS_LIST, payload: true })//clearing all records of search list
     setSelectedUserToChat(username);//setting selected user
 
@@ -200,23 +196,13 @@ export const NewRTCA = () => {
         <div className="outer">
 
           {/***** SIDEBAR STARTS ******/}
-          {/* maybe add a boolean to check if sidebar is visible,, only than show sidebar,, this will prevent unnecessary rerender of sidebar even when its not in use */}
-          {sidebar &&
-            <>
-              <Sidebar
-                // searchedUserList={searchedUserList}
-                // setSearchedUserList={setSearchedUserList}
-                handleSelectedUserToChat={handleSelectedUserToChat}
-              />
-              <div className="overlay pointer" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div>
-            </>
-          }
+          <Sidebar handleSelectedUserToChat={handleSelectedUserToChat} />
           {/***** SIDEBAR ENDS ******/}
 
 
           {/***** CHAT HEADER STARTS ******/}
           <div className="chat-head zIndex2">
-            <div className="hamburger" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: true }); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
+            <div className="hamburger" onClick={() => { dispatch(showSidebar(true)); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
               <img src={hamburger} alt="." />
             </div>
             {selectedUserToChat &&
@@ -245,7 +231,7 @@ export const NewRTCA = () => {
                       {isGroupSelected ?
                         <>
                           <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit this group <code>${selectedGroupName}</code>?`, () => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)))}>Exit Group</li>
-                          <li className="dropdown-item pointer" onClick={() => setShowEntityInfoModal(true)}>Group info</li>
+                          <li className="dropdown-item pointer" onClick={() => dispatch(showEntityInfoModal(true))}>Group info</li>
                         </>
                         :
                         <>
@@ -422,17 +408,13 @@ export const NewRTCA = () => {
           {/***** CHAT BODY ENDS ******/}
 
 
-          {/* <div className="overlay pointer d-none" onClick={() => { dispatch({ type: SET_SIDEBAR, payload: false }); dispatch({ type: RESET_USERS_LIST, payload: true }) }}></div> */}
 
-          {showEntityInfoModal &&
-            <>
-              <EntityInfoModal
-                setShowEntityInfoModal={setShowEntityInfoModal}
-                selectedUserToChat={selectedUserToChat}
-                selectedGroupName={selectedGroupName}
-              />
-              <div className="overlay pointer zIndex4" onClick={() => setShowEntityInfoModal(false)}></div>
-            </>
+          {/* only needed for group */}
+          {selectedUserToChat && isGroupSelected &&
+            <EntityInfoModal
+              selectedUserToChat={selectedUserToChat}
+              selectedGroupName={selectedGroupName}
+            />
           }
 
           <ConfirmationModal />

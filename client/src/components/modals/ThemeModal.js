@@ -1,14 +1,16 @@
 import { Trash, Upload, X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { getPatternUrl } from '../../utils'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { SET_THEME } from '../../redux/actionTypes'
+import { showThemeModal } from '../../redux/actionCreators'
 
 
-const ThemeModal = ({ setShowThemeModal }) => {
+const ThemeModal = () => {
 
     const dispatch = useDispatch()
     const [selectedPattern, setSelectedPattern] = useState('');
+    const isThemeModalVisible = useSelector((state) => state.ui.isThemeModalVisible);
 
     function setPattern(img) {
         // const body = document.querySelector('body');
@@ -20,12 +22,14 @@ const ThemeModal = ({ setShowThemeModal }) => {
         }
     }
 
+    if(!isThemeModalVisible) return null;
+
     return (
         <>
             <div className="" id="themeModal" >
                 <div className="m-dialog d-flex flex-column justify-content-between bg-dark rounded-1">
                     {/* <button type="button" className="btn-close"></button> */}
-                    <X size="20" className='btn-close' onClick={() => setShowThemeModal(false)} />
+                    <X size="20" className='btn-close' onClick={() => dispatch(showThemeModal(false))} />
 
                     <div className='avatar_grid'>
                         {Array.from(Array(40).keys()).map((x, i) => {
@@ -36,6 +40,7 @@ const ThemeModal = ({ setShowThemeModal }) => {
 
                 </div>
             </div>
+            <div className="overlay pointer zIndex4" onClick={() => dispatch(showThemeModal(false))}></div>
         </>
     )
 }
