@@ -271,3 +271,86 @@ https://css-tricks.com/methods-contrasting-text-backgrounds/
 - use usecontext whenever there are mutiple data that needed to passed down to child,,, u can create context of functions also
 - if you have onchange which is setting a state in parent component than on every key press the child componnet will rerender,, to avoid this either wrap the child component in `React.memo` or use useRef for the input field instead of dstate
 - very important when using img tag to show images instead of backgroundImage... sometimes image gets stretched bcz of specific width and height given(in a grid sometimes all images are not of same ratio),,, to overcome that apply `object-fit: cover;` with width and height `width: 100%; height: 80px;`
+
+- `useStore`: This hook returns a reference to the same Redux store that was passed in to the <Provider> component.
+  - this may be useful for less common scenarios that do require access to the store, such as replacing reducers.
+  - returns an instance of the store. Generally not recommended, because the component which uses this will not get updated. In such case use have to use react hooks like useEffect o explicitly update the component. 
+```js
+ const pageArrayTwo = useStore();
+  const pageArray = pageArrayTwo.getState().pages;
+```
+
+- `useSelector`: You should not get entire object in useSelector ? bcz if we are getting the whole object ,than if any of the other state of that object changes than the component will re-render for no reason
+```js
+ const {test1State} = useSelector(state=>state.test); /// getting whole object
+ const test1State = useSelector(state=>state.test.test1State); /// getting the value which is needed
+```
+  - this is the reason why only related states should be present in a reducer,,, the state that gonna be used in a single componnet.. that way even if you get the whole object,, it wont matter bcz you gonna use every state in that componnet
+  - *NOTE*: unlike connect(), useSelector() does not prevent the component from re-rendering due to its parent re-rendering, even if the component's props did not change.
+
+- `createSelector`:  It is used to create a memoized selector function that can efficiently compute derived data from the Redux store.
+  - A selector is a function that takes the Redux store state as input and returns a derived value. createSelector allows you to define a selector function that will only recalculate its output if its input values change. This can improve the performance of your application by reducing unnecessary recalculations of derived data.
+  - its needed when you have complex calculation on state u are fetching..in the below example the selector functions performs a taskk now this task can be a performace overhead is the component rerenders too mmuch,, to solve thios prpblem we can have a createSelector which will memoize the result
+  ```js
+    let xyz = "test4";
+    const {testArr} = useSelector(state=>state.testArr.map(x=> x!= xyz)); 
+
+    //with createSelector
+    const clickedBtnId = createSelector(
+      (state) => {return state.testArr.map(x=> x!= xyz)},
+      (retTestArr) => {console.log('arr to return',retTestArr); return retTestArr}
+    )
+    const {testArr} = useSelector(clickedBtnId); 
+  ```
+
+- `connect`: connect still works and is supported in React-Redux 8.x. However, we recommend using the hooks API (means useSelector) as the default.
+  - The connect() function connects a React component to a Redux store.
+  - connect can be used with both React class components and function components whereas hooks can be used with function components only. Using hooks is simpler. The simplicity comes at a price: you have less performance tweaks at your disposal in comparison with connect.
+  - *better performance*: connect is a HOC, which means you pass your own component, and connect returns a wrapper component that does all the work of subscribing to the store, running your mapState and mapDispatch, and passing the combined props down to your own component. And the connect will make your component renders if the props passing down changed, beside that, all the new values from the mapState also causes it to re-render, and the component acts the a PureComponent . This means connect has better performance by default
+  - On the other hand, useSelector is just a hook that you called inside your function components, and you have no way to alter the rendering when the parents props changed. This is a very important when it comes to optimization, but you can optimize the function components that use useSelector with useMemo to prevent unnecessary re-renders
+  - *arguemnets*:
+    - As the first argument passed in to connect, `mapStateToProps` is used for selecting the part of the data from the store that the connected component needs.
+    - As the second argument passed in to connect, `mapDispatchToProps` is used for dispatching actions to the store.
+  - https://dev.to/am20dipi/redux-what-is-connect-1c6l
+  - in my words: 
+  ```js
+  const ConfirmationModal = ({ isConfirmationModalVisible,  hideConfirmationModal }) => {
+
+    //const isConfirmationModalVisible = useSelector((state) => state.ui.isConfirmationModalVisible); NOTE::: this is not needed ,, you can directly use the state,, as all the states are passed as props
+
+    const handleConfirm = () => {
+      if (onConfirm) onConfirm();
+      hideConfirmationModal();
+    }
+
+    if (!isConfirmationModalVisible) return null;
+
+    return (
+        <ul className='list d-flex mt-3'>
+            <li onClick={() => hideConfirmationModal()}>Cancel</li>// HERE you dont need to dispatch this action like dispatch(hideConfirmationModal()) bcz the component has access to dispatch
+        </ul>
+    )
+  }
+  const mapStateToProps = (state) => ({
+    isConfirmationModalVisible: state.ui.isConfirmationModalVisible,
+  });
+
+  const mapDispatchToProps = {
+    hideConfirmationModal
+  };
+  export default connect(mapStateToProps, mapDispatchToProps)(ConfirmationModal);
+  ```
+  - [Common ways of calling `connect`](https://react-redux.js.org/tutorials/connect#common-ways-of-calling-connect)
+  - Q: How using connect is better than useSelector??
+
+
+- `Currying` is a technique in functional programming that transforms a function with multiple arguments into a sequence of functions,  each accepting a single argument and ultimately returning the final result. In JavaScript, currying can be achieved using closures. a good example can be how you implemented debouncing,, you created a chain of functions
+```js
+function add(a, b) {
+  return a + b;
+}
+const addOne = add(1);
+console.log(addOne(2)); // 3
+//In this example, the add function takes two arguments and returns their sum. The addOne function is a curried version of the add function that takes one argument and returns a function that adds that argument to 1.
+```
+

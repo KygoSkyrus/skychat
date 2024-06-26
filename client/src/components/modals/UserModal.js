@@ -6,14 +6,16 @@ import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { showConfirmationModal, showUserModal } from '../../redux/actionCreators'
+import { setToast, showConfirmationModal, showUserModal } from '../../redux/actionCreators'
 
 const UserModal = () => {
 
     const dispatch = useDispatch()
     const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
-    const { isUserModalVisible } = useSelector((state) => state.ui);
+    const isUserModalVisible = useSelector((state) => state.ui.isUserModalVisible);
+
+    console.log('``````````usermodal')
 
     const [showEditAvatarModal, setShowEditAvatarModal] = useState(false)
     const [showBlockedConnections, setShowBlockedConnections] = useState(false)
@@ -21,7 +23,7 @@ const UserModal = () => {
 
     const handleTogglePrivacy = async (e) => {
         const newPrivacySetting = e.target.checked;
-        dispatch(showConfirmationModal(`Are you sure you want to turn your account's privacy ${e.target.checked ? 'on' : 'off'}?`, () => togglePrivacy(newPrivacySetting)))
+        dispatch(showConfirmationModal(`Are you sure you want to turn your account privacy ${e.target.checked ? 'on' : 'off'}?`, () => togglePrivacy(newPrivacySetting)))
     }
 
     const togglePrivacy = async (newPrivacySetting) => {
@@ -29,6 +31,7 @@ const UserModal = () => {
         await updateDoc(docRef, {
             privacy: newPrivacySetting,
         });
+        dispatch(setToast(`Account privacy turned ${newPrivacySetting ? 'on' : 'off'}`,false))
     };
 
     if (!isUserModalVisible) return null;

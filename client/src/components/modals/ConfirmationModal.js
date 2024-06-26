@@ -6,7 +6,11 @@ import { hideConfirmationModal } from '../../redux/actionCreators';
 const ConfirmationModal = () => {
 
     const dispatch = useDispatch()
-    const { isConfirmationModalVisible, onConfirm, confirmationText } = useSelector((state) => state.ui);
+    // const { isConfirmationModalVisible, onConfirm, confirmationText } = useSelector((state) => state.ui);
+    // why not using the above way of getting state? bcz we are getting the whole object ui here,and if any of the other state other than these three changes than this component will re-render for no reason
+    const isConfirmationModalVisible = useSelector((state) => state.ui.isConfirmationModalVisible);
+    const onConfirm = useSelector((state) => state.ui.onConfirm);
+    const confirmationText = useSelector((state) => state.ui.confirmationText);
 
     console.log('`````````````````')
     const handleConfirm = () => {

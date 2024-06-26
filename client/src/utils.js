@@ -1,6 +1,7 @@
 import { Timestamp, addDoc, collection, doc, getFirestore, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
 import { onSnapshot, query, where } from "firebase/firestore";
 import { SET_TOAST } from "./redux/actionTypes"
+import { setToast } from "./redux/actionCreators";
 
 export const dbUsers = {
     "test7": {
@@ -402,7 +403,8 @@ export async function acceptConnectionReq(db, userData, userName, dispatch) {
                 },
             }
         });
-        dispatch({ type: SET_TOAST, payload: { toastContent: "Request accepted", isError: false } })
+        // dispatch({ type: SET_TOAST, payload: { toastContent: "Request accepted", isError: false } })
+        dispatch(setToast(`Request accepted`,false))
     }
 }
 
