@@ -145,6 +145,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             connections: {},
             requests: {},
             blockList: {},
+            theme: '',
             privacy: true,
             time: serverTimestamp(),
         };
