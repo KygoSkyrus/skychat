@@ -1,25 +1,22 @@
-import { collection, doc, getDoc, getDocs, getFirestore, updateDoc, where, query, serverTimestamp, onSnapshot } from 'firebase/firestore'
-import { ArrowLeft, Edit, LogOut, MessageSquareX, UserRoundPlus, Users, X } from 'lucide-react'
+import { collection, doc, getDocs, where, query, serverTimestamp, onSnapshot } from 'firebase/firestore'
+import { UserRoundPlus, Users, X } from 'lucide-react'
 import React, { useContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { exitGroup, getDateStr, getExactTimeStr, getFullDateStr, getLocalDateStr, writeToDb } from '../../utils'
+import { exitGroup, getLocalDateStr, writeToDb } from '../../utils'
 import GroupModal from './GroupModal'
 import { FirebaseContext } from '../../firebaseContext'
-import { setToast, showAddMemberModal, showConfirmationModal, showEntityInfoModal } from '../../redux/actionCreators'
+import { setToast, showAddMemberModal, showConfirmationModal, showEntityInfoModal, showLoader } from '../../redux/actionCreators'
 
 
-const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
+const EntityInfoModal = React.memo(({ selectedUserToChat, selectedGroupName }) => {
 
     const dispatch = useDispatch();
     const { db } = useContext(FirebaseContext);
 
     const userData = useSelector(state => state.user.userInfo)
-    const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
-    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)// use this firebaseapp everywhere instead of passing it as prop
-    // const db = getFirestore(firebaseApp);
-
     const [groupInfo, setGroupInfo] = useState();
 
+    console.log('__________________________________-EntityInfoModal')
 
     useEffect(() => {
         const docRef = doc(db, "group", selectedUserToChat);
@@ -35,9 +32,9 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
 
         // snapshot cleanup
         return () => unsubscribe();
-    }, [])
+    }, [selectedUserToChat])
 
-    console.log('-------------setGroupInfo', groupInfo)
+        console.log('-------------setGroupInfo', groupInfo)
 
     async function setInfo(data, groupId) {
         let localGroupInfo = localStorage.getItem('groupInfo');
@@ -115,6 +112,8 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
             return;
         }
 
+        dispatch(showLoader(true));
+
         // deleting group from user's connection/req list 
         console.log('username', userName)
         let q = query(collection(db, "users"), where("username", "==", userName));
@@ -126,7 +125,7 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
             receiverDoc.id = doc.id;
             return;
         });
-        await exitGroup(db, receiverDoc, selectedUserToChat, false, true)
+        await exitGroup(dispatch, db, receiverDoc, selectedUserToChat, false, true)
 
         // SENDING NOTIFICATION (USER removed)
         const msgData = {
@@ -138,7 +137,7 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
             type: "removed",
         };
         await writeToDb(db, msgData);
-
+        dispatch(showLoader(false));
     }
 
     const handleAddMember = () => {
@@ -177,7 +176,6 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
 
     // if user exit/removed from group and when he is added again then msgs are not showing in realtime,, if he reopens the chat than its working,, this may be bcz of the condiion if exitAT
 
-    if (!isEntityInfoModalVisible) return null;
 
     return (
         <>
@@ -239,7 +237,6 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
 
                 </div>
             </div>
-            <div className="overlay pointer zIndex4" onClick={() => dispatch(showEntityInfoModal(false))}></div>
 
             <GroupModal
                 type="add_member"
@@ -248,6 +245,6 @@ const EntityInfoModal = ({ selectedUserToChat, selectedGroupName }) => {
             />
         </>
     )
-}
+})
 
 export default EntityInfoModal

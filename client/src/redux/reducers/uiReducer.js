@@ -1,6 +1,7 @@
-import { RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL, SHOW_ADD_MEMBER_MODAL, SHOW_SIDEBAR } from "./../actionTypes";
+import { SHOW_LOADER, RESET_USERS_LIST, SHOW_CONFIRMATION_MODAL, HIDE_CONFIRMATION_MODAL, SHOW_USER_MODAL, SHOW_THEME_MODAL, SHOW_GROUP_MODAL, SHOW_ENTITY_INFO_MODAL, SHOW_EDIT_AVATAR_MODAL, SHOW_BLOCKED_CONNECTIONS_MODAL, SHOW_ADD_MEMBER_MODAL, SHOW_SIDEBAR } from "./../actionTypes";
 
 const initialState = {
+  isLoaderVisible: false,
   isSidebarVisible: false,
   resetUserSearchList: false,
   onConfirm: null,
@@ -17,18 +18,27 @@ const initialState = {
 
 export const uiReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SHOW_LOADER: {
+      return {
+        ...state,
+        isLoaderVisible: action.payload,
+      };
+    }
+
     case SHOW_SIDEBAR: {
       return {
         ...state,
         isSidebarVisible: action.payload,
       };
     }
+
     case RESET_USERS_LIST: {
       return {
         ...state,
         resetUserSearchList: action.payload
       }
     }
+
     case SHOW_CONFIRMATION_MODAL: {
       return {
         ...state,
@@ -37,6 +47,7 @@ export const uiReducer = (state = initialState, action) => {
         confirmationText: action.payload.confirmationText,
       }
     }
+
     case HIDE_CONFIRMATION_MODAL: {
       return {
         ...state,

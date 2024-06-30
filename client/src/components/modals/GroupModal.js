@@ -8,27 +8,22 @@ import { v4 as uuidv4 } from 'uuid';
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';
-import { setToast, showAddMemberModal, showGroupModal } from '../../redux/actionCreators';
+import { setToast, showAddMemberModal, showGroupModal, showLoader } from '../../redux/actionCreators';
 
 const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
 
+    const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
     const isGroupModalVisible = useSelector((state) => state.ui.isGroupModalVisible);
     const isAddMemberModalVisible = useSelector((state) => state.ui.isAddMemberModalVisible);
-    // const firebaseApp = useSelector(state => state.firebase.firebaseApp)
-    // const db = getFirestore(firebaseApp);
-    const { db } = useContext(FirebaseContext);
 
 
     const [selectedUsersForGroup, setSelectedUsersForGroup] = useState([])
     const [firstPage, setFirstPage] = useState(type !== "add_member");
     const [groupName, setGroupName] = useState('');
-
-
-    // NOTE:: CLOSE THIS GROUP MODAL WHEN CCLICKED ON CHECK>>>>
 
 
     // on creating group user can add any user by searcing the user name
@@ -40,6 +35,8 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
 
         // let connectionId;
         if (groupName) {
+            dispatch(showLoader(true));
+
             let connectionId = uuidv4(); // creating a new connection id
             const members = [];
 
@@ -120,6 +117,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
             setGroupName(''); // resetting input text field
             dispatch(showGroupModal(false))// hiding modal
             handleSelectedUserToChat(connectionId, true);
+            dispatch(showLoader(false));
         }
     }
 
@@ -174,6 +172,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
         // and add the group to users' request list (just like what we did when we created the group)
 
         if (selectedUsersForGroup) {
+            dispatch(showLoader(true));
             // let connectionId = uuidv4(); // creating a new connection id
             const members = [];// array of objects of member and their avatar
 
@@ -256,7 +255,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                 setGroupInfo(data);
                 dispatch(showAddMemberModal(false)); // closing addmember modal
             }
-
+            dispatch(showLoader(false));
         }
     }
 

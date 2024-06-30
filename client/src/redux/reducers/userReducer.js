@@ -5,7 +5,6 @@ const initialState = {
   userInfo: null,
   usersList: null,
   requestList: null,
-  theme: null,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -32,12 +31,6 @@ export const userReducer = (state = initialState, action) => {
       return {
         ...state,
         requestList: action.payload
-      }
-    }
-    case SET_THEME: {
-      return {
-        ...state,
-        theme: action.payload
       }
     }
 

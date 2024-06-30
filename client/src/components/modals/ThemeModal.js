@@ -1,28 +1,36 @@
-import { Trash, Upload, X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { X } from 'lucide-react'
+import React, { useContext, useState } from 'react'
 import { getPatternUrl } from '../../utils'
 import { useDispatch, useSelector } from 'react-redux'
-import { SET_THEME } from '../../redux/actionTypes'
-import { showThemeModal } from '../../redux/actionCreators'
+import { showLoader, showThemeModal } from '../../redux/actionCreators'
+import { doc, updateDoc } from 'firebase/firestore'
+import { FirebaseContext } from '../../firebaseContext'
 
 
 const ThemeModal = () => {
 
     const dispatch = useDispatch()
-    const [selectedPattern, setSelectedPattern] = useState('');
+    const { db } = useContext(FirebaseContext);
+    const userData = useSelector(state => state.user.userInfo);
     const isThemeModalVisible = useSelector((state) => state.ui.isThemeModalVisible);
+    
+    const [selectedPattern, setSelectedPattern] = useState('');
 
-    function setPattern(img) {
+    async function setPattern(img) {
+        dispatch(showLoader(true));
         // const body = document.querySelector('body');
         // body.style.backgroundImage = `url('${img}')`;
         setSelectedPattern(img);
-        if(localStorage.getItem('theme') !== img){
-            localStorage.setItem('theme',img)
-            dispatch({ type: SET_THEME, payload: img })
+        if (userData?.theme !== img) {
+            const docRef = doc(db, "users", userData?.id);
+            await updateDoc(docRef, {
+                theme: img
+            });
         }
+        dispatch(showLoader(false));
     }
 
-    if(!isThemeModalVisible) return null;
+    if (!isThemeModalVisible) return null;
 
     return (
         <>

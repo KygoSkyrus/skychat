@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateUserDoc } from '../../utils'
 import { doc, getFirestore, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { showBlockedConnectionsModal } from '../../redux/actionCreators'
+import { showBlockedConnectionsModal, showLoader } from '../../redux/actionCreators'
 
 const BlockedConnectionsModal = () => {
 
@@ -22,6 +22,7 @@ const BlockedConnectionsModal = () => {
 
         //connection is moved to req list from blocked list 
         if (userData?.blockList?.hasOwnProperty(id)) {
+            dispatch(showLoader(true));
 
             let connectionId = userData.blockList[id]?.id;
             let deletedTill = userData.blockList[id]?.blockedAt;
@@ -44,6 +45,7 @@ const BlockedConnectionsModal = () => {
 
 
             // setSelectedUserToChat(undefined)//only call when inner block button is clicked, not on list's btn, so that component wont render bcz of unneccesary state update
+            dispatch(showLoader(false));
         }
     }
 

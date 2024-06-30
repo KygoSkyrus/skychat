@@ -24,7 +24,7 @@ body {
   width: 200px;
   height: 200px;
   
-  background-image: url(./assets/page_bg-removebg-preview.png);
+  background-image: url(./assets/page-bg.png);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -57,7 +57,7 @@ body {
 
 /* BASIC CSS */
 .absolute-centered{
-  position: absolute;
+  position: absolute !important;
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
@@ -74,6 +74,9 @@ body {
 .fs-12 {
   font-size: 12px !important;
 }
+.fs-14 {
+  font-size: 14px !important;
+}
 .zIndex1 {
   z-index: 1 !important;
 }
@@ -89,12 +92,18 @@ body {
 .zIndex6 {
   z-index: 6 !important;
 }
+
+.form-control:focus{
+  box-shadow: 0 0 0 .25rem rgb(167 167 167 / 25%) !important;
+}
 /* BASICS */
 
 
 /* join page/ signin */
 .outer-join {
-  width: 350px;
+  /* width: 350px; */
+  width: 60vw;
+  max-width: 768px;
   height: 400px;
   /* position: absolute;
   top: 50%;
@@ -104,10 +113,32 @@ body {
   border-radius: 4px;
   /* padding: 0 30px; */
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   z-index: 1;
+}
+.signin .forms-holder{
+  min-width: 370px;
+}
+.signin-img {
+  width: 45%;
+}
+.signin-img img {
+  -webkit-filter: drop-shadow(5px 5px 5px #909090);
+  filter: drop-shadow(5px 5px 5px #909090);
+}
+.continue-with span{
+  position: relative;
+  z-index: 2;
+  background: lightgrey;
+  padding: 0 10px;
+}
+.continue-with section{
+  width: 100%;
+  height: 1px;
+  background: rgb(82, 82, 82);
+  position: absolute;
+  top: 55%;
 }
 .toast_container{
   position: absolute;
@@ -840,6 +871,65 @@ input[type="search"] {
 .request_list .list:hover .overrideClrRed{
   right: 0px;
   background-color: #dc3545a1;
+}
+
+.loader{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* z-index: 11; */
+}
+.loader section{
+  width: 70px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+/* 
+popup animation
+.loader > section .svg2{
+  display: none;
+}
+.loader > section .svg1{
+  animation: popup 1s infinite linear; 
+  -webkit-animation: popup 1s infinite linear;
+  transform: translateY(100px);
+  scale: 0.1; 
+}
+@keyframes popup {
+  100%{
+    scale: 1;
+    transform: translateY(0);
+  }
+} */
+
+.loader > section svg{
+  position: absolute;
+  transform: scaleX(-1);
+}
+.loader > section .svg1{
+  animation: blink 500ms steps(10, start) infinite; 
+  -webkit-animation: blink 500ms steps(5, start) infinite;
+}
+.loader > section .svg2{  
+  animation: blink2 500ms steps(5, start) infinite;
+  -webkit-animation: blink2 500ms steps(5, start) infinite;
+}
+@keyframes blink {
+  to{
+    visibility: hidden;
+  }
+}
+
+
+
+.loader + .overlay{
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /*********************************************** custom LOADER ************************************************* */

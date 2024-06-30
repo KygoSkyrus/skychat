@@ -1,5 +1,5 @@
 import { Timestamp, addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
-import { setToast } from "./redux/actionCreators";
+import { setToast, showLoader } from "./redux/actionCreators";
 
 export const dbUsers = {
     "test7": {
@@ -370,6 +370,8 @@ export function getPatternUrl(i) {
     return `https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(${i}).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d`
 }
 
+export const defaultTheme = 'https://firebasestorage.googleapis.com/v0/b/shopp-itt.appspot.com/o/patterns%2Fpattern%20(36).jpg?alt=media&token=66fa6c1d-4de8-4d33-8824-71095a0c8a4d';
+
 // export async function updateUserDoc(db, id, newValue) {
 //     const docRef = doc(db, "users", id);
 //     await updateDoc(docRef, newValue);
@@ -380,6 +382,7 @@ export async function acceptConnectionReq(db, userData, userName, dispatch) {
     console.log('acceptConnectionReq', userName)
 
     if (userData?.requests?.hasOwnProperty(userName)) {
+        dispatch(showLoader(true));
 
         let connectionId = userData.requests[userName]?.id;
         let deletedTill = userData.requests[userName]?.deletedTill || Timestamp.fromDate(new Date('1970'));
@@ -401,15 +404,16 @@ export async function acceptConnectionReq(db, userData, userName, dispatch) {
                 },
             }
         });
+        dispatch(showLoader(false));
         dispatch(setToast(`Request accepted`, false))
     }
 }
 
-export async function acceptGroupReq(db, userData, id) {
+export async function acceptGroupReq(db, userData, id, dispatch) {
     console.log('acceptGroupReq', id)
 
     if (userData?.requests?.hasOwnProperty(id)) {
-
+        dispatch(showLoader(true));
         let groupName = userData.requests[id]?.groupName;
         let deletedTill = userData.requests[id]?.deletedTill || Timestamp.fromDate(new Date('1970'));
 
@@ -431,14 +435,17 @@ export async function acceptGroupReq(db, userData, id) {
                 },
             }
         });
+        dispatch(showLoader(false));
     }
 }
 
-export async function declineConnectionReq(db, userData, userName, setSelectedUserToChat) {
+export async function declineConnectionReq(db, userData, userName, setSelectedUserToChat, dispatch) {
     console.log('declineConnectionReq', userName)
 
     //delete msgs here , don't remove from req list
     if (userData?.requests?.hasOwnProperty(userName)) {
+        dispatch(showLoader(true));
+
         // delete userData.requests[userName];
         userData.requests[userName].deletedTill = serverTimestamp();
 
@@ -449,11 +456,12 @@ export async function declineConnectionReq(db, userData, userName, setSelectedUs
         });
 
         setSelectedUserToChat(undefined)
+        dispatch(showLoader(false));
     }
 }
 
-export async function blockConnection(db, userData, id, setSelectedUserToChat) {
-
+export async function blockConnection(db, userData, id, setSelectedUserToChat, dispatch) {
+    dispatch(showLoader(true));
     let connectionId = '';
     //connection is moved to block list from connection list or req list / messages are not deketed
     console.log('blockConnection', id)
@@ -486,12 +494,15 @@ export async function blockConnection(db, userData, id, setSelectedUserToChat) {
         });
 
         setSelectedUserToChat(undefined)//only call when inner block button is clicked, not on list's btn, so that component wont render bcz of unneccesary state update
+        dispatch(showLoader(false));
     }
 }
 
 
-export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTriggeredByAdmin = false) => {
+export const exitGroup = async (dispatch, db, userData, id, setSelectedUserToChat, isTriggeredByAdmin = false) => {
     // @params: isTriggeredByAdmin-> will be false when this function is triggered by user(who's leaving), and if true it means user is being removed
+
+    dispatch(showLoader(true));
 
     //removing member from group list 
     const docRef = doc(db, "group", id);
@@ -547,7 +558,7 @@ export const exitGroup = async (db, userData, id, setSelectedUserToChat, isTrigg
         };
         await writeToDb(db, msgData);
     }
-
+    dispatch(showLoader(false));
 }
 
 

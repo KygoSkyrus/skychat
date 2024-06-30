@@ -1,22 +1,27 @@
 import React, { useState } from 'react'
 
-import SignInForm from './SignInForm';
 import Toast from './Toast';
-// import loginImg from "./../../assets/images/login-cover.svg"
+import Loader from './Loader';
+import SignInForm from './SignInForm';
+import signinImg from './../assets/signin-img.png'
+import signinImg500 from './../assets/signin-img500.png'
+import pagebg from './../assets/page-bg.png'
 
-const Authenticate = ({ firebaseApp }) => {
+const Authenticate = () => {
 
     const [currAuthMethod, setCurrAuthMethod] = useState('signin')
 
     return (
         <>
             <div className='position-relative d-flex'>
-                <div className="signin outer-join">
+                <div className="signin outer-join d-flex">
                     {/* <button type="button" id='closeSignin' className="d-none" data-bs-dismiss="modal" aria-label="Close"><i className='fa fa-times'></i></button> */}
-
+                    <div className='signin-img d-flex justify-content-center align-items-center ' style={{ zIndex: 2 }}>
+                        <img src={signinImg500} width={300} alt='skychat' />
+                    </div>
                     <div className="d-flex flex-row py-0 px-4 position-relative">
-                        {/* <div className='w-50 signin-img d-flex bg-dark' style={{ zIndex: 2 }}>
-                            <img src={loginImg} alt='shoppitt' />
+                        {/* <div className='w-25 signin-img d-flex bg-dark' style={{ zIndex: 2 }}>
+                            <img src={signinImg} alt='skychat' />
                         </div> */}
                         <div className='forms-holder' >
                             {currAuthMethod === 'signin' ?
@@ -29,7 +34,6 @@ const Authenticate = ({ firebaseApp }) => {
                                         signInOrSignUp="signin"
                                         switchTo="signup"
                                         setCurrAuthMethod={setCurrAuthMethod}
-                                        firebaseApp={firebaseApp}
                                     />
                                 </div>
                                 :
@@ -42,7 +46,6 @@ const Authenticate = ({ firebaseApp }) => {
                                         signInOrSignUp="signup"
                                         switchTo="signin"
                                         setCurrAuthMethod={setCurrAuthMethod}
-                                        firebaseApp={firebaseApp}
                                     />
                                 </div>
                             }
@@ -50,8 +53,9 @@ const Authenticate = ({ firebaseApp }) => {
                     </div>
                 </div>
 
-                <Toast/>
+                <Toast />
 
+                <Loader cName='absolute-centered' />
             </div>
         </>
     )

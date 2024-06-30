@@ -6,7 +6,7 @@ import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
 import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
-import { showConfirmationModal, showEntityInfoModal, showSidebar } from "../redux/actionCreators";
+import { showConfirmationModal, showEntityInfoModal, showLoader, showSidebar } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
 import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
 
@@ -17,30 +17,27 @@ import Toast from "./Toast";
 import EntityInfoModal from "./modals/EntityInfoModal";
 import { FirebaseContext } from "../firebaseContext";
 import ConfirmationModal from "./modals/ConfirmationModal";
+import Loader from "./Loader";
 
 
 export const NewRTCA = () => {
 
-  const { firebaseApp, db } = useContext(FirebaseContext);
-  // const db = getFirestore(firebaseApp);  
   const dispatch = useDispatch()
+  const { db } = useContext(FirebaseContext);
 
 
-  // const [searchedUserList, setSearchedUserList] = useState() // queries user list
   const [selectedUserToChat, setSelectedUserToChat] = useState()
-  // const [selectedGroupToChat, setSelectedGroupToChat] = useState(null)
   const [isGroupSelected, setIsGroupSelected] = useState(false)
   const [selectedGroupName, setSelectedGroupName] = useState(undefined)
   const [connectionHeader, setConnectionHeader] = useState(true)
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
 
-
-
-  const currentUser = useSelector(state => state.user.currentUser)
+  
+  
   const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
-  // const sidebar = useSelector(state => state.ui.sidebar);
+  const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
 
   console.log('===============================================================================userData', userData)
   // console.log('currentUser', currentUser)
@@ -84,7 +81,7 @@ export const NewRTCA = () => {
       for (const uName of Object.keys(userData?.requests)) {
         const hasNewMessages = await getConnectionRequests(uName);
         if (hasNewMessages) {
-          connections.push(userData?.requests[uName].groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
+          connections.push(userData?.requests[uName]?.groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
           ids.push(uName); // for chatbox to hide show the chat input field
         }
       }
@@ -133,8 +130,11 @@ export const NewRTCA = () => {
 
     console.log('handleSelectedUserToChat  clicked', username, groupName)
     if (groupName) {
-      setIsGroupSelected(true);
+      setIsGroupSelected(true)
       setSelectedGroupName(groupName)
+    }else{
+      setIsGroupSelected(false)
+      setSelectedGroupName(undefined)
     }
 
     // retrieveTexts(username);// it will be in useefct in chatbox compo and whenever selectedUsertoChat is changed than it will run this function
@@ -146,6 +146,7 @@ export const NewRTCA = () => {
     //connection is moved to req list after deleting msgs
     console.log('clearChat', id)
     if (userData?.connections?.hasOwnProperty(id)) {
+      dispatch(showLoader(true));
 
       // let connectionId = userData.connections[id]?.id;
       userData.connections[id].deletedTill = serverTimestamp();
@@ -158,6 +159,7 @@ export const NewRTCA = () => {
 
       setSelectedUserToChat(undefined)
       setIsGroupSelected(false)
+      dispatch(showLoader(false));
     }
   }
 
@@ -166,7 +168,7 @@ export const NewRTCA = () => {
     //connection is moved to req list after deleting msgs
     console.log('deleteConnection', id)
     if (userData?.connections?.hasOwnProperty(id)) {
-
+      dispatch(showLoader(true));
       let connectionId = userData.connections[id]?.id;
       delete userData.connections[id];
 
@@ -185,6 +187,7 @@ export const NewRTCA = () => {
 
       setSelectedUserToChat(undefined)
       setIsGroupSelected(false)
+      dispatch(showLoader(false));
     }
   }
 
@@ -230,14 +233,14 @@ export const NewRTCA = () => {
                       <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Do you want to clear this chat?`, () => clearChat(selectedUserToChat)))}>Clear chat</li>
                       {isGroupSelected ?
                         <>
-                          <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit this group <code>${selectedGroupName}</code>?`, () => exitGroup(db, userData, selectedUserToChat, setSelectedUserToChat, false)))}>Exit Group</li>
+                          <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit this group <code>${selectedGroupName}</code>?`, () => exitGroup(dispatch, db, userData, selectedUserToChat, setSelectedUserToChat, false)))}>Exit Group</li>
                           <li className="dropdown-item pointer" onClick={() => dispatch(showEntityInfoModal(true))}>Group info</li>
                         </>
                         :
                         <>
                           <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to delete connection with <code>${selectedUserToChat}</code>?`, () => deleteConnection(selectedUserToChat)))}>Delete connection</li>
                           <li className="dropdown-item pointer"
-                            onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat)))}
+                            onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}
                           >Block connection</li>
                         </>
                       }
@@ -315,7 +318,7 @@ export const NewRTCA = () => {
 
                           {/* ACTIONS */}
                           {userData?.connections[x]?.groupName ?
-                            <section className="blockConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${userData?.connections[x].groupName}</code>?`, () => exitGroup(db, userData, x, setSelectedUserToChat, false, false)))} title="Exit group">
+                            <section className="blockConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${userData?.connections[x].groupName}</code>?`, () => exitGroup(dispatch, db, userData, x, false, false)))} title="Exit group">
                               <LogOut size={18} />
                             </section>
                             :
@@ -324,7 +327,7 @@ export const NewRTCA = () => {
                                 <UserRoundX size={18} />
                               </section>
                               <section className="blockConnection"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${x}</code>?`, () => blockConnection(db, userData, x, setSelectedUserToChat)))}
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${x}</code>?`, () => blockConnection(db, userData, x, setSelectedUserToChat, dispatch)))}
                                 title="Block connection">
                                 <Ban size={18} />
                               </section>
@@ -364,21 +367,21 @@ export const NewRTCA = () => {
 
                           {/* ACTIONS */}
                           <section className={`acceptReq ${uName?.groupName && ' overrideClrGreen'}`} onClick={() =>
-                            uName?.groupName ? acceptGroupReq(db, userData, id) : acceptConnectionReq(db, userData, id, dispatch)} title="Accept connection">
+                            uName?.groupName ? acceptGroupReq(db, userData, id, dispatch) : acceptConnectionReq(db, userData, id, dispatch)} title="Accept connection">
                             <UserCheck2 size={18} />
                           </section>
                           {uName?.groupName ?
-                            <section className="declineReq overrideClrRed" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${uName?.groupName}</code>?`, () => exitGroup(db, userData, id, setSelectedUserToChat, false)))} title="Decline & exit group">
+                            <section className="declineReq overrideClrRed" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to exit group <code>${uName?.groupName}</code>?`, () => exitGroup(dispatch, db, userData, id, false, false)))} title="Decline & exit group">
                               <UserRoundX size={18} />
                             </section>
                             :
                             <>
-                              <section className="blockReq declineReq" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, id, setSelectedUserToChat)))} title="Decline connection">
+                              <section className="blockReq declineReq" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, id, setSelectedUserToChat, dispatch)))} title="Decline connection">
                                 {/* <Trash size={18} /> */}
                                 <UserRoundX size={18} />
                               </section>
                               <section className="blockReq"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${uName}</code>?`, () => blockConnection(db, userData, id, setSelectedUserToChat)))}
+                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${uName}</code>?`, () => blockConnection(db, userData, id, setSelectedUserToChat, dispatch)))}
                                 title="Block connection">
                                 {/* <UserRoundX size={18} /> */}
                                 <Ban size={18} />
@@ -410,17 +413,21 @@ export const NewRTCA = () => {
 
 
           {/* only needed for group */}
-          {selectedUserToChat && isGroupSelected &&
-            <EntityInfoModal
-              selectedUserToChat={selectedUserToChat}
-              selectedGroupName={selectedGroupName}
-            />
+          {isEntityInfoModalVisible &&
+            <>
+              <EntityInfoModal
+                selectedUserToChat={selectedUserToChat}
+                selectedGroupName={selectedGroupName}
+              />
+              <div className="overlay pointer zIndex4" onClick={() => dispatch(showEntityInfoModal(false))}></div>
+            </>
           }
 
           <ConfirmationModal />
 
         </div>
         <Toast />
+        <Loader />
       </div>
     </>
   )

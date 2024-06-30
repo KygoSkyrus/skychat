@@ -6,7 +6,7 @@ import BlockedConnectionsModal from './BlockedConnectionsModal'
 import ThemeModal from './ThemeModal'
 import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
-import { setToast, showBlockedConnectionsModal, showConfirmationModal, showEditAvatarModal, showThemeModal, showUserModal } from '../../redux/actionCreators'
+import { setToast, showBlockedConnectionsModal, showConfirmationModal, showEditAvatarModal, showLoader, showThemeModal, showUserModal } from '../../redux/actionCreators'
 
 const UserModal = () => {
 
@@ -24,10 +24,12 @@ const UserModal = () => {
     }
 
     const togglePrivacy = async (newPrivacySetting) => {
+        dispatch(showLoader(true));
         const docRef = doc(db, "users", userData?.id);
         await updateDoc(docRef, {
             privacy: newPrivacySetting,
         });
+        dispatch(showLoader(false));
         dispatch(setToast(`Account privacy turned ${newPrivacySetting ? 'on' : 'off'}`, false))
     };
 

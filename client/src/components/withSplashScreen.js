@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 
 function SplashMessage() {
     return (
-        <div className="mainlogo">
+        <div className="mainlogo absolute-centered mainlogo text-center text-light">
         <div className="">
           SKYCHAT
             {/* <img src={mainlogo}  alt="logo" /> */}

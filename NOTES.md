@@ -69,13 +69,19 @@
 - [done]on every modal we have created a state in parent from where the modal will be publised,,, we did this to control visisibility,, this way the parent component itself renders when this state toggles as well as the child,, but what if we dispatch an action from parent,,, and get the state in child only, than maybe we will be able to save parent to rerender,, and from child componnet we can return null if the state is false and the child if its true
 - [done]need to have overlay for few modals(block,entity,editavatar,theme), so that the specific modal is closed,, now whats happening is that if you close editavatar modal than it will close the usermodal too,bcz its using usermodal's overlay,, same with blocked connection modal.. if the above modal visibility approcah is implemented than we can hve
 - [done]maybe try the modal thing for sidebar too
+- [done]for modals  that has some complex calculations insidemm should not be rendered before they needed,,, revert those modals to previous approach ,, ex entityInfoModal... in useeefect,, its fetching all data before the enfinity modal is loaded
+- [done]there is a need of a loader mostly on every action
+- [done]add theme in document
+- [done]fix signin ui 
+- [done]need to check and optimize chatbox componnet
+- [done]when a group chat is openend than opening some user from search is not happening
+- [done]all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
 
-- there is a need of a loader mostly on every action
-
-- all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
+- add email verification and password reset for email password signin
+- what about google login????? without it user can login with fake accounts too
+- []currentUser state in store may not be needed,, we have everthing in userData [maybe needed,,, reviti after implementing google login]
 - fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
-- need to check and optimize chatbox componnet
 
 # Todo 
 - [done]delete msg
@@ -86,12 +92,12 @@
 - [done]username can not be changed , add regex for usernmae , set criteria (username can only be in lowercase and number, cannot have characters)
 - [done]fix theme and add layer
 - [done]on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
+- [done]on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
+- [done]add a layer or loader on loading action
 
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
 - maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
-- on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
 - try push notifications
-- add a layer or loader on loading action
 - add a fallback component on error,,,, 
 - add lazy loading in pattern images
 - change fonts
@@ -115,6 +121,8 @@
 
 
 **things to do before deploying**
+- check responsivness
+- fix splash screen  with logo
 - add by kygoskyrus at bottom
 - add loading more msgs feature, only showing latest 20 rn
 - add dummy accounts 
@@ -356,3 +364,4 @@ console.log(addOne(2)); // 3
 //In this example, the add function takes two arguments and returns their sum. The addOne function is a curried version of the add function that takes one argument and returns a function that adds that argument to 1.
 ```
 
+- in firebase auth.onAuthStateChanged is a very usefull asset to know if a user is till logged in or not,, this is for every auth method(firebase ogin, google etc),,, without setting any extra cookie or session

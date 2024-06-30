@@ -1,18 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  BrowserRouter as Router,
-} from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from 'react-redux';
 
 import App from './App';
 import store from './redux/store';
-// import { initializeApp } from 'firebase/app';
-// import { firebaseConfig } from './firebaseConfig';
-
-// const firebaseApp = initializeApp(firebaseConfig);
-
-
 import { FirebaseProvider } from './firebaseContext';
 
 ReactDOM.render(
@@ -20,9 +12,7 @@ ReactDOM.render(
     <Router>
       <FirebaseProvider>
         <Provider store={store}>
-          <App
-          // firebaseApp={firebaseApp}
-          />
+          <App/>
         </Provider>
       </FirebaseProvider>
     </Router>

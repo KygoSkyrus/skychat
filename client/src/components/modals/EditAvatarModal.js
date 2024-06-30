@@ -7,7 +7,7 @@ import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
 import { FirebaseContext } from '../../firebaseContext';
 import { getAvatarUrl } from '../../utils'
-import { setToast, showEditAvatarModal } from '../../redux/actionCreators';
+import { setToast, showEditAvatarModal, showLoader } from '../../redux/actionCreators';
 
 
 const EditAvatarModal = () => {
@@ -30,6 +30,8 @@ const EditAvatarModal = () => {
             dispatch(setToast(`Select different avatar or upload new`, true))
             return;
         }
+
+        dispatch(showLoader(true));
 
         let updatedAvatar;
 
@@ -96,6 +98,7 @@ const EditAvatarModal = () => {
                 });
             }
         }
+        dispatch(showLoader(false));
         dispatch(setToast(`Profile updated`, false))
     }
 

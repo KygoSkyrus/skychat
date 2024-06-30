@@ -1,44 +1,24 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
 import { SET_CURRENT_USER } from '../redux/actionTypes';
 import { defaultAvatar } from '../utils';
 import { setUserData } from '../redux/thunk/userDataThunk';
 import { FirebaseContext } from '../firebaseContext';
-import { setToast } from '../redux/actionCreators';
+import { setToast, showLoader } from '../redux/actionCreators';
 
-// import { goWithGoogle, signinAPI, defaultAvatar, inProgressLoader } from './Utility'
 
-const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, currAuthMethod, setCurrAuthMethod }) => {
+const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, setCurrAuthMethod }) => {
 
     const auth = getAuth();
     const navigate = useNavigate()
     const dispatch = useDispatch()
+
+    const { db } = useContext(FirebaseContext);
     const [userCredentials, setUserCredentials] = useState({ email: '', password: '', username: '' });
-
-    // const firestore = getFirestore(firebaseApp);
-    const { firebaseApp, db } = useContext(FirebaseContext);
-
-
-    // useEffect(() => {
-
-    //     auth.onAuthStateChanged((user) => {
-    //         const userInfo = document.getElementById('user-info');
-    //         console.log('authstate changed', user)
-    //         //set user in redux
-    //         if (user) {
-    //             dispatch({ type: SET_CURRENT_USER, payload:user })
-    //             navigate('/chat')
-    //         } else {
-    //             dispatch({ type: SET_CURRENT_USER, payload:null })
-    //             console.log('')
-    //         }
-    //     });
-    // }, [])
-
 
     useEffect(() => {
         if (signInOrSignUp === "signup")
@@ -46,7 +26,6 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         else
             document.getElementById('email1').focus();
     }, [signInOrSignUp])
-
 
 
     function handleClick(e) {
@@ -81,6 +60,8 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             dispatch(setToast(`Invalid username. Only characters a-z and numbers are  acceptable.`, true))
             return false;
         }
+
+        dispatch(showLoader(true));
 
         //checks if username already exists or not
         let res = await fetch(`/api/doesUserExist`, {
@@ -128,10 +109,12 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 navigate('/chat')
             }
         }
+        dispatch(showLoader(false));
     }
 
     function loginUserFirebase() {
         console.log('login')
+        dispatch(showLoader(true));
         // inProgressLoader(dispatch, true)
         signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
             .then(
@@ -139,17 +122,16 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     const user = response.user;
                     console.log('signin user', user)
                     dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                    // signinAPI(user?.email, "", "", user?.photoURL, dispatch)//not needed 
-                    // inProgressLoader(dispatch, false)
                     navigate('/chat')
+                    dispatch(showLoader(false));
                 }
             )
             .catch((error) => {
                 dispatch(setToast(`Authentication Failed, Invalid email/password`, true))
-                // inProgressLoader(dispatch, false)
+                dispatch(showLoader(false));
                 setUserCredentials({ email: '', password: '', username: '' })
-                // dispatch(invokeToast({ isSuccess: false, message: "Authentication Failed, Invalid email/password" }))
             });
+        
     }
 
 
@@ -167,19 +149,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             time: serverTimestamp(),
         };
         await addDoc(collection(db, "users"), userData);
-
         return true;
-        // for adding the custom document id (here username is used as document ID)
-        // const collectionRef = collection(firestore, "users");
-        // await setDoc(doc(collectionRef, username), {
-        //     username: username,
-        //     email: email,
-        //     avatar: photo,
-        //     connections:{},
-        //     requests:{},
-        //     time: serverTimestamp(),
-        // });
-
     }
 
     //toggles between signIn and signUp form
@@ -209,76 +179,91 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         setUserCredentials({ email: '', password: '', username: '' })
     }
 
-    // export const goWithGoogle = (val, navigate, dispatch, route, isAdminLogin) => {
-    //     const auth = getAuth();
-    //     const provider = new GoogleAuthProvider();
-    //     signInWithPopup(auth, provider)
-    //         .then((result) => {
+    const goWithGoogle = async (val, navigate, dispatch, route, isAdminLogin) => {
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        let isUserCreated = false;
+        await signInWithPopup(auth, provider)
+            .then((result) => {
 
-    //             const credential = GoogleAuthProvider.credentialFromResult(result);
-    //             const token = credential.accessToken;// a Google Access Token. can be used to access the Google API.
-    //             if (token) {
-    //                 let dname = result.user.displayName.split(" ")
-    //                 let lastname = ''
-    //                 let firstname = dname[0]
-    //                 if (dname.length > 1) {
-    //                     lastname = dname[dname.length - 1]
-    //                 }
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;// a Google Access Token. can be used to access the Google API.
+                if (token) {
 
-    //                 if (val === 'signup') {
-    //                     signinAPI('signup', result.user.email, firstname, lastname, result.user.photoURL, dispatch)
-    //                     navigate('/user');//sending user to user page for filling out other details
-    //                 } else {
-    //                     signinAPI('signin', result.user.email, '', '', '', dispatch, navigate, route, isAdminLogin)
-    //                 }
-    //             }
-    //         })
-    //         .catch((error) => {
-    //             dispatch(invokeToast({ isSuccess: false, message: "Google login failed, Try Again with valid google account" }))
-    //         });
+                    console.log('result--',result)
+                    // have to handle username here..
+                    // also this should be done for signup only,,and users collection shoule be checked if user already exits,,, while signing up
+                    let isRegistered = registerUserInDB(result?.email, userCredentials?.username, result?.photoURL)
+                    if (isRegistered) isUserCreated = true;
 
-    // }
+                    // if (val === 'signup') {
+                    //     signinAPI('signup', result.user.email, firstname, lastname, result.user.photoURL, dispatch)
+                    //     navigate('/user');//sending user to user page for filling out other details
+                    // } else {
+                    //     signinAPI('signin', result.user.email, '', '', '', dispatch, navigate, route, isAdminLogin)
+                    // }
+                }
+            })
+            .catch((error) => {
+                // dispatch(invokeToast({ isSuccess: false, message: "Google login failed, Try Again with valid google account" }))
+            });
 
-    // export const signinAPI = (val, email, firstname, lastname, photo, dispatch, navigate, route, isAdminLogin = false) => {
+            if (isUserCreated) {
+                await updateProfile(auth.currentUser, { displayName: 'dg333' })
+                    .catch(
+                        (err) => console.log('err', err)
+                    );
 
-    //     let resp;
-    //     fetch(`/api/${val}`, {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json"
-    //         },
-    //         body: JSON.stringify({
-    //             firstname, lastname, email, photo, isAdminLogin
-    //         })
-    //     })
-    //         .then(response => {
-    //             resp = response;
-    //             return response.json()
-    //         })
-    //         .then(res => {
-    //             document.getElementById('closeSignin').click()//closing the modal
-    //             if (resp.status === 200) {
-    //                 dispatch(invokeToast({ isSuccess: true, message: res.message }))
-    //             } else {
-    //                 dispatch(invokeToast({ isSuccess: false, message: res.message }))
-    //             }
+                    console.log(' auth.currentUser', auth.currentUser)
 
-    //             if (res.is_user_logged_in) {
-    //                 dispatch(isUserLoggedIn({ value: true }))
-    //                 dispatch(setUserDetails({ user: res.user }))
-    //             }
+                //setting user and redirecting to chats
+                dispatch(setUserData(userCredentials?.username, db));
+                dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                navigate('/chat')
+            }
 
-    //             if (isAdminLogin && res.is_user_logged_in) {
-    //                 dispatch(setAdminAuthStatus({ value: res.is_user_logged_in }))
-    //                 navigate(`/admin/${route}`)//navigates to requested route
-    //             } 
-    //         })
-    // }
+    }
+
+    const signinAPI = (val, email, firstname, lastname, photo, dispatch, navigate, route, isAdminLogin = false) => {
+
+        let resp;
+        fetch(`/api/${val}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                firstname, lastname, email, photo, isAdminLogin
+            })
+        })
+            .then(response => {
+                resp = response;
+                return response.json()
+            })
+            .then(res => {
+                document.getElementById('closeSignin').click()//closing the modal
+                if (resp.status === 200) {
+                    // dispatch(invokeToast({ isSuccess: true, message: res.message }))
+                } else {
+                    // dispatch(invokeToast({ isSuccess: false, message: res.message }))
+                }
+
+                if (res.is_user_logged_in) {
+                    // dispatch(isUserLoggedIn({ value: true }))
+                    // dispatch(setUserDetails({ user: res.user }))
+                }
+
+                if (isAdminLogin && res.is_user_logged_in) {
+                    // dispatch(setAdminAuthStatus({ value: res.is_user_logged_in }))
+                    navigate(`/admin/${route}`)//navigates to requested route
+                } 
+            })
+    }
 
     return (
         <>
             <h5 className='text-dark text-center fw-bold'>{title}</h5>
-            <section className='text-center'>{description}</section>
+            <section className='text-center fs-14'>{description}</section>
 
             <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e => handleClick(e)}>
                 {signInOrSignUp === "signup" &&
@@ -318,15 +303,15 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
                 <button type='submit' className='btn btn-outline-warning w-100 my-2'>{btnText}</button>
 
-                <section className='my-3 text-end w-100 pointer' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
+                <section className='my-3 text-end w-100 pointer fs-14' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
 
-                <section className='continue-with position-relative w-100 text-center'>
-                    <span >OR CONTINUE WITH</span>
+                <section className='continue-with position-relative w-100 text-center mt-2'>
+                    <span className='fs-12'>OR CONTINUE WITH</span>
                     <section></section>
                 </section>
 
                 <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1'
-                // onClick={() => goWithGoogle(signInOrSignUp, navigate, dispatch)}
+                onClick={() => goWithGoogle(signInOrSignUp, navigate, dispatch)}
                 >
                     <svg width="25" height="25" viewBox="5 5 35 35" xmlns="http://www.w3.org/2000/svg" style={{ height: "32px", width: "32px", marginLeft: "-8px" }}><g fill="none" fillRule="evenodd"><path d="M31.64 23.205c0-.639-.057-1.252-.164-1.841H23v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"></path><path d="M23 32c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711h-3.007v2.332A8.997 8.997 0 0 0 23 32z" fill="#34A853"></path><path d="M17.964 24.71a5.41 5.41 0 0 1-.282-1.71c0-.593.102-1.17.282-1.71v-2.332h-3.007A8.996 8.996 0 0 0 14 23c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path><path d="M23 17.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C27.463 14.891 25.426 14 23 14a8.997 8.997 0 0 0-8.043 4.958l3.007 2.332c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"></path><path d="M14 14h18v18H14V14z"></path></g></svg> <span>Google</span>
                 </button>
