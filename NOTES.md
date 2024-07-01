@@ -76,10 +76,10 @@
 - [done]need to check and optimize chatbox componnet
 - [done]when a group chat is openend than opening some user from search is not happening
 - [done]all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
+- [done]what about google login????? (google login implemented)
 
+- have to check for email too,, currently a user is able to create multiple acc with single email
 - add email verification and password reset for email password signin
-- what about google login????? without it user can login with fake accounts too
-- []currentUser state in store may not be needed,, we have everthing in userData [maybe needed,,, reviti after implementing google login]
 - fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
 

@@ -578,3 +578,22 @@ export function getFormattedNotification(msgData, myName) {
     }
     return msgData?.message;
 }
+
+
+export function toggleLoginFields(val) {
+    // val== true // hide fields
+    let zIndex = 1;
+    let opacity = 1;
+    if(val) {
+        zIndex = 4;
+        opacity = 0.1;
+    }
+    document.getElementById('username').style.zIndex = zIndex;
+    document.querySelector('.googleBtn').style.zIndex = zIndex;
+
+    document.getElementById('email1').style.opacity = opacity;
+    document.getElementById('password1').style.opacity = opacity;
+    document.querySelector('.toggle').style.opacity = opacity;
+    document.querySelector('.continue-with').style.opacity = opacity;
+    document.querySelector('.createAcc').style.opacity = opacity;
+}

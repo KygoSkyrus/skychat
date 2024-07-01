@@ -15,9 +15,8 @@ const Authenticate = () => {
         <>
             <div className='position-relative d-flex'>
                 <div className="signin outer-join d-flex">
-                    {/* <button type="button" id='closeSignin' className="d-none" data-bs-dismiss="modal" aria-label="Close"><i className='fa fa-times'></i></button> */}
                     <div className='signin-img d-flex justify-content-center align-items-center ' style={{ zIndex: 2 }}>
-                        <img src={signinImg500} width={300} alt='skychat' />
+                        {/* <img src={signinImg500} width={300} alt='skychat' /> */}
                     </div>
                     <div className="d-flex flex-row py-0 px-4 position-relative">
                         {/* <div className='w-25 signin-img d-flex bg-dark' style={{ zIndex: 2 }}>
@@ -40,7 +39,7 @@ const Authenticate = () => {
                                 <div className={`signup-form ${window.outerWidth < 768 && 'd-none'}`} >
                                     <SignInForm
                                         title="Create an account"
-                                        description="Enter your email below to create your account"
+                                        description="Enter your details below to create your account"
                                         btnText="Create account"
                                         toggleText='Exsiting user? SignIn'
                                         signInOrSignUp="signup"
