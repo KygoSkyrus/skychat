@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail } from "firebase/auth";
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
 import { SET_CURRENT_USER } from '../redux/actionTypes';
@@ -31,6 +31,10 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     function handleClick(e) {
         e?.preventDefault();
+        // blocking email/password auth as email verification is not implemented
+        dispatch(setToast('Email/password authentication is currently unavailable, please login with Google instead',false))
+        return true;
+        
         if (signInOrSignUp === "signup") {
             createUserAccountFirebase()
         } else if (signInOrSignUp === "signin") {
@@ -78,6 +82,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     function loginUserFirebase() {
         console.log('login')
+        // emailVerication();
         dispatch(showLoader(true));
         // inProgressLoader(dispatch, true)
         signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
@@ -104,7 +109,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             toggleLoginFields(true);
 
             const isVerified = await verifyUserName(true);
-            if (isVerified)  goWithGoogle();
+            if (isVerified) goWithGoogle();
             else dispatch(showLoader(false));
         } else {
             goWithGoogle();
@@ -161,7 +166,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         if (isGoogle && userCredentials?.username?.length === 0) {
             dispatch(setToast(`please fill out username field`, true))
             return false;
-        } 
+        }
 
         if (!isGoogle && (userCredentials?.username?.length === 0 || userCredentials?.email.length === 0 || userCredentials?.password.length === 0)) {
             dispatch(setToast(`please fill out all required fields`, true))
@@ -252,6 +257,22 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         setUserCredentials({ email: '', password: '', username: '' })
     }
 
+    function emailVerication() {
+        const actionCodeSettings = {
+            url: 'https://localhost:3000',
+            handleCodeInApp: true,
+            // dynamicLinkDomain: 'https://skyrus-3416b.firebaseapp.com'
+        };
+
+        sendSignInLinkToEmail(auth, userCredentials?.email, actionCodeSettings)
+            .then(() => {
+                window.localStorage.setItem('emailForSignIn', userCredentials?.email);
+            })
+            .catch((error) => {
+                console.log('userCredentials?.email', error)
+            });
+    }
+
     return (
         <>
             <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: '#ff000029' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleLoginFields(false) }}></div>
@@ -267,7 +288,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                         placeholder="Username"
                         value={userCredentials?.username}
                         onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
-                        onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
+                    // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
                     />
                 }
 
@@ -280,7 +301,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     aria-describedby="emailHelp"
                     value={userCredentials?.email}
                     onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
-                    onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('password1').focus()}
+                // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('password1').focus()}
                 />
 
                 <input
@@ -291,7 +312,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     placeholder="Password*"
                     value={userCredentials?.password}
                     onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
-                    onKeyUp={(e) => e.key === "Enter" && e.target.value && handleClick(e)}
+                // onKeyUp={(e) => e.key === "Enter" && e.target.value && handleClick(e)}
                 />
 
                 <button type='submit' className='btn btn-outline-warning w-100 my-2 createAcc'>{btnText}</button>

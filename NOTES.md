@@ -79,7 +79,6 @@
 - [done]what about google login????? (google login implemented)
 
 - have to check for email too,, currently a user is able to create multiple acc with single email
-- add email verification and password reset for email password signin
 - fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
 
@@ -364,4 +363,9 @@ console.log(addOne(2)); // 3
 //In this example, the add function takes two arguments and returns their sum. The addOne function is a curried version of the add function that takes one argument and returns a function that adds that argument to 1.
 ```
 
+
+- onKeyUp are no needed on inputs which are enclosed in a form to go to next field.. its a by deafult feature of a  form
+
+- **firebase**
 - in firebase auth.onAuthStateChanged is a very usefull asset to know if a user is till logged in or not,, this is for every auth method(firebase ogin, google etc),,, without setting any extra cookie or session
+- the per day limit for sending signin email link is 10,, to get more billing instrument should be added
