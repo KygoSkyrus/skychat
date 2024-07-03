@@ -36,14 +36,18 @@ function App() {
 
   async function checkAuthStatus() {
     await auth.onAuthStateChanged((user) => {
-      // console.log('authstate changed NWRTC', user)
+      console.log('authstate changed NWRTC', user,user?.displayName)
       if (user) {
-        console.log('the current user',user)
-        dispatch({ type: SET_CURRENT_USER, payload: user })
-        navigate('/chat')
-
-        //have to store the result of this query in cache 
-        dispatch(setUserData(user.displayName, db));
+        dispatch(setUserData(user?.displayName, db))
+          .then(doesUserExist => {
+            console.log('doesUserExist', doesUserExist)
+            if (doesUserExist) {
+              dispatch({ type: SET_CURRENT_USER, payload: user })
+              navigate('/chat')
+            }else{
+              navigate('/')
+            }
+          })
       } else {
         dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
@@ -65,7 +69,7 @@ function App() {
         </Routes>
         <div className="body-bg"><span>SKYCHAT</span></div>
       </>
-      
+
       <Link to={'/about'} className="info">
         <Info />
       </Link>

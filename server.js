@@ -31,20 +31,25 @@ const firestore = admin.firestore();
 
 app.post('/api/doesUserExist', (req, res) => {
 
-  const { username } = req.body;
+  const { username, email } = req.body;
   console.log('user', username)
 
   const usersRef = firestore.collection('users');
-  const query = usersRef.where('username', '==', username);
+  let query;
+  if( username){
+    query = usersRef.where('username', '==', username);
+  }else if( email){
+    query = usersRef.where('email', '==', email);
+  }
 
   query.get()
     .then(snapshot => {
       if (snapshot.empty) {
-        console.log('User with username "test1" not found.');
+        console.log('User not found.');
         res.json({userFound: false, message:""})
       } else {
         const userDoc = snapshot.docs[0];
-        console.log('User with username "test1" found:', userDoc.data());
+        console.log('User found:', userDoc.data());
         res.json({userFound: true, message:"Username already exists! Please try a different one."})
       }
     })

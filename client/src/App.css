@@ -175,9 +175,11 @@ body {
   border-top: 5px solid #ec407a;
 }
 .toast_animation{
-  right: -189px; 
+  /* right: -189px; 
   right: calc(-100% - 4px);
-  top: 10%;
+  top: 10%; */
+  top: unset !important;
+  bottom: -28% !important;
 }
 
 

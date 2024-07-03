@@ -78,7 +78,6 @@
 - [done]all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
 - [done]what about google login????? (google login implemented)
 
-- have to check for email too,, currently a user is able to create multiple acc with single email
 - fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
 

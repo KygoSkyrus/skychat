@@ -579,12 +579,25 @@ export function getFormattedNotification(msgData, myName) {
     return msgData?.message;
 }
 
+export async function doesUserExistApi(username, email) {
+    let res = await fetch(`/api/doesUserExist`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username, email
+        })
+    })
+    let data = await res.json()
+    return data;
+}
 
 export function toggleLoginFields(val) {
     // val== true // hide fields
     let zIndex = 1;
     let opacity = 1;
-    if(val) {
+    if (val) {
         zIndex = 4;
         opacity = 0.1;
     }

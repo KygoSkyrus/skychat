@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RESET_TOAST } from "../redux/actionTypes";
 
-const Toast = () => {
+const Toast = React.memo(() => {
   let timer;
   const dispatch = useDispatch();
   const toastContainer = useRef();
@@ -13,25 +13,25 @@ const Toast = () => {
   //   };
 
   const showToast = () => {
-    console.log("showtoast", toastContainer.current.classList);
+    console.log("showtoast", toastContainer?.current?.classList);
     if (isError) {
-      toastContainer.current.classList.add(
+      toastContainer?.current?.classList.add(
         "d-block",
         "toast_animation",
         "error"
       );
     } else {
-      toastContainer.current.classList.add("d-block", "toast_animation");
+      toastContainer?.current?.classList.add("d-block", "toast_animation");
     }
     timer = setTimeout(() => {
-      toastContainer.current.classList.remove(
+      toastContainer?.current?.classList.remove(
         "d-block",
         "toast_animation",
         "error"
       );
       dispatch({ type: RESET_TOAST });
       //call hidetoast instead of the above lines
-    }, 3500);
+    }, 350000000);
   };
 
   const isToastVisible = useSelector((state) => state.toast.toast);
@@ -51,6 +51,6 @@ const Toast = () => {
       </div>
     </>
   );
-};
+});
 
 export default Toast;

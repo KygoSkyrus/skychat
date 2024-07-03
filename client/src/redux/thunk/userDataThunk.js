@@ -9,13 +9,16 @@ export const setUserData = (username,db) => async (dispatch) => {
     try {
         const q = query(collection(db, 'users'), where('username', '==', username));
 
-        // Listen for real-time updates
+        let ret = false;
         onSnapshot(q, (querySnapshot) => {
             querySnapshot.forEach((doc) => {
-                const userObj = { ...doc.data(), id: doc.id };
+                let userObj = { ...doc.data(), id: doc.id };
+                console.log('uo',userObj)
+                ret = true;
                 dispatch({ type: SET_USER_INFO, payload: userObj });
             });
         });
+        return ret
 
     } catch (error) {
         dispatch(setToast(`Error: Unable to get user data`, true))
