@@ -1,7 +1,7 @@
 import { RESET_TOAST, SET_TOAST } from "../actionTypes";
 
 const initialState = {
-    toast: false,
+    isToastVisible: false,
     toastContent: "",
     isError: false,
 };
@@ -11,7 +11,7 @@ export const toastReducer = (state = initialState, action) => {
         case SET_TOAST: {
             return {
                 ...state,
-                toast: true,
+                isToastVisible: true,
                 toastContent: action.payload.toastContent,
                 isError: action.payload.isError,
             };

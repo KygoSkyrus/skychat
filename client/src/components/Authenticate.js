@@ -52,7 +52,7 @@ const Authenticate = () => {
                     </div>
                 </div>
 
-                <Toast />
+                {/* <Toast /> */}
 
                 <Loader cName='absolute-centered' />
             </div>

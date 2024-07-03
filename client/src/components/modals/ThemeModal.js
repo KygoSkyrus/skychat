@@ -42,7 +42,7 @@ const ThemeModal = () => {
                     <div className='avatar_grid'>
                         {Array.from(Array(40).keys()).map((x, i) => {
                             return <img src={getPatternUrl(i + 1)} key={i} alt='skychat' onClick={e => setPattern(e.target.src)}
-                                className={`${getPatternUrl(i + 1) === selectedPattern ? 'selectedPattern' : ''}`} />
+                                className={`${getPatternUrl(i + 1) === selectedPattern ? 'selectedPattern' : ''}`} loading="lazy" />
                         })}
                     </div>
 

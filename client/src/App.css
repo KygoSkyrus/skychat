@@ -45,6 +45,8 @@ body {
   height: 100vh;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  position: relative;
 }
 .info{
   position: absolute;
@@ -141,16 +143,18 @@ body {
   top: 55%;
 }
 .toast_container{
+  height: fit-content;
   position: absolute;
-  right: 0;
-  top: 30%;
+  bottom: -50px;
   width: 100%;
   transition: var(--transition);
+  display: flex;
+  justify-content: center;
 }
 .toast{
   /* display: none; */
-
   /* width: 180px; */
+  position: relative;
   color: #fff;
   background: var(--violet);
   font-weight: lighter;
@@ -178,8 +182,8 @@ body {
   /* right: -189px; 
   right: calc(-100% - 4px);
   top: 10%; */
-  top: unset !important;
-  bottom: -28% !important;
+  bottom: min(3%, 16px) !important;  
+  z-index: 20;
 }
 
 

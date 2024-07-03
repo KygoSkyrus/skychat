@@ -35,19 +35,23 @@ function App() {
   }, [])
 
   async function checkAuthStatus() {
-    await auth.onAuthStateChanged((user) => {
-      console.log('authstate changed NWRTC', user,user?.displayName)
+    await auth.onAuthStateChanged(async (user) => {
+      console.log('authstate changed NWRTC', user, user?.displayName)
       if (user) {
-        dispatch(setUserData(user?.displayName, db))
-          .then(doesUserExist => {
-            console.log('doesUserExist', doesUserExist)
-            if (doesUserExist) {
-              dispatch({ type: SET_CURRENT_USER, payload: user })
-              navigate('/chat')
-            }else{
-              navigate('/')
-            }
-          })
+        try {
+          const userFound = await dispatch(setUserData(user?.displayName, db))
+          console.log('userFound', userFound)
+          if (userFound) {
+            dispatch({ type: SET_CURRENT_USER, payload: user })
+            navigate('/chat')
+          } else {
+            navigate('/')
+          }
+        } catch (error) {
+          console.error('An error occurred:', error);
+          dispatch({ type: SET_CURRENT_USER, payload: null });
+          navigate('/');
+        }
       } else {
         dispatch({ type: SET_CURRENT_USER, payload: null })
         navigate('/')
@@ -74,6 +78,7 @@ function App() {
         <Info />
       </Link>
 
+      <Toast />
       {/* <div className="info" >
         <Info className="" data-bs-toggle="dropdown" aria-expanded="false" />
         <div className="dropdown-menu p-2">

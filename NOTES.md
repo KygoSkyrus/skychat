@@ -77,8 +77,8 @@
 - [done]when a group chat is openend than opening some user from search is not happening
 - [done]all the state which are being passed to child ,, can be converted in redux state, for eg,, selectedUserToChat and setSelectedUserToChat,, this can be moved to redux as its widely used
 - [done]what about google login????? (google login implemented)
+- [done]fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
-- fix the toast position since overall width of chatbody is increased {try putting at bottom center}
 
 
 # Todo 
@@ -92,26 +92,19 @@
 - [done]on every action like [delete/accept/block connection, logout etc] create a popup that if user wanna do this,, will have yes no option 
 - [done]on creating new account, its taking too long ,,, show a loader that or show creating your account,, and also check why its taking so long
 - [done]add a layer or loader on loading action
+- [done]add a fallback component on error,,,, 
 
+http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
+- try firebase push notifications
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
-- maybe send a notification to user when he is logged in first time after creating account that his privacy setting is off by deafult
-- try push notifications
-- add a fallback component on error,,,, 
-- add lazy loading in pattern images
 - change fonts
 - there is screnshot for ui dated 2nd feb
-- create env file for secret keys, like collection name etc
-- in this one , on any corner show the feature your provide , like security, functionalities etc
 - encrypt messages/passwords
-- check db security using other domain
-- remove localhost and add app's real domain to authorized domain from firebase in production 
-- try firebase push notifications
-- optimize code... check if there is unnecessary prop drilling.. create another branch to do this
-- use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
+- create env file for secret keys, like collection name etc
 
 
 **Style**
-- [done]u can try  a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
+- [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
 - [done]the height of chat body changes as we go from connection to req window, and opens a req chat
 - [done]increase the width of overall chatbody
 - [done]add a search icon next to user serch input
@@ -120,8 +113,10 @@
 
 **things to do before deploying**
 - check responsivness
-- fix splash screen  with logo
+- fix splash screen with logo
 - add by kygoskyrus at bottom
+- check db security using other domain
+- remove localhost and add app's real domain to authorized domain from firebase in production 
 - add loading more msgs feature, only showing latest 20 rn
 - add dummy accounts 
 - add your on acc as creator
@@ -160,6 +155,7 @@ https://css-tricks.com/methods-contrasting-text-backgrounds/
 
 # Things to implement in version #3
 - add a single snapshot to get the msgs and to handle realtime changes, this will also help with the delete msg(for both participant). currently we just have a snapshot for single msg as it dont listen to every document in the collection, so the feature(delete for both) is not available in this version
+- use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
 
 
 ## Components

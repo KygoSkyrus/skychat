@@ -4,23 +4,27 @@ import { setToast } from "../actionCreators";
 
 
 // Thunk Action Creator
-export const setUserData = (username,db) => async (dispatch) => {
-
-    try {
-        const q = query(collection(db, 'users'), where('username', '==', username));
-
-        let ret = false;
-        onSnapshot(q, (querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                let userObj = { ...doc.data(), id: doc.id };
-                console.log('uo',userObj)
-                ret = true;
-                dispatch({ type: SET_USER_INFO, payload: userObj });
+export const setUserData = (username, db) => (dispatch) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const q = query(collection(db, 'users'), where('username', '==', username));
+            onSnapshot(q, (querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        let userObj = { ...doc.data(), id: doc.id };
+                        dispatch({ type: SET_USER_INFO, payload: userObj });
+                    });
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            }, (error) => {
+                dispatch(setToast(`Error: Unable to get user data`, true));
+                reject(error);
             });
-        });
-        return ret
-
-    } catch (error) {
-        dispatch(setToast(`Error: Unable to get user data`, true))
-    }
+        } catch (error) {
+            dispatch(setToast(`Error: Unable to get user data`, true));
+            reject(error);
+        }
+    });
 };
