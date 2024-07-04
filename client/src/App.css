@@ -1,6 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 :root {
   --transition: all 0.3s ease-in-out;
-
   /* colors */
   --black1: #1b1f22;
   --violet: rgb(112.520718, 44.062154, 249.437846);
@@ -13,7 +14,11 @@ body {
   box-sizing: border-box;
   background: #1b1b1b;
   background: var(--black1);
+  background:#211f1f;
+  font-weight: 400;
   font-family: cursive, sans-serif;
+  font-family: "Roboto", sans-serif;
+  font-family: "Poppins", sans-serif; /* better */
 }
 .body-bg{
   position: absolute;
@@ -208,6 +213,8 @@ body {
   justify-content: space-between;
   padding: 12px;
   color: rgb(206, 206, 206);
+  background-color: rgb(210 210 210);
+  background-color: rgb(0 106 157);
 }
 
 .chatWithProfile {
@@ -281,23 +288,26 @@ body {
   z-index: 1;
 }
 .req_badge {
-  background: #fff;
+  background: #2f6b8d;
   width: 14px;
   font-size: 9px;
   height: 14px;
-  display: inline-block;
-  border-radius: 50%;
-  color: #000;
+  border-radius: 4px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
 }
 
 /*chat page*/
 .outer-top{
   /* width: 350px;
   height: 400px; */
-  width: 80vw;
+  width: 90vw;
   min-width: 350px;
-  max-width: 700px;
-  height: 50vh;
+  max-width: 900px;
+  height: 84vh;
   min-height: 400px;
   position: relative;
 }
@@ -316,10 +326,12 @@ body {
   display: flex;
   flex-direction: column;
 
-  border-radius: 4px;
+  /* border-radius: 4px; */
   box-shadow: 0 0 5px 0px #00000080;
   overflow: hidden;
   z-index: 1;
+  border-radius: 18px;
+  border: 1px solid #4b4b4b;
 }
 
 .overlay {
@@ -398,7 +410,7 @@ body {
 .chat-box .bg-layer,
 .chat-box .transparent-overlay{
   position: fixed;
-  background: #000000b8;
+  background: #000000d4;
   width: 100%;
   height: 100%;
   top: 0;
@@ -414,7 +426,7 @@ body {
   z-index: 1 !important;
 }
 .chat-body .chat-box::-webkit-scrollbar-thumb {
-  background-color: rgb(92, 92, 92);
+  background-color: rgb(255, 255, 255);
   border-radius: 4px;
 }
 
@@ -555,7 +567,7 @@ body {
 /* deleted msg */
 .chat-body .chat-box .msg-block:has(.deleted-msg) {
   background: #a2a2a2bf;
-  color: darkslategrey;
+  color: #fff;
   text-decoration: underline;
   font-style: italic;
   padding: 2px 8px;
@@ -679,7 +691,7 @@ body {
   align-items: center;
   border-radius: 12px;
   color: #4b4b4b;
-  background-color: #cdcdcd;
+  /* background-color: #cdcdcd; */
 }
 
 .msg-input aside{
@@ -692,8 +704,8 @@ body {
 }
 
 .msg-input .sendBtn {
-  background-color: #4b4b4b;
-  color: white;
+  background-color: #d1d1d1;
+  color: #4b4b4b;
   border: none;
 }
 
@@ -727,6 +739,15 @@ body {
 .hamburger img {
   width: 20px;
   transform: rotate(180deg);
+  mix-blend-mode: soft-light;
+}
+.sc{
+  font-weight: 400;
+  letter-spacing: 4px;
+  background: linear-gradient(45deg, black, #1b1a1a80, black);
+  background: #dadada;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 input[type="search"] {
   outline: none;
@@ -790,6 +811,7 @@ input[type="search"] {
 .member_list .list img  {
   width: 35px;
   height: 35px;
+  border-radius: 50%;
 }
 .chat_list .list .groupIcon,
 .request_list .list .groupIcon,
@@ -1369,27 +1391,24 @@ popup animation
   display: block;
   font-weight: bold;
   font-size: 18px;
-  border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  color: #2f2f2f;
-  background-color: #f5ef84;
-  border-bottom: 5px solid #dcbb00;
+  color: #454545;
+  padding: 4px;
+  background-color: #d9d9d9;
+  border-bottom: 5px solid #aaaaaa;
   -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
 }
-.enq_btn:hover {
-  color: #fff;
-  background: #f2a25c;
-  border-bottom: 5px solid #db7d00;
+.enq_btn.accept{
+  border-radius: 8px 8px 0 0 !important;
 }
-
-.enq_btn.delete,
-.enq_btn.accept {
-  color: #2f2f2f;
-  background-color: #d9d9d9;
-  border-bottom: 5px solid #aaaaaa;
+.enq_btn.delete{
+  border-radius: 0 0 0 8px !important;
+}
+.enq_btn.d2{
+  border-radius: 0 0 8px 0 !important;
 }
 .enq_btn.delete:hover {
   color: #fff;
@@ -1433,11 +1452,11 @@ popup animation
     0.8
   ); /* easing on toggle switch */
 
-  width: fit-content;
+  /* width: fit-content; */
   display: flex;
   justify-content: center;
   position: relative;
-  border-radius: 12px;
+  /* border-radius: 12px; */
   cursor: pointer;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1461,6 +1480,7 @@ popup animation
   place-content: center;
   transition: opacity 300ms ease-in-out 150ms;
   padding: var(--_label-padding);
+  color: #dadada;
 }
 .switch::before,
 .switch::after {
@@ -1478,6 +1498,7 @@ popup animation
     background-color 500ms ease-in-out;
   z-index: -1;
   box-shadow:inset 0 1px 1px rgba(0,0,0,.3),0 1px rgba(255,255,255,.3);
+  border-radius: 8px;
 }
 /* switch bg color */
 .switch::after {
@@ -1487,9 +1508,9 @@ popup animation
   
 }
 /* switch hover */
-.switch:hover::after {
+/* .switch:hover::after {
   inset: -0.25rem;
-}
+} */
 /* checked - move slider to right */
 .switch:has(input:checked)::before {
   background-color: var(--_slider-bg-clr-on);

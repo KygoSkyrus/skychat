@@ -32,7 +32,8 @@ const Toast = React.memo(() => {
   return (
     <>
       <div className="toast_container" ref={toastContainer}>
-        <div className="toast">{toastContent}</div>
+      {isToastVisible &&
+        <div className="toast">{toastContent}</div>}
       </div>
     </>
   );

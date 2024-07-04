@@ -71,7 +71,7 @@ function App() {
           <Route exact path="/about" element={<About />} />
           <Route exact path="*" element={<Error />} />
         </Routes>
-        <div className="body-bg"><span>SKYCHAT</span></div>
+        {/* <div className="body-bg fs-5"><span><b>SKYCHAT</b></span></div> */}
       </>
 
       <Link to={'/about'} className="info">

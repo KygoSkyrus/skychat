@@ -33,8 +33,8 @@ export const NewRTCA = () => {
   const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
 
 
-  
-  
+
+
   const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
   const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
@@ -127,12 +127,12 @@ export const NewRTCA = () => {
     dispatch(showSidebar(false))
     dispatch({ type: RESET_USERS_LIST, payload: true })//clearing all records of search list
     setSelectedUserToChat(username);//setting selected user
-
+    // document.querySelector('.toast_container').style.bottom='-500px';
     console.log('handleSelectedUserToChat  clicked', username, groupName)
     if (groupName) {
       setIsGroupSelected(true)
       setSelectedGroupName(groupName)
-    }else{
+    } else {
       setIsGroupSelected(false)
       setSelectedGroupName(undefined)
     }
@@ -191,6 +191,8 @@ export const NewRTCA = () => {
     }
   }
 
+  console.log('coneection header---------------------', connectionHeader)
+
 
 
   return (
@@ -208,12 +210,12 @@ export const NewRTCA = () => {
             <div className="hamburger" onClick={() => { dispatch(showSidebar(true)); dispatch({ type: RESET_USERS_LIST, payload: false }) }}>
               <img src={hamburger} alt="." />
             </div>
-            {selectedUserToChat &&
+            {selectedUserToChat ?
               <div className="d-flex align-items-center">
                 <ChevronLeft className="pointer" onClick={() => { setSelectedUserToChat(undefined); setIsGroupSelected(false) }} />
                 <section id="chatWith">{isGroupSelected ? selectedGroupName : selectedUserToChat}</section>
 
-                <div className="dropdown">
+                <div className="dropdown d-flex">
                   <span className="position-relative cwp" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     {isGroupSelected ?
                       <span className="chatWithProfile ms-1" >
@@ -249,42 +251,27 @@ export const NewRTCA = () => {
                 </div>
 
               </div>
+              :
+              <div className="sc"><b>SKYCHAT</b></div>
             }
           </div>
 
           {/* connection/request button */}
           {!selectedUserToChat &&
-            <div className="header d-grid text-light">
-              <section
-                className={`connection_header pointer ${connectionHeader ? 'header_shadow' : 'connection_header_sm'}`}
-                onClick={() => setConnectionHeader(true)}>
-                {connectionHeader ? "Connections" : <Users size={15} />}
-              </section>
-              <section
-                className={`request_header pointer bg-danger ${!connectionHeader && 'header_shadow request_header_lg'}`} onClick={() => setConnectionHeader(false)}>
-
+            <label htmlFor="filter" className="switch" aria-label="Toggle Filter">
+              <input type="checkbox" id="filter" />
+              <span onClick={() => setConnectionHeader(true)} >Connections</span>
+              <span onClick={() => setConnectionHeader(false)} className="d-flex align-items-center">Requests
                 {/* just to check total requests */}
-                {userData?.requests && Object.keys(userData?.requests)?.length}-
-                {connectionHeader ? <UserPlus2 size={15} /> : <span className="me-1">Connection Requests</span>}
-
+                {/* {userData?.requests && Object.keys(userData?.requests)?.length}- */}
                 {connectionsToShow?.length > 0 &&
                   <span className="req_badge">
                     {connectionsToShow.length}
                   </span>}
-              </section>
-            </div>
+              </span>
+            </label>
           }
           {/***** CHAT HEADER ENDS ******/}
-
-
-
-          {/***** NEW HEADER START ******/}
-          {/* <label htmlFor="filter" className="switch" aria-label="Toggle Filter" onClick={() => setConnectionHeader(prev => !prev)}>
-            <input type="checkbox" id="filter" />
-            <span>C</span>
-            <span>R</span>
-          </label> */}
-          {/***** NEW HEADER ENDS ******/}
 
 
           {/***** CHAT BODY STARTS ******/}

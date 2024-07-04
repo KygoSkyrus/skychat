@@ -95,12 +95,16 @@
 - [done]add a fallback component on error,,,, 
 
 http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
-- try firebase push notifications
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
-- change fonts
 - there is screnshot for ui dated 2nd feb
-- encrypt messages/passwords
-- create env file for secret keys, like collection name etc
+- change fonts
+- add a feedback named "skychat" by default in chat
+- uncommemt user search code for dynamic data
+on mobile
+- signin ui is messsed up
+- signup is acting crazy
+- modals width are too low
+- fonts are too cursive
 
 
 **Style**
@@ -116,6 +120,7 @@ http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - fix splash screen with logo
 - add by kygoskyrus at bottom
 - check db security using other domain
+- encrypt messages/passwords (if database is accessible outside the domain)
 - remove localhost and add app's real domain to authorized domain from firebase in production 
 - add loading more msgs feature, only showing latest 20 rn
 - add dummy accounts 

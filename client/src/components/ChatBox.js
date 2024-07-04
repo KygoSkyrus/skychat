@@ -429,7 +429,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             :
                             <>
                                 <section className="enq_btn delete mt-1" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}>Decline</section>
-                                <section className="enq_btn delete mt-1"
+                                <section className="enq_btn delete d2 mt-1"
                                     onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}
                                 >Block</section>
                             </>
@@ -468,7 +468,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             // reactionsDefaultOpen={true}
                             />
                         </div>
-                        <button onClick={() => sendText()} className="rounded-2 sendBtn"><Send /></button>
+                        <button onClick={() => sendText()} className="sendBtn"><Send /></button>
                     </div>
                 )
             }

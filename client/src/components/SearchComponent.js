@@ -45,7 +45,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
     // NOTE::: Move the "setSearchedUserList" to this component,, why its being passed from top to here? when its main use is here only
 
     async function searchUser(e) {
-        let result = Object.keys(usersList).filter(user => user.includes(e.target.value) && user !== userData.username)//excludes self
+        let result = Object.keys(usersList).filter(user => user.includes(e.target.value?.toLowerCase()) && user !== userData.username)//excludes self
 
         let userSearchDropdown = document.getElementById(id)
         let noResult = userSearchDropdown.querySelector('.no-user')

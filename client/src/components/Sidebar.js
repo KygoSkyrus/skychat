@@ -19,6 +19,7 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
     const userData = useSelector(state => state.user.userInfo)
 
     const isSidebarVisible = useSelector(state => state.ui.isSidebarVisible);
+    const isGroupModalVisible = useSelector((state) => state.ui.isGroupModalVisible);
 
 
     const signOut = () => {
@@ -69,10 +70,12 @@ const Sidebar = ({ handleSelectedUserToChat }) => {
 
             <UserModal />
 
+            {isGroupModalVisible &&
             <GroupModal
                 type="create_group"
                 handleSelectedUserToChat={handleSelectedUserToChat}
             />
+            }
         </>
     )
 }

@@ -1,10 +1,10 @@
-import { ArrowLeft, Edit, X, Check } from 'lucide-react'
 import React, { useContext, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import SearchComponent from '../SearchComponent'
+import { ArrowLeft, X, Check } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid';
 
 
+import SearchComponent from '../SearchComponent'
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
 import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';

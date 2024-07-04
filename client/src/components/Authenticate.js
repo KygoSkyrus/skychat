@@ -16,7 +16,7 @@ const Authenticate = () => {
             <div className='position-relative d-flex'>
                 <div className="signin outer-join d-flex">
                     <div className='signin-img d-flex justify-content-center align-items-center ' style={{ zIndex: 2 }}>
-                        {/* <img src={signinImg500} width={300} alt='skychat' /> */}
+                        <img src={signinImg500} width={300} alt='skychat' />
                     </div>
                     <div className="d-flex flex-row py-0 px-4 position-relative">
                         {/* <div className='w-25 signin-img d-flex bg-dark' style={{ zIndex: 2 }}>
