@@ -39,17 +39,18 @@ export const NewRTCA = () => {
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
   const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
 
-  console.log('===============================================================================userData', userData)
+  console.log('===============================================================================userData', userData, usersList)
   // console.log('currentUser', currentUser)
   // console.log('connectionsToShow-', connectionsToShow)
 
 
-  //NOTE:: try merging these two useeffects..Also try to optimize getAllUsersList function
-  useEffect(() => {
+  //NOTE:: try merging these two useeffects..Also try to optimize getAllUsersList function  
+//   useEffect(() => {
+// console.log('THE UEEEEEEEEEEEEEE',dbUsers)
+//     dispatch({ type: SET_USERS_LIST, payload: dbUsers });
 
-    // getAllUsersList()// using snapshot instead
-    dispatch({ type: SET_USERS_LIST, payload: dbUsers });
     //commented for testing
+    // MOVED TO APP.js
     // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
     //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
     //   let userList = {};
@@ -62,7 +63,7 @@ export const NewRTCA = () => {
     // });
 
     // return () => unsubscribe();
-  }, [])
+  // }, [])
 
   useEffect(() => {
     //setting connection req list
@@ -293,7 +294,7 @@ export const NewRTCA = () => {
                       return (
                         <div className="list" key={i}>
                           <section className="chat_list_item" onClick={() => handleSelectedUserToChat(x, userData?.connections[x]?.groupName || false)} >
-                            {userData?.connections[x].groupName ?
+                            {userData?.connections[x]?.groupName ?
                               <span className="me-2 groupIcon" >
                                 <Users size={18} />
                               </span>

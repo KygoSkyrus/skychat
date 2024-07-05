@@ -580,17 +580,22 @@ export function getFormattedNotification(msgData, myName) {
 }
 
 export async function doesUserExistApi(username, email) {
-    let res = await fetch(`/api/doesUserExist`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username, email
+    try {
+        let res = await fetch(`/api/doesUserExist`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username, email
+            })
         })
-    })
-    let data = await res.json()
-    return data;
+        let data = await res.json()
+        console.log('log', data)
+        return data;
+    } catch (error) {
+        return false;
+    }
 }
 
 export function toggleLoginFields(val) {

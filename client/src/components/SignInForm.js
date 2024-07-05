@@ -131,6 +131,7 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
                     console.log('result--', result)
                     const data = await doesUserExistApi(undefined, result?.user?.email); // checks if email already exists or not
+                    console.log('data in signinin',data)
                     if (signInOrSignUp === "signup") {
                         console.log('issignup')
                         console.log('ememememme', data)

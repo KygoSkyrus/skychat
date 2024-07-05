@@ -10,7 +10,7 @@ import "./App.css";
 import { NewRTCA } from "./components/NewRTCA";
 import Authenticate from "./components/Authenticate";
 import Error from "./components/Error"
-import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USER_INFO } from "./redux/actionTypes";
+import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USERS_LIST, SET_USER_INFO } from "./redux/actionTypes";
 import { Info } from "lucide-react";
 import Toast from "./components/Toast";
 import { setUserData } from "./redux/thunk/userDataThunk";
@@ -18,6 +18,7 @@ import { FirebaseContext } from "./firebaseContext";
 import About from "./components/About";
 import Loader from "./components/Loader";
 import withSplashScreen from "./components/withSplashScreen";
+import { dbUsers } from "./utils";
 // import { firebaseApp, db } from "./firebaseConfig";
 
 
@@ -32,6 +33,20 @@ function App() {
 
   useEffect(() => {
     checkAuthStatus();
+    dispatch({ type: SET_USERS_LIST, payload: dbUsers })
+    //uncomment this
+    // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+    //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
+    //   let userList = {};
+    //   snapshot.docs.forEach((doc) => {
+    //     // let data = {...doc.data(),id:doc.id};
+    //     userList[doc.data()?.username] = {...doc.data(),id:doc.id};
+    //   });
+    //   console.log('ul',userList)
+    //   dispatch({ type: SET_USERS_LIST, payload: userList });
+    // });
+
+    // return () => unsubscribe();
   }, [])
 
   async function checkAuthStatus() {

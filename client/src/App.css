@@ -348,7 +348,7 @@ body {
 }
 
 .noOneToChat {
-  height: 320px;
+  height: inherit;
   background-color: #1b1b1b;
   display: flex;
   justify-content: center;

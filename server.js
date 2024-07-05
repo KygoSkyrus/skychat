@@ -30,34 +30,33 @@ admin.initializeApp({
 const firestore = admin.firestore();
 
 app.post('/api/doesUserExist', (req, res) => {
+  try {
+    const { username, email } = req.body;
+    console.log('user', username)
 
-  const { username, email } = req.body;
-  console.log('user', username)
+    const usersRef = firestore.collection('users');
+    let query;
+    if (username) {
+      query = usersRef.where('username', '==', username);
+    } else if (email) {
+      query = usersRef.where('email', '==', email);
+    }
 
-  const usersRef = firestore.collection('users');
-  let query;
-  if( username){
-    query = usersRef.where('username', '==', username);
-  }else if( email){
-    query = usersRef.where('email', '==', email);
+    query.get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          console.log('User not found.');
+          res.json({ userFound: false, message: "" })
+        } else {
+          const userDoc = snapshot.docs[0];
+          console.log('User found:', userDoc.data());
+          res.json({ userFound: true, message: "Username already exists! Please try a different one." })
+        }
+      })
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.json({ userFound: false, message: "Error fetching user. Internal server error!" })
   }
-
-  query.get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        console.log('User not found.');
-        res.json({userFound: false, message:""})
-      } else {
-        const userDoc = snapshot.docs[0];
-        console.log('User found:', userDoc.data());
-        res.json({userFound: true, message:"Username already exists! Please try a different one."})
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching user:', error);
-      res.json({message:"Internal server error!"})
-    });
-
 })
 
 
@@ -66,67 +65,67 @@ app.post('/api/signup', async (req, res) => {
   const { firstname, lastname, email, photo } = req.body;
   //need to handle more details when there is other method of signing up other than google
   try {
-      const userExist = await USER.findOne({ email: email });
+    const userExist = await USER.findOne({ email: email });
 
-      if (userExist) {
-          return res.status(422).json({ message: "User already exists!!! Try Signing in instead", is_user_created: false, is_user_logged_in: false });
-      }
+    if (userExist) {
+      return res.status(422).json({ message: "User already exists!!! Try Signing in instead", is_user_created: false, is_user_logged_in: false });
+    }
 
-      const newUser = new USER({ firstname: firstname, lastname: lastname, email: email, avtar: photo });
+    const newUser = new USER({ firstname: firstname, lastname: lastname, email: email, avtar: photo });
 
-      const { token, user } = await newUser.generateAuthToken();
-      res.cookie('jwt', token, {
-          expires: new Date(Date.now() + 10800000),
-          httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
-      });
+    const { token, user } = await newUser.generateAuthToken();
+    res.cookie('jwt', token, {
+      expires: new Date(Date.now() + 10800000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+    });
 
-      res.status(200).json({ message: "Account created successfully", is_user_created: true, is_user_logged_in: true, user })
+    res.status(200).json({ message: "Account created successfully", is_user_created: true, is_user_logged_in: true, user })
 
   } catch (err) {
-      console.log(err);
+    console.log(err);
   }
 })
 
 app.post('/api/signin', async (req, res) => {
 
   try {
-      const { email, isAdminLogin } = req.body;
+    const { email, isAdminLogin } = req.body;
 
-      const user = await USER.findOne({ email: email }).populate('cartProducts');
+    const user = await USER.findOne({ email: email }).populate('cartProducts');
 
-      if (user) {
-          if (isAdminLogin) {
-              if ((user.role !== "admin" && user.email !== process.env.ADMIN_ID) && (user.role !== "guest" && user.email !== process.env.GUEST_USER)) {
-                  return res.status(404).json({ message: 'Access denied!!!', is_user_logged_in: false });
-              } else {
-                  await setCookie('ajwt', 7200000)
-                  return res.status(200).json({ message: `${user.role === "guest" ? 'Guest' : 'Admin'} logged in successfully`, is_user_logged_in: true, user });
-              }
-          }
-
-          if (email === process.env.GUEST_USER) {
-              return res.status(404).json({ message: 'Invalid credentials', is_user_logged_in: false });
-          }
-
-          async function setCookie(val, validTill) {
-              const { token } = await user.generateAuthToken();
-              res.cookie(val, token, {
-                  expires: new Date(Date.now() + validTill),
-                  httpOnly: true,
-                  secure: process.env.NODE_ENV !== "development",
-              });
-          }
-
-          await setCookie('jwt', 10800000)
-
-          res.status(200).json({ message: "User logged in successfully", is_user_logged_in: true, user });
-      } else {
-          res.status(400).json({ message: "Account doesn't exists", is_user_logged_in: false, });
+    if (user) {
+      if (isAdminLogin) {
+        if ((user.role !== "admin" && user.email !== process.env.ADMIN_ID) && (user.role !== "guest" && user.email !== process.env.GUEST_USER)) {
+          return res.status(404).json({ message: 'Access denied!!!', is_user_logged_in: false });
+        } else {
+          await setCookie('ajwt', 7200000)
+          return res.status(200).json({ message: `${user.role === "guest" ? 'Guest' : 'Admin'} logged in successfully`, is_user_logged_in: true, user });
+        }
       }
 
+      if (email === process.env.GUEST_USER) {
+        return res.status(404).json({ message: 'Invalid credentials', is_user_logged_in: false });
+      }
+
+      async function setCookie(val, validTill) {
+        const { token } = await user.generateAuthToken();
+        res.cookie(val, token, {
+          expires: new Date(Date.now() + validTill),
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+        });
+      }
+
+      await setCookie('jwt', 10800000)
+
+      res.status(200).json({ message: "User logged in successfully", is_user_logged_in: true, user });
+    } else {
+      res.status(400).json({ message: "Account doesn't exists", is_user_logged_in: false, });
+    }
+
   } catch (err) {
-      console.log(err);
+    console.log(err);
   }
 })
 
