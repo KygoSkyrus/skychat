@@ -1,5 +1,6 @@
 const http = require("http");
 const express = require("express");
+const cors = require('cors');
 const bodyParser = require('body-parser')
 const admin = require("firebase-admin");
 const serviceAccount = require("./serviceAccountKey");
@@ -7,6 +8,12 @@ const serviceAccount = require("./serviceAccountKey");
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 5000;
+
+const corsOptions = {
+  origin: ['https://skychat-dg.web.app', 'http://localhost:3000'],
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json())
 
@@ -20,7 +27,6 @@ const firestore = admin.firestore();
 app.post('/api/doesUserExist', (req, res) => {
   try {
     const { username, email } = req.body;
-    // console.log('user', username)
 
     const usersRef = firestore.collection('users');
     let query;
