@@ -108,17 +108,18 @@ body {
 
 /* join page/ signin */
 .outer-join {
-  /* width: 350px; */
-  width: 60vw;
+  /* width: 60vw;
   max-width: 768px;
-  height: 400px;
-  /* position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
+  height: 400px; */
+  width: 90vw;
+  min-width: 350px;
+  max-width: 900px;
+  height: 88vh;
+  min-height: 400px;
   background-color: rgb(211, 211, 211);
-  border-radius: 4px;
-  /* padding: 0 30px; */
+  background-color: lavender;
+  background: linear-gradient(120deg, lightPink, lightSeaGreen);
+  border-radius: 18px;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -162,7 +163,6 @@ body {
   position: relative;
   color: #fff;
   background: var(--violet);
-  font-weight: lighter;
   text-align: center;
   border-radius: 4px;
   padding: 4px;
@@ -307,7 +307,7 @@ body {
   width: 90vw;
   min-width: 350px;
   max-width: 900px;
-  height: 84vh;
+  height: 88vh;
   min-height: 400px;
   position: relative;
 }
@@ -1601,6 +1601,34 @@ popup animation
 
 
 /* Media queries */
+/* for smaller devices */
+@media (max-width:768px) {
+  .outer-top{
+    width: calc(100vw - 10px);
+    height: calc(100vh - 10px);
+  }
+  .outer-join{
+    flex-direction: column;
+  }
+  .signin-form{
+    width: 100%;
+  }
+  /* .signin .forms-holder{
+    min-width: unset;
+  } */
+
+  #userModal,
+  #entityInfoModal,
+  #groupModal,
+  #avatarModal,
+  #themeModal,
+  #confirmationModal,
+  #blockedConnModal {
+    width: 90%;
+  }
+}
+
+/* for tab and larger devices */
 @media (min-width:768px) {
   .req_btn {
     padding: 10px 17%;

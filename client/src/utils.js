@@ -615,3 +615,19 @@ export function toggleLoginFields(val) {
     document.querySelector('.continue-with').style.opacity = opacity;
     document.querySelector('.createAcc').style.opacity = opacity;
 }
+
+export function toggleUsernameField(val) {
+    // val== true // hide fields
+    let zIndex = 1;
+    if (val) zIndex = 4;
+
+    document.getElementById('username').classList.toggle('d-none');
+    document.getElementById('username').style.zIndex = zIndex;
+
+    document.querySelector('.googleBtn').classList.toggle('d-none');
+    document.querySelector('.googleBtn').style.zIndex = zIndex;
+
+    document.querySelector('.continue').classList.toggle('d-none');
+    document.querySelector('.continue').style.zIndex = zIndex;
+
+}

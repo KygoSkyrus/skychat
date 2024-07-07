@@ -86,23 +86,11 @@ function App() {
           <Route exact path="/about" element={<About />} />
           <Route exact path="*" element={<Error />} />
         </Routes>
-        {/* <div className="body-bg fs-5"><span><b>SKYCHAT</b></span></div> */}
+        <div className="body-bg fs-5"><span><b>SKYCHAT</b></span></div>
       </>
 
-      <Link to={'/about'} className="info">
-        <Info />
-      </Link>
-
       <Toast />
-      {/* <div className="info" >
-        <Info className="" data-bs-toggle="dropdown" aria-expanded="false" />
-        <div className="dropdown-menu p-2">
-          <h4>SKYCHAT</h4>
-          <p>info</p>
-        </div>
-      </div> */}
     </div>
-
   );
 }
 

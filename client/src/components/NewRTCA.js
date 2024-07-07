@@ -8,7 +8,7 @@ import ChatBox from "./ChatBox";
 import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
 import { showConfirmationModal, showEntityInfoModal, showLoader, showSidebar } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List } from 'lucide-react';
+import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List, Info } from 'lucide-react';
 
 
 import { getAuth } from "firebase/auth";
@@ -18,6 +18,7 @@ import EntityInfoModal from "./modals/EntityInfoModal";
 import { FirebaseContext } from "../firebaseContext";
 import ConfirmationModal from "./modals/ConfirmationModal";
 import Loader from "./Loader";
+import { Link } from "react-router-dom";
 
 
 export const NewRTCA = () => {
@@ -417,6 +418,9 @@ export const NewRTCA = () => {
         {/* <Toast /> */}
         <Loader />
       </div>
+      <Link to={'/about'} className="info">
+        <Info />
+      </Link>
     </>
   )
 }

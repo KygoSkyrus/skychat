@@ -5,11 +5,17 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, up
 import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
 
 import { SET_CURRENT_USER } from '../redux/actionTypes';
-import { defaultAvatar, doesUserExistApi, toggleLoginFields } from '../utils';
+import { defaultAvatar, doesUserExistApi, toggleLoginFields, toggleUsernameField } from '../utils';
 import { setUserData } from '../redux/thunk/userDataThunk';
 import { FirebaseContext } from '../firebaseContext';
 import { setToast, showLoader } from '../redux/actionCreators';
 
+import logo1 from './../assets/logo/logo (1).png'
+import logo2 from './../assets/logo/logo (2).png'
+import logo3 from './../assets/logo/logo (3).png'
+import logo4 from './../assets/logo/logo (4).png'
+import logo5 from './../assets/logo/logo (5).png'
+import logo7 from './../assets/logo/logo (7).png'
 
 const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, setCurrAuthMethod }) => {
 
@@ -19,108 +25,110 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
 
     const overlayRef = useRef()
     const { db } = useContext(FirebaseContext);
-    const [userCredentials, setUserCredentials] = useState({ email: '', password: '', username: '' });
+    const [userCredentials, setUserCredentials] = useState({ email: '', photoURL: '', username: '' });
 
-    useEffect(() => {
-        if (signInOrSignUp === "signup")
-            document.getElementById('username').focus();// focus on input field
-        else
-            document.getElementById('email1').focus();
-    }, [signInOrSignUp])
+    // useEffect(() => {
+    //     if (signInOrSignUp === "signup")
+    //         document.getElementById('username').focus();// focus on input field
+    //     else
+    //         document.getElementById('email1').focus();
+    // }, [signInOrSignUp])
 
 
-    function handleClick(e) {
-        console.log('handleclick')
-        e?.preventDefault();
-        // blocking email/password auth as email verification is not implemented
-        dispatch(setToast('Email/password authentication is currently unavailable, please login with Google instead', false))
-        return true;
+    // function handleClick(e) {
+    //     console.log('handleclick')
+    //     e?.preventDefault();
+    //     // blocking email/password auth as email verification is not implemented
+    //     dispatch(setToast('Email/password authentication is currently unavailable, please login with Google instead', false))
+    //     return true;
 
-        if (signInOrSignUp === "signup") {
-            createUserAccountFirebase()
-        } else if (signInOrSignUp === "signin") {
-            loginUserFirebase()
-        }
-    }
+    //     if (signInOrSignUp === "signup") {
+    //         createUserAccountFirebase()
+    //     } else if (signInOrSignUp === "signin") {
+    //         loginUserFirebase()
+    //     }
+    // }
 
-    async function createUserAccountFirebase() {
+    // async function createUserAccountFirebase() {
 
-        const isVerified = await verifyUserName(false);
-        if (isVerified) {
-            let isUserCreated = false;
-            await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
-                .then((response) => {
-                    const user = response.user;
-                    console.log('signup user', user)
-                    let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
-                    if (isRegistered) isUserCreated = true;
-                    // inProgressLoader(dispatch, false)
-                    //navigate('/user');//sending user to user page for filling out other details
-                })
-                .catch((error) => {
-                    // inProgressLoader(dispatch, false)
-                    setUserCredentials({ email: '', password: '', username: '' })
-                    let errMsg = error.message;
-                    console.log('error', error)
-                    if (error.code === 'auth/email-already-in-use') errMsg = "Email already exists!!! Try Signing in instead"
-                    dispatch(setToast(errMsg, true))
-                });
+    //     const isVerified = await verifyUserName(false);
+    //     if (isVerified) {
+    //         let isUserCreated = false;
+    //         await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
+    //             .then((response) => {
+    //                 const user = response.user;
+    //                 console.log('signup user', user)
+    //                 let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
+    //                 if (isRegistered) isUserCreated = true;
+    //                 // inProgressLoader(dispatch, false)
+    //                 //navigate('/user');//sending user to user page for filling out other details
+    //             })
+    //             .catch((error) => {
+    //                 // inProgressLoader(dispatch, false)
+    //                 setUserCredentials({ email: '', password: '', username: '' })
+    //                 let errMsg = error.message;
+    //                 console.log('error', error)
+    //                 if (error.code === 'auth/email-already-in-use') errMsg = "Email already exists!!! Try Signing in instead"
+    //                 dispatch(setToast(errMsg, true))
+    //             });
 
-            if (isUserCreated) {
-                await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-                    .catch(
-                        (err) => console.log('err', err)
-                    );
+    //         if (isUserCreated) {
+    //             await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+    //                 .catch(
+    //                     (err) => console.log('err', err)
+    //                 );
 
-                //setting user and redirecting to chats
-                dispatch(setUserData(userCredentials?.username, db));
-                dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                navigate('/chat')
-            }
-        }
-        dispatch(showLoader(false));
-    }
+    //             //setting user and redirecting to chats
+    //             dispatch(setUserData(userCredentials?.username, db));
+    //             dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+    //             navigate('/chat')
+    //         }
+    //     }
+    //     dispatch(showLoader(false));
+    // }
 
-    function loginUserFirebase() {
-        console.log('login')
-        // emailVerication();
-        dispatch(showLoader(true));
-        // inProgressLoader(dispatch, true)
-        signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
-            .then(
-                (response) => {
-                    const user = response.user;
-                    console.log('signin user', user)
-                    dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                    navigate('/chat')
-                    dispatch(showLoader(false));
-                }
-            )
-            .catch((error) => {
-                dispatch(setToast(`Authentication Failed, Invalid email/password`, true))
-                dispatch(showLoader(false));
-                setUserCredentials({ email: '', password: '', username: '' })
-            });
+    // function loginUserFirebase() {
+    //     console.log('login')
+    //     // emailVerication();
+    //     dispatch(showLoader(true));
+    //     // inProgressLoader(dispatch, true)
+    //     signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
+    //         .then(
+    //             (response) => {
+    //                 const user = response.user;
+    //                 console.log('signin user', user)
+    //                 dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+    //                 navigate('/chat')
+    //                 dispatch(showLoader(false));
+    //             }
+    //         )
+    //         .catch((error) => {
+    //             dispatch(setToast(`Authentication Failed, Invalid email/password`, true))
+    //             dispatch(showLoader(false));
+    //             setUserCredentials({ email: '', password: '', username: '' })
+    //         });
 
-    }
+    // }
+
 
     const handleGoogleAuth = async (e) => {
         e.preventDefault()
-        if (signInOrSignUp === "signup") {
-            overlayRef.current.classList.remove('d-none');
-            setUserCredentials({ ...userCredentials, email: '', password: '' })
-            toggleLoginFields(true);
+        goWithGoogle();
+        // if (signInOrSignUp === "signup") {
+        //     overlayRef.current.classList.remove('d-none');
+        //     setUserCredentials({ ...userCredentials, email: '', password: '' })
+        //     toggleLoginFields(true);
 
-            const isVerified = await verifyUserName(true);
-            if (isVerified) goWithGoogle();
-            else dispatch(showLoader(false));
-        } else {
-            goWithGoogle();
-        }
+        //     const isVerified = await verifyUserName(true);
+        //     if (isVerified) goWithGoogle();
+        //     else dispatch(showLoader(false));
+        // } else {
+        //     goWithGoogle();
+        // }
     }
 
     const goWithGoogle = async () => {
-        const auth = getAuth();
+        // const auth = getAuth();
         const provider = new GoogleAuthProvider();
         let isUserCreated = false;
         await signInWithPopup(auth, provider)
@@ -128,44 +136,64 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 const token = credential.accessToken;// a Google Access Token. can be used to access the Google API.
                 if (token) {
-
                     console.log('result--', result)
-                    const data = await doesUserExistApi(undefined, result?.user?.email); // checks if email already exists or not
-                    console.log('data in signinin',data)
-                    if (signInOrSignUp === "signup") {
-                        console.log('issignup')
-                        console.log('ememememme', data)
-                        if (data.userFound) {
-                            // logout the user
-                            dispatch(setToast(`Email already exists, Try Logging in instead.`, true))
-                            dispatch(showLoader(false));
-                            setTimeout(() => {
-                                auth.signOut()
-                                    .catch((error) => {
-                                        console.error(error);
-                                    });
-                            }, 3000)
-                        } else {
-                            let isRegistered = registerUserInDB(result?.user?.email, userCredentials?.username, result?.user?.photoURL)
-                            if (isRegistered) isUserCreated = true;
-                        }
 
-                    } else if (signInOrSignUp === "signin") {
-                        console.log('issignIN')
-                        dispatch(showLoader(false));
-                        if (!data.userFound) {
-                            dispatch(setToast(`User doesn't exists, Create account first`, true))
-                            setTimeout(() => {
-                                auth.signOut()
-                                    .catch((error) => {
-                                        console.error(error);
-                                    });
-                            }, 3000)
-                        }else{
+                    // checks if email already exists or not
+                    const data = await doesUserExistApi(undefined, result?.user?.email);
+                    console.log('data in signinin', data)
+
+                    if (data) {
+                        if (data.userFound) { //login
                             dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                             navigate('/chat')
+                        } else { //create account
+                            dispatch(setToast(`Enter username to continue`, false))
+                            overlayRef.current.classList.remove('d-none');
+                            toggleUsernameField(true);
+                            setUserCredentials({ ...userCredentials, email: result?.user?.email, photoURL: result?.user?.photoURL })
+                            //maybe create a popupufor username,, or addd a continue button in this exssting system,,, on continue do the rest of signup process that is registering in db and updating the displaynmae
+
+                            // let isRegistered = registerUserInDB(result?.user?.email, userCredentials?.username, result?.user?.photoURL)
+                            // if (isRegistered) isUserCreated = true;
                         }
+                    } else {
+                        dispatch(setToast(`Please wait for few seconds while server is loading`, false))
                     }
+
+                    // if (signInOrSignUp === "signup") {
+                    //     console.log('issignup')
+                    //     console.log('ememememme', data)
+                    //     if (data.userFound) {
+                    //         // logout the user
+                    //         dispatch(setToast(`Email already exists, Try Logging in instead.`, true))
+                    //         dispatch(showLoader(false));
+                    //         setTimeout(() => {
+                    //             auth.signOut()
+                    //                 .catch((error) => {
+                    //                     console.error(error);
+                    //                 });
+                    //         }, 3000)
+                    //     } else {
+                    //         let isRegistered = registerUserInDB(result?.user?.email, userCredentials?.username, result?.user?.photoURL)
+                    //         if (isRegistered) isUserCreated = true;
+                    //     }
+
+                    // } else if (signInOrSignUp === "signin") {
+                    //     console.log('issignIN')
+                    //     dispatch(showLoader(false));
+                    //     if (!data.userFound) {
+                    //         dispatch(setToast(`User doesn't exists, Create account first`, true))
+                    //         setTimeout(() => {
+                    //             auth.signOut()
+                    //                 .catch((error) => {
+                    //                     console.error(error);
+                    //                 });
+                    //         }, 3000)
+                    //     } else {
+                    //         dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                    //         navigate('/chat')
+                    //     }
+                    // }
 
                 }
             })
@@ -188,6 +216,34 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
             dispatch(showLoader(false));
             dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
             navigate('/chat')
+        }
+
+    }
+
+    console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxx',userCredentials)
+
+    const createAccount = async (e) => {
+        e.preventDefault()
+        console.log('createAccount', userCredentials?.email, userCredentials?.username, userCredentials?.photoURL)
+
+        const isVerified = await verifyUserName(true);
+        if (isVerified) {
+            
+            let isRegistered = registerUserInDB(userCredentials?.email, userCredentials?.username, userCredentials?.photoURL)
+            if (isRegistered) {
+                await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
+                    .catch(
+                        (err) => console.log('err', err)
+                    );
+
+                //setting user and redirecting to chats
+                dispatch(setUserData(userCredentials?.username, db));
+                dispatch(showLoader(false));
+                dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
+                navigate('/chat')
+            }
+        } else {
+            dispatch(showLoader(false))
         }
 
     }
@@ -253,68 +309,54 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     }
 
     //toggles between signIn and signUp form
-    const toggleSignIn = (form) => {
-        console.log('form', form)
-        setCurrAuthMethod(form)
+    // const toggleSignIn = (form) => {
+    //     console.log('form', form)
+    //     setCurrAuthMethod(form)
 
-        // let signin = document.querySelector('.signin-form')
-        // let signup = document.querySelector('.signup-form')
-        // if (form === 'signin') {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.add('d-none')
-        //         signin.classList.remove('d-none')
-        //     } else {
-        //         signup.style.left = '0'
-        //         signin.style.right = '0'
-        //     }
-        // } else {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.remove('d-none')
-        //         signin.classList.add('d-none')
-        //     } else {
-        //         signup.style.left = '50%'
-        //         signin.style.right = '50%'
-        //     }
-        // }
-        setUserCredentials({ email: '', password: '', username: '' })
-    }
+    //     // let signin = document.querySelector('.signin-form')
+    //     // let signup = document.querySelector('.signup-form')
+    //     // if (form === 'signin') {
+    //     //     if (window.outerWidth < 768) {
+    //     //         signup.classList.add('d-none')
+    //     //         signin.classList.remove('d-none')
+    //     //     } else {
+    //     //         signup.style.left = '0'
+    //     //         signin.style.right = '0'
+    //     //     }
+    //     // } else {
+    //     //     if (window.outerWidth < 768) {
+    //     //         signup.classList.remove('d-none')
+    //     //         signin.classList.add('d-none')
+    //     //     } else {
+    //     //         signup.style.left = '50%'
+    //     //         signin.style.right = '50%'
+    //     //     }
+    //     // }
+    //     setUserCredentials({ email: '', password: '', username: '' })
+    // }
 
-    function emailVerication() {
-        const actionCodeSettings = {
-            url: 'https://localhost:3000',
-            handleCodeInApp: true,
-            // dynamicLinkDomain: 'https://skyrus-3416b.firebaseapp.com'
-        };
-
-        sendSignInLinkToEmail(auth, userCredentials?.email, actionCodeSettings)
-            .then(() => {
-                window.localStorage.setItem('emailForSignIn', userCredentials?.email);
-            })
-            .catch((error) => {
-                console.log('userCredentials?.email', error)
-            });
-    }
 
     return (
         <>
-            <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: '#ff000029' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleLoginFields(false); dispatch(showLoader(false)); }}></div>
+            <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: '#ff000029' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleUsernameField(false); dispatch(showLoader(false)); }}></div>
             <h5 className='text-dark text-center fw-bold'>{title}</h5>
             <section className='text-center fs-14'>{description}</section>
 
-            <form className='d-flex justify-content-center align-items-center flex-column h-100' onSubmit={e => handleClick(e)}>
-                {signInOrSignUp === "signup" &&
-                    <input
-                        type="text" required
-                        className="form-control mt-2"
-                        name="username" id="username"
-                        placeholder="Username"
-                        value={userCredentials?.username}
-                        onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
-                    // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
-                    />
-                }
+            <form className='d-flex justify-content-center align-items-center flex-column h-100'
+            // onSubmit={e => handleClick(e)}
+            >
 
                 <input
+                    type="text" required
+                    className="form-control mt-2 d-none"
+                    name="username" id="username"
+                    placeholder="Username"
+                    value={userCredentials?.username}
+                    onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
+                // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
+                />
+
+                {/* <input
                     type="email" required
                     className="form-control my-2"
                     name="email"
@@ -324,9 +366,9 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     value={userCredentials?.email}
                     onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
                 // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('password1').focus()}
-                />
+                /> */}
 
-                <input
+                {/* <input
                     type="password" required
                     className="form-control"
                     id="password1"
@@ -335,16 +377,22 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     value={userCredentials?.password}
                     onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
                 // onKeyUp={(e) => e.key === "Enter" && e.target.value && handleClick(e)}
-                />
+                /> */}
 
-                <button type='submit' className='btn btn-outline-warning w-100 my-2 createAcc'>{btnText}</button>
+                {/* <button type='submit' className='btn btn-outline-warning w-100 my-2 createAcc'>{btnText}</button> */}
 
-                <section className='my-3 text-end w-100 pointer fs-14 toggle' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section>
+                {/* <section className='my-3 text-end w-100 pointer fs-14 toggle' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section> */}
 
-                <section className='continue-with position-relative w-100 text-center mt-2'>
+                {/* <section className='continue-with position-relative w-100 text-center mt-2'>
                     <span className='fs-12'>OR CONTINUE WITH</span>
                     <section></section>
-                </section>
+                </section> */}
+
+                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 d-none continue'
+                    onClick={(e) => createAccount(e)}
+                >
+                    <span>Continue</span>
+                </button>
 
                 <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 googleBtn'
                     onClick={(e) => handleGoogleAuth(e)}

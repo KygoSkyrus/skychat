@@ -301,7 +301,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                             />
 
                             {selectedUsersForGroup.length > 0 &&
-                                <section className='pointer bold bg-success rounded-3 d-flex justify-content-center align-items-center' style={{ width: "30px", height: "30px", position: "absolute", bottom: "16px", right: "16px" }} onClick={type === "add_member" ? addMember : createGroup}>
+                                <section className='pointer bold rounded-3 d-flex justify-content-center align-items-center' style={{ width: "30px", height: "30px", position: "absolute", bottom: "16px", right: "16px", background: "#0783be", boxShadow: "0 0 10px #0783be96" }} onClick={type === "add_member" ? addMember : createGroup}>
                                     <Check size={20} strokeWidth={4} />
                                 </section>
                             }
