@@ -311,41 +311,10 @@ export function getLocalDateStr(d) {
 
 export async function writeToDb(db, msgObj) {
     try {
-        const docRef = await addDoc(collection(db, "v2"), msgObj);
-        //console.log("message send with ID: ", docRef.id);
-    } catch (e) {
-        console.error("Error adding document: ", e);
+        await addDoc(collection(db, "v2"), msgObj);
+    } catch (error) {
+        console.error("Error adding document: ", error);
     }
-}
-
-// i think its not used anywhere
-export function hideSearchedUsersList(setSearchedUserList) {
-    console.log('hideSearchedUsersList')
-    clearSearchList(setSearchedUserList)
-    // document.getElementById('userSearchDropdown').classList.toggle('d-none')//hiding the dropdown
-}
-
-// i think its not used anywhere
-export const sidebarVisibility = (val) => {
-    // export const sidebarVisibility = (val, setSearchedUserList) => {
-    let sidebar = document.getElementById("mySidebar");
-    let overlay = document.querySelector('.overlay');
-
-    if (val) {
-        sidebar.style.display = "flex";
-        overlay?.classList.remove('d-none');
-    } else {
-        sidebar.style.display = "none";
-        overlay?.classList.add('d-none');
-
-        // clearSearchList(setSearchedUserList);//getting rid of this setSearchedUserList state
-    }
-};
-
-function clearSearchList(setSearchedUserList) {
-    setSearchedUserList(undefined)  //clearing all records
-    document.querySelector('[type="search"]').value = "";//clearing the input on focus out
-    document.getElementById('userSearchDropdown').classList.add('d-none')
 }
 
 

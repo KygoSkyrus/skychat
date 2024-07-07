@@ -1609,6 +1609,7 @@ popup animation
   }
   .outer-join{
     flex-direction: column;
+    justify-content: center;
   }
   .signin-form{
     width: 100%;

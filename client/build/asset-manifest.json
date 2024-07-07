@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/static/css/main.7903c2af.css",
-    "main.js": "/static/js/main.d11e5f4c.js",
+    "main.css": "/static/css/main.0566712a.css",
+    "main.js": "/static/js/main.5f82b3b8.js",
     "static/media/signin-img.png": "/static/media/signin-img.070617807c2a62671a0f.png",
-    "static/media/logo (5).png": "/static/media/logo (5).39b1df9fe18f62cc1c4b.png",
+    "static/media/logo (5).png": "/static/media/logo (5).ae1381f141bd19db8ae1.png",
     "static/media/page-bg.png": "/static/media/page-bg.10410e30216bc41fae32.png",
-    "static/media/logo (3).png": "/static/media/logo (3).914ec6d71f6526ef6d34.png",
+    "static/media/logo (3).png": "/static/media/logo (3).6600b3101ecbf4cb421c.png",
     "static/media/signin-img500.png": "/static/media/signin-img500.6a60c3b86e5c492a325b.png",
-    "static/media/logo (1).png": "/static/media/logo (1).c8f684c0a7eb3c732fe0.png",
-    "static/media/logo (7).png": "/static/media/logo (7).c735a5130142f21e4049.png",
-    "static/media/logo (4).png": "/static/media/logo (4).8d404b45b4a71b3a915e.png",
-    "static/media/logo (2).png": "/static/media/logo (2).c11a34d73854dd469772.png",
+    "static/media/logo (1).png": "/static/media/logo (1).592f257c6f8e9869d70a.png",
+    "static/media/logo (7).png": "/static/media/logo (7).6adbdcb68e8b88d1c7a5.png",
+    "static/media/logo (4).png": "/static/media/logo (4).352e1e0c8154564df506.png",
+    "static/media/logo (2).png": "/static/media/logo (2).053608e058ea9ead3ba0.png",
     "static/media/discord.mp3": "/static/media/discord.264ced943ebd4f5407c4.mp3",
     "index.html": "/index.html",
-    "main.7903c2af.css.map": "/static/css/main.7903c2af.css.map",
-    "main.d11e5f4c.js.map": "/static/js/main.d11e5f4c.js.map"
+    "main.0566712a.css.map": "/static/css/main.0566712a.css.map",
+    "main.5f82b3b8.js.map": "/static/js/main.5f82b3b8.js.map"
   },
   "entrypoints": [
-    "static/css/main.7903c2af.css",
-    "static/js/main.d11e5f4c.js"
+    "static/css/main.0566712a.css",
+    "static/js/main.5f82b3b8.js"
   ]
 }

@@ -1,25 +1,20 @@
 import React, { useContext, useEffect } from "react";
-import { Routes, Route, useNavigate, Link } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore, onSnapshot, query, where } from "firebase/firestore";
 
-// Components
-import "./App.css";
-import { NewRTCA } from "./components/NewRTCA";
-import Authenticate from "./components/Authenticate";
-import Error from "./components/Error"
-import { SET_CURRENT_USER, SET_FIREBASE_APP, SET_USERS_LIST, SET_USER_INFO } from "./redux/actionTypes";
-import { Info } from "lucide-react";
-import Toast from "./components/Toast";
+import { SET_CURRENT_USER, SET_USERS_LIST } from "./redux/actionTypes";
 import { setUserData } from "./redux/thunk/userDataThunk";
 import { FirebaseContext } from "./firebaseContext";
-import About from "./components/About";
-import Loader from "./components/Loader";
-import withSplashScreen from "./components/withSplashScreen";
 import { dbUsers } from "./utils";
-// import { firebaseApp, db } from "./firebaseConfig";
+
+import "./App.css";
+import NewRTCA from "./components/NewRTCA";
+import Authenticate from "./components/Authenticate";
+import About from "./components/About";
+import Toast from "./components/Toast";
+import Error from "./components/Error"
+import withSplashScreen from "./components/withSplashScreen";
 
 
 function App() {
@@ -34,10 +29,6 @@ function App() {
   useEffect(() => {
     checkAuthStatus();
     dispatch({ type: SET_USERS_LIST, payload: dbUsers })
-
-    test1()
-
-
     //uncomment this
     // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
     //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
@@ -52,42 +43,6 @@ function App() {
 
     // return () => unsubscribe();
   }, [])
-
-  async function test1() {
-
-    // try {
-    //   let res = await fetch(`https://skychat-dg.onrender.com/api/doesUserExist`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify({
-    //       username: 'tttt'
-    //     })
-    //   })
-    //   let data = await res.json()
-    //   console.log('test logoogogogo', data)
-    //   return data;
-    // } catch (error) {
-    //   return false;
-    // }
-    let headers = new Headers();
-
-    headers.append('Content-Type', 'application/json');
-    headers.append('Accept', 'application/json');
-    // headers.append('Authorization', 'Basic ' + base64.encode(username + ":" +  password));
-    headers.append('Origin','http://localhost:3000');
-
-    fetch('https://skychat-dg.onrender.com/api/doesUserExist', {
-        mode: 'cors',
-        credentials: 'include',
-        method: 'POST',
-        headers: headers
-    })
-    .then(response => response.json())
-    .then(json => console.log(json))
-    .catch(error => console.log('Authorization failed: ' + error.message));
-  }
 
   async function checkAuthStatus() {
     await auth.onAuthStateChanged(async (user) => {
@@ -117,16 +72,14 @@ function App() {
 
   return (
     <div className="App">
-      {/* <div className="transparent-overlay"></div> */}
       <>
         <Routes>
           <Route exact path="/" element={<Authenticate />} />
           <Route exact path="/chat" element={<NewRTCA />} />
-
           <Route exact path="/about" element={<About />} />
           <Route exact path="*" element={<Error />} />
         </Routes>
-        <div className="body-bg fs-5"><span><b>SKYCHAT</b></span></div>
+        {/* <div className="body-bg fs-5"><span><b>SKYCHAT</b></span></div> */}
       </>
 
       <Toast />

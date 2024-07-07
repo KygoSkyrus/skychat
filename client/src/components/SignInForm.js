@@ -1,23 +1,17 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, sendSignInLinkToEmail } from "firebase/auth";
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, } from "firebase/firestore";
+import { getAuth, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 import { SET_CURRENT_USER } from '../redux/actionTypes';
-import { defaultAvatar, doesUserExistApi, toggleLoginFields, toggleUsernameField } from '../utils';
-import { setUserData } from '../redux/thunk/userDataThunk';
-import { FirebaseContext } from '../firebaseContext';
 import { setToast, showLoader } from '../redux/actionCreators';
+import { setUserData } from '../redux/thunk/userDataThunk';
+import { doesUserExistApi, toggleUsernameField } from '../utils';
+import { FirebaseContext } from '../firebaseContext';
 
-import logo1 from './../assets/logo/logo (1).png'
-import logo2 from './../assets/logo/logo (2).png'
-import logo3 from './../assets/logo/logo (3).png'
-import logo4 from './../assets/logo/logo (4).png'
-import logo5 from './../assets/logo/logo (5).png'
-import logo7 from './../assets/logo/logo (7).png'
 
-const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, btnText, setCurrAuthMethod }) => {
+const SignInForm = () => {
 
     const auth = getAuth();
     const navigate = useNavigate()
@@ -27,110 +21,9 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
     const { db } = useContext(FirebaseContext);
     const [userCredentials, setUserCredentials] = useState({ email: '', photoURL: '', username: '' });
 
-    // useEffect(() => {
-    //     if (signInOrSignUp === "signup")
-    //         document.getElementById('username').focus();// focus on input field
-    //     else
-    //         document.getElementById('email1').focus();
-    // }, [signInOrSignUp])
-
-
-    // function handleClick(e) {
-    //     console.log('handleclick')
-    //     e?.preventDefault();
-    //     // blocking email/password auth as email verification is not implemented
-    //     dispatch(setToast('Email/password authentication is currently unavailable, please login with Google instead', false))
-    //     return true;
-
-    //     if (signInOrSignUp === "signup") {
-    //         createUserAccountFirebase()
-    //     } else if (signInOrSignUp === "signin") {
-    //         loginUserFirebase()
-    //     }
-    // }
-
-    // async function createUserAccountFirebase() {
-
-    //     const isVerified = await verifyUserName(false);
-    //     if (isVerified) {
-    //         let isUserCreated = false;
-    //         await createUserWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
-    //             .then((response) => {
-    //                 const user = response.user;
-    //                 console.log('signup user', user)
-    //                 let isRegistered = registerUserInDB(user?.email, userCredentials?.username, defaultAvatar)
-    //                 if (isRegistered) isUserCreated = true;
-    //                 // inProgressLoader(dispatch, false)
-    //                 //navigate('/user');//sending user to user page for filling out other details
-    //             })
-    //             .catch((error) => {
-    //                 // inProgressLoader(dispatch, false)
-    //                 setUserCredentials({ email: '', password: '', username: '' })
-    //                 let errMsg = error.message;
-    //                 console.log('error', error)
-    //                 if (error.code === 'auth/email-already-in-use') errMsg = "Email already exists!!! Try Signing in instead"
-    //                 dispatch(setToast(errMsg, true))
-    //             });
-
-    //         if (isUserCreated) {
-    //             await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-    //                 .catch(
-    //                     (err) => console.log('err', err)
-    //                 );
-
-    //             //setting user and redirecting to chats
-    //             dispatch(setUserData(userCredentials?.username, db));
-    //             dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-    //             navigate('/chat')
-    //         }
-    //     }
-    //     dispatch(showLoader(false));
-    // }
-
-    // function loginUserFirebase() {
-    //     console.log('login')
-    //     // emailVerication();
-    //     dispatch(showLoader(true));
-    //     // inProgressLoader(dispatch, true)
-    //     signInWithEmailAndPassword(auth, userCredentials?.email, userCredentials?.password)
-    //         .then(
-    //             (response) => {
-    //                 const user = response.user;
-    //                 console.log('signin user', user)
-    //                 dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-    //                 navigate('/chat')
-    //                 dispatch(showLoader(false));
-    //             }
-    //         )
-    //         .catch((error) => {
-    //             dispatch(setToast(`Authentication Failed, Invalid email/password`, true))
-    //             dispatch(showLoader(false));
-    //             setUserCredentials({ email: '', password: '', username: '' })
-    //         });
-
-    // }
-
-
-    const handleGoogleAuth = async (e) => {
-        e.preventDefault()
-        goWithGoogle();
-        // if (signInOrSignUp === "signup") {
-        //     overlayRef.current.classList.remove('d-none');
-        //     setUserCredentials({ ...userCredentials, email: '', password: '' })
-        //     toggleLoginFields(true);
-
-        //     const isVerified = await verifyUserName(true);
-        //     if (isVerified) goWithGoogle();
-        //     else dispatch(showLoader(false));
-        // } else {
-        //     goWithGoogle();
-        // }
-    }
 
     const goWithGoogle = async () => {
-        // const auth = getAuth();
         const provider = new GoogleAuthProvider();
-        let isUserCreated = false;
         await signInWithPopup(auth, provider)
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -151,50 +44,10 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                             overlayRef.current.classList.remove('d-none');
                             toggleUsernameField(true);
                             setUserCredentials({ ...userCredentials, email: result?.user?.email, photoURL: result?.user?.photoURL })
-                            //maybe create a popupufor username,, or addd a continue button in this exssting system,,, on continue do the rest of signup process that is registering in db and updating the displaynmae
-
-                            // let isRegistered = registerUserInDB(result?.user?.email, userCredentials?.username, result?.user?.photoURL)
-                            // if (isRegistered) isUserCreated = true;
                         }
                     } else {
                         dispatch(setToast(`Please wait for few seconds while server is loading`, false))
                     }
-
-                    // if (signInOrSignUp === "signup") {
-                    //     console.log('issignup')
-                    //     console.log('ememememme', data)
-                    //     if (data.userFound) {
-                    //         // logout the user
-                    //         dispatch(setToast(`Email already exists, Try Logging in instead.`, true))
-                    //         dispatch(showLoader(false));
-                    //         setTimeout(() => {
-                    //             auth.signOut()
-                    //                 .catch((error) => {
-                    //                     console.error(error);
-                    //                 });
-                    //         }, 3000)
-                    //     } else {
-                    //         let isRegistered = registerUserInDB(result?.user?.email, userCredentials?.username, result?.user?.photoURL)
-                    //         if (isRegistered) isUserCreated = true;
-                    //     }
-
-                    // } else if (signInOrSignUp === "signin") {
-                    //     console.log('issignIN')
-                    //     dispatch(showLoader(false));
-                    //     if (!data.userFound) {
-                    //         dispatch(setToast(`User doesn't exists, Create account first`, true))
-                    //         setTimeout(() => {
-                    //             auth.signOut()
-                    //                 .catch((error) => {
-                    //                     console.error(error);
-                    //                 });
-                    //         }, 3000)
-                    //     } else {
-                    //         dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-                    //         navigate('/chat')
-                    //     }
-                    // }
-
                 }
             })
             .catch((error) => {
@@ -204,20 +57,6 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                 dispatch(showLoader(false));
                 dispatch(setToast(errMsg, true))
             });
-
-        if (isUserCreated) {
-            await updateProfile(auth.currentUser, { displayName: userCredentials?.username })
-                .catch(
-                    (err) => console.log('err', err)
-                );
-
-            //setting user and redirecting to chats
-            dispatch(setUserData(userCredentials?.username, db));
-            dispatch(showLoader(false));
-            dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
-            navigate('/chat')
-        }
-
     }
 
     console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxx',userCredentials)
@@ -308,44 +147,17 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
         return true;
     }
 
-    //toggles between signIn and signUp form
-    // const toggleSignIn = (form) => {
-    //     console.log('form', form)
-    //     setCurrAuthMethod(form)
-
-    //     // let signin = document.querySelector('.signin-form')
-    //     // let signup = document.querySelector('.signup-form')
-    //     // if (form === 'signin') {
-    //     //     if (window.outerWidth < 768) {
-    //     //         signup.classList.add('d-none')
-    //     //         signin.classList.remove('d-none')
-    //     //     } else {
-    //     //         signup.style.left = '0'
-    //     //         signin.style.right = '0'
-    //     //     }
-    //     // } else {
-    //     //     if (window.outerWidth < 768) {
-    //     //         signup.classList.remove('d-none')
-    //     //         signin.classList.add('d-none')
-    //     //     } else {
-    //     //         signup.style.left = '50%'
-    //     //         signin.style.right = '50%'
-    //     //     }
-    //     // }
-    //     setUserCredentials({ email: '', password: '', username: '' })
-    // }
-
 
     return (
         <>
             <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: '#ff000029' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleUsernameField(false); dispatch(showLoader(false)); }}></div>
-            <h5 className='text-dark text-center fw-bold'>{title}</h5>
-            <section className='text-center fs-14'>{description}</section>
 
-            <form className='d-flex justify-content-center align-items-center flex-column h-100'
-            // onSubmit={e => handleClick(e)}
-            >
+            <h5 className='text-dark text-center fw-bold'>Login to your account</h5>
 
+            {/* <section className='text-center fs-14'>Connect and Chat with SkyChat - Login Now!</section> */}
+            <section className='text-center fs-14 mb-3'>Step into SkyChat, Begin the Conversation!</section>
+
+            <div className='d-flex justify-content-center align-items-center flex-column h-100'>
                 <input
                     type="text" required
                     className="form-control mt-2 d-none"
@@ -353,53 +165,16 @@ const SignInForm = ({ title, description, toggleText, signInOrSignUp, switchTo, 
                     placeholder="Username"
                     value={userCredentials?.username}
                     onChange={(e) => setUserCredentials({ ...userCredentials, username: e.target.value })}
-                // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('email1').focus()}
                 />
 
-                {/* <input
-                    type="email" required
-                    className="form-control my-2"
-                    name="email"
-                    id="email1"
-                    placeholder="Email address"
-                    aria-describedby="emailHelp"
-                    value={userCredentials?.email}
-                    onChange={(e) => setUserCredentials({ ...userCredentials, email: e.target.value })}
-                // onKeyUp={(e) => e.key === "Enter" && e.target.value && document.getElementById('password1').focus()}
-                /> */}
-
-                {/* <input
-                    type="password" required
-                    className="form-control"
-                    id="password1"
-                    name="password"
-                    placeholder="Password*"
-                    value={userCredentials?.password}
-                    onChange={(e) => setUserCredentials({ ...userCredentials, password: e.target.value })}
-                // onKeyUp={(e) => e.key === "Enter" && e.target.value && handleClick(e)}
-                /> */}
-
-                {/* <button type='submit' className='btn btn-outline-warning w-100 my-2 createAcc'>{btnText}</button> */}
-
-                {/* <section className='my-3 text-end w-100 pointer fs-14 toggle' onClick={() => toggleSignIn(switchTo)}>{toggleText}</section> */}
-
-                {/* <section className='continue-with position-relative w-100 text-center mt-2'>
-                    <span className='fs-12'>OR CONTINUE WITH</span>
-                    <section></section>
-                </section> */}
-
-                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 d-none continue'
-                    onClick={(e) => createAccount(e)}
-                >
+                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 d-none continue' onClick={(e) => createAccount(e)}>
                     <span>Continue</span>
                 </button>
 
-                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 googleBtn'
-                    onClick={(e) => handleGoogleAuth(e)}
-                >
+                <button className='btn border w-100 m-2 d-flex justify-content-center align-items-center fs-5 text-black-50 py-1 googleBtn' onClick={() => goWithGoogle()} >
                     <svg width="25" height="25" viewBox="5 5 35 35" xmlns="http://www.w3.org/2000/svg" style={{ height: "32px", width: "32px", marginLeft: "-8px" }}><g fill="none" fillRule="evenodd"><path d="M31.64 23.205c0-.639-.057-1.252-.164-1.841H23v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"></path><path d="M23 32c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711h-3.007v2.332A8.997 8.997 0 0 0 23 32z" fill="#34A853"></path><path d="M17.964 24.71a5.41 5.41 0 0 1-.282-1.71c0-.593.102-1.17.282-1.71v-2.332h-3.007A8.996 8.996 0 0 0 14 23c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path><path d="M23 17.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C27.463 14.891 25.426 14 23 14a8.997 8.997 0 0 0-8.043 4.958l3.007 2.332c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"></path><path d="M14 14h18v18H14V14z"></path></g></svg> <span>Google</span>
                 </button>
-            </form>
+            </div>
         </>
     )
 }

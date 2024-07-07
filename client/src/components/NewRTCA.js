@@ -1,19 +1,16 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useDispatch, useSelector } from 'react-redux'
-
 
 import hamburger from "./../assets/menu.png";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
-import { RESET_USERS_LIST, SET_CURRENT_USER, SET_REQUEST_LIST, SET_USERS_LIST, SET_USER_INFO } from "../redux/actionTypes";
+import { RESET_USERS_LIST, SET_REQUEST_LIST } from "../redux/actionTypes";
 import { showConfirmationModal, showEntityInfoModal, showLoader, showSidebar } from "../redux/actionCreators";
-import { acceptConnectionReq, blockConnection, dbUsers, debounce, declineConnectionReq, sidebarVisibility, writeToDb, exitGroup, acceptGroupReq } from "../utils";
-import { ChevronLeft, LogOut, Send, X, Users, UserPlus2, UserPlus, Users2, Delete, DeleteIcon, Trash, UserRoundX, UserCheck, UserCheck2, UserX, UserX2, Ban, List, Info } from 'lucide-react';
+import { acceptConnectionReq, blockConnection, declineConnectionReq, exitGroup, acceptGroupReq } from "../utils";
+import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info } from 'lucide-react';
 
 
-import { getAuth } from "firebase/auth";
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
-import Toast from "./Toast";
+import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc } from "firebase/firestore";
 import EntityInfoModal from "./modals/EntityInfoModal";
 import { FirebaseContext } from "../firebaseContext";
 import ConfirmationModal from "./modals/ConfirmationModal";
@@ -21,7 +18,7 @@ import Loader from "./Loader";
 import { Link } from "react-router-dom";
 
 
-export const NewRTCA = () => {
+const NewRTCA = () => {
 
   const dispatch = useDispatch()
   const { db } = useContext(FirebaseContext);
@@ -424,3 +421,5 @@ export const NewRTCA = () => {
     </>
   )
 }
+
+export default NewRTCA
