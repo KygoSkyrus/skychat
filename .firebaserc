@@ -7,6 +7,9 @@
       "hosting": {
         "chat": [
           "skychat-dg"
+        ],
+        "chat2": [
+          "skyrus-3416b"
         ]
       }
     }
