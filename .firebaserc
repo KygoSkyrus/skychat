@@ -1,5 +1,15 @@
 {
   "projects": {
-    "default": "skychat-by-dg"
-  }
+    "default": "skyrus-3416b"
+  },
+  "targets": {
+    "skyrus-3416b": {
+      "hosting": {
+        "chat": [
+          "skychat-dg"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
