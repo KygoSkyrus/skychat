@@ -54,7 +54,7 @@ const BlockedConnectionsModal = () => {
     return (
         <>
             <div className="" id="blockedConnModal" >
-                <div className="m-dialog rounded-1">
+                <div className="m-dialog">
 
                     <div className='d-flex align-items-center justify-content-between bg-dark p-3'>
                         <ArrowLeft size="20" className='text-secondary pointer' onClick={() => dispatch(showBlockedConnectionsModal(false))} />

@@ -39,15 +39,28 @@ body {
   align-items: flex-end;
   padding-bottom: 8px;
 }
-.body-bg span{
+.splash{
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  background-color: transparent;
+  background: linear-gradient(217deg, #6cdff6, #509fe6);
+}
+.body-bg span,
+.mainlogo span{
   color: var(--violet);
   padding: 5px 15px;
   border-radius: 4px;
   /* font-weight: bold; */
   letter-spacing: 7px;
 }
+.mainlogo .by {
+  /* color: goldenrod; */
+  font-weight: 200;
+}
 .App{
-  height: 100vh;
+  height: 100dvh;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -108,13 +121,10 @@ body {
 
 /* join page/ signin */
 .outer-join {
-  /* width: 60vw;
-  max-width: 768px;
-  height: 400px; */
   width: 90vw;
-  min-width: 350px;
+  /* min-width: 350px; */
   max-width: 900px;
-  height: 88vh;
+  height: 88dvh;
   min-height: 400px;
   background-color: rgb(211, 211, 211);
   background-color: lavender;
@@ -305,9 +315,9 @@ body {
   /* width: 350px;
   height: 400px; */
   width: 90vw;
-  min-width: 350px;
+  min-width: 260px;
   max-width: 900px;
-  height: 88vh;
+  height: 88dvh;
   min-height: 400px;
   position: relative;
 }
@@ -483,7 +493,7 @@ body {
   border-bottom: 2px solid rgb(43 9 110);
   /* border-radius: 6px 6px 0 6px; */
   border-radius: 9px;
-  z-index: 1;
+  z-index: 2;
 }
 .chat-body .chat-box .nothing_to_load .msg-arrow{
   position: absolute;
@@ -696,7 +706,7 @@ body {
 
 .msg-input aside{
   width: 350px !important;
-  height: 300px !important;
+  height: 330px !important;
   position: absolute;
   left: 50%;
   top: 53%;
@@ -1015,7 +1025,8 @@ popup animation
   width: 100%;
   position: relative;
   height: calc(100% - 3.5rem);
-  /* overflow: auto; */
+  border-radius: 12px !important;
+  border: 1px solid #4b4b4b;
 }
 .m-dialog::-webkit-scrollbar {
   /* display: none; */
@@ -1429,7 +1440,7 @@ popup animation
   color-scheme: dark;
 } */
 /* body {
-  min-height: 100svh;
+  min-height: 100sdvh;
   padding: 2rem;
 
   color: white;
@@ -1605,7 +1616,7 @@ popup animation
 @media (max-width:768px) {
   .outer-top{
     width: calc(100vw - 10px);
-    height: calc(100vh - 10px);
+    height: calc(100dvh - 10px);
   }
   .outer-join{
     flex-direction: column;
@@ -1614,9 +1625,10 @@ popup animation
   .signin-form{
     width: 100%;
   }
-  /* .signin .forms-holder{
+  .signin .forms-holder {
     min-width: unset;
-  } */
+  }
+
 
   #userModal,
   #entityInfoModal,
@@ -1626,6 +1638,7 @@ popup animation
   #confirmationModal,
   #blockedConnModal {
     width: 90%;
+    height: 65%;
   }
 }
 

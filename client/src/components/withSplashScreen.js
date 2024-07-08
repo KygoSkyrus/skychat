@@ -1,46 +1,42 @@
 import React, { useEffect, useState } from 'react';
-// import './assets/css/App.css'
-// import mainlogo from './assets/images/mainlogo1.png'
-
+import logo1 from './../assets/logo/logo (1).png'
 
 function SplashMessage() {
-    return (
-        <div className="mainlogo absolute-centered mainlogo text-center text-light">
-        <div className="">
-          SKYCHAT
-            {/* <img src={mainlogo}  alt="logo" /> */}
-        </div>
-        <p className="by">by dheeraj gupta</p>
+  return (
+    <div className='splash'>
+      <div className="mainlogo absolute-centered mainlogo text-center text-light">
+        {/* <span className='fs-2'><b>SKYCHAT</b></span> */}
+        <img src={logo1} width={200} alt='' />
+        <p className="by fs-3">
+          <i className='text-light fs-12'>by</i> dheeraj gupta
+        </p>
+      </div>
     </div>
-    );
+  );
 }
 
 const withSplashScreen = (WrappedComponent) => {
-    return (props) => {
-      const [loading, setLoading] = useState(true);
-  
-      useEffect(() => {
-        const fetchData = async () => {
-          try {
-            // Put your await requests/API requests here
-            setTimeout(() => {
-              setLoading(false);
-            }, 1000);
-          } catch (err) {
-            console.log(err);
+  return (props) => {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setTimeout(() => {
             setLoading(false);
-          }
-        };
-  
-        fetchData();
-      }, []);
-  
-      // While checking user session, show "loading" message
-      if (loading) return SplashMessage();
-  
-      // Otherwise, show the desired route
-      return <WrappedComponent {...props} />;
-    };
+          }, 1800);
+        } catch (err) {
+          console.log(err);
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []);
+
+    if (loading) return SplashMessage();
+    return <WrappedComponent {...props} />;
   };
+};
 
 export default withSplashScreen;

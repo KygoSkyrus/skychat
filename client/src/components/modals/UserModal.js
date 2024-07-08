@@ -38,7 +38,7 @@ const UserModal = () => {
     return (
         <>
             <div className="" id="userModal" >
-                <div className="m-dialog justify-content-center bg-dark rounded-1">
+                <div className="m-dialog justify-content-center bg-dark">
 
                     <div className='d-flex align-items-center justify-content-between p-3' style={{ position: 'absolute', width: '100%' }}>
                         {/* <X size="20" className='btn-close' onClick={() => dispatch(showUserModal(false))} /> */}

@@ -345,8 +345,8 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             };
 
             writeToDb(db, msgData);
-            // setcurrentText(''); // resetting input text field
-            inputRef.current.value = '';
+            inputRef.current.value = ''; // reset input field
+            if(showEmojiPicker) setShowEmojiPicker(false); // hide emoji-picker
         }
     }
 

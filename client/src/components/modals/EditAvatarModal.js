@@ -136,7 +136,7 @@ const EditAvatarModal = () => {
     return (
         <>
             <div className="" id="avatarModal" >
-                <div className="m-dialog d-flex flex-column justify-content-between bg-dark rounded-1">
+                <div className="m-dialog d-flex flex-column justify-content-between bg-dark">
                     {/* <button type="button" className="btn-close"></button> */}
                     <X size="20" className='btn-close' onClick={() => dispatch(showEditAvatarModal(false))} />
 

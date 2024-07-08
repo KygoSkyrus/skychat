@@ -180,7 +180,7 @@ const EntityInfoModal = React.memo(({ selectedUserToChat, selectedGroupName }) =
     return (
         <>
             <div className="" id="entityInfoModal" >
-                <div className="m-dialog justify-content-center bg-dark rounded-1">
+                <div className="m-dialog justify-content-center bg-dark">
 
                     <div className='d-flex align-items-center justify-content-between'>
                         <X size="20" className='btn-close' onClick={() => dispatch(showEntityInfoModal(false))} />

@@ -26,7 +26,7 @@ const Toast = React.memo(() => {
     }
     timer = setTimeout(() => {
       hideToast();
-    }, 3500);
+    }, 4000);
   };
 
   return (

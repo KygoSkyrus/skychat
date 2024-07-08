@@ -96,15 +96,12 @@
 
 http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
-- change fonts
 -[need testing] on server only allow requests from the own skychat client
-- add a feedback account named "skychat" by default in chat
 - uncommemt user search code for dynamic data
-on mobile
-- signin ui is messsed up
-- signup is acting crazy
-- modals width are too low
-- fonts are too cursive
+- add a feedback account named "skychat" by default in chat
+[done]
+- change vh to dvh
+- change api call to live server api
 
 
 **Style**

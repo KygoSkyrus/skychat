@@ -23,7 +23,7 @@ const ConfirmationModal = () => {
     return (
         <>
             <div className="" id="confirmationModal" >
-                <div className="m-dialog justify-content-center bg-dark rounded-1">
+                <div className="m-dialog justify-content-center bg-dark">
 
                     <div className="d-flex align-items-center justify-content-center flex-column text-light h-100 p-5">
                         <section className='text-center mb-2' dangerouslySetInnerHTML={{ __html: confirmationText }}></section>
