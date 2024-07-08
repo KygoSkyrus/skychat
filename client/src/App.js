@@ -15,6 +15,7 @@ import About from "./components/About";
 import Toast from "./components/Toast";
 import Error from "./components/Error"
 import withSplashScreen from "./components/withSplashScreen";
+import { collection, onSnapshot } from "firebase/firestore";
 
 
 function App() {
@@ -28,20 +29,19 @@ function App() {
 
   useEffect(() => {
     checkAuthStatus();
-    dispatch({ type: SET_USERS_LIST, payload: dbUsers })
+    // dispatch({ type: SET_USERS_LIST, payload: dbUsers })
     //uncomment this
-    // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-    //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
-    //   let userList = {};
-    //   snapshot.docs.forEach((doc) => {
-    //     // let data = {...doc.data(),id:doc.id};
-    //     userList[doc.data()?.username] = {...doc.data(),id:doc.id};
-    //   });
-    //   console.log('ul',userList)
-    //   dispatch({ type: SET_USERS_LIST, payload: userList });
-    // });
+    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+      console.log('+++++++++++++++++++++getAllUsersList',snapshot)
+      let userList = {};
+      snapshot.docs.forEach((doc) => {
+        userList[doc.data()?.username] = {...doc.data(),id:doc.id};
+      });
+      console.log('ul',userList)
+      dispatch({ type: SET_USERS_LIST, payload: userList });
+    });
 
-    // return () => unsubscribe();
+    return () => unsubscribe();
   }, [])
 
   async function checkAuthStatus() {

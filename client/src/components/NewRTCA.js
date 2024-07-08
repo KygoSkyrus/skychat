@@ -418,6 +418,7 @@ const NewRTCA = () => {
       <Link to={'/about'} className="info">
         <Info />
       </Link>
+      <section className="copyright fs-12">© 2024 All Rights Reserved, Skychat <i className="">by</i> Dheeraj Gupta</section>
     </>
   )
 }

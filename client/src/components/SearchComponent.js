@@ -85,7 +85,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
                     return (
                         <section className="dropdown-item pointer p-1 px-2 d-flex align-items-center justify-content-between" key={x} onClick={() => handleSelect(x, usersList[x]?.privacy)}>
                             <span>
-                                <img src={usersList[x]?.avatar} className='me-2' alt="" />
+                                <img src={usersList[x]?.avatar} className='me-2 rounded-circle' alt="" />
                                 <span>{x}</span>
                             </span>
                             {usersList[x]?.privacy &&

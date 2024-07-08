@@ -100,10 +100,8 @@ http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - uncommemt user search code for dynamic data
 - add a feedback account named "skychat" by default in chat
 
-- increase height of toast ,, move it up a little,,
-- try changing yhe violet color to blue
-- gruppname doesnt show on chatheader when created 
 - add description in index
+- maybe addmember or create group has common code,,, leave if its time raking and complex
 
 **Style**
 - [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -257,6 +255,39 @@ https://css-tricks.com/methods-contrasting-text-backgrounds/
 - # About
  SKYCHAT comes with a various unique features to enhance the messaging experience
  - **Privacy** : We have a privacy setting (turned on by default) which let users to controll who can text them and add them to a group. Even though the msg sent by someone or if you are added to a group, in both case connection-req/group-req will be shown in request list. But we have considered user's privacy to control who can text them by this feature.
+
+
+# group modal
+    // on creating group user can add any user by searcing the user name
+    // there will be modal.. first there will be a  text box to enter username then when user click on search to search,,, it is exactly like search on sidebar
+    // next below that there will be all the users in the connection list(maybe show req list or blocked connection too but then before adding them user has to unlock or approve his reuqest)
+    //you can also show the slected users on the top 
+
+# enitiyinfo modal
+    // [done]..have  to delete the self from group collections too when a user is removed and exits volunteeraly
+    // [done]..for adding members in group  mdoal ,, things you have to do is send a msg to group that user has added,, same goes when a member is removed
+    // [done]..second important thing is that u need to check if the msg if recieved by the members only,, not by the removed members 
+    // [done]..user cant add more than 25 members in group
+    // [done]..when user leaves it should show right than in the groupmemberlist,,,can we do something like this that if we are groupinfo page and right then if someone leaves,,,we see the chnage in member list,,, can add a snapshot for groupinfo,,,maybe that will work in real time
+    // [done]on add member modal its showing create group at the top 
+
+    // CASE:?? if the admin leaves than there is no admin, hence no members can be added.. possible solution>> is to have createdBy as an array.. which initailly will have one(creator) user.. and if that user leaves than push the next member from memberlist to that array,, this array will be like stack,, the top user is the current admin,,,and the first ever user will be the creator. 
+
+    //ADDED:> when a user is added to group by admin(using btn in groupinfo after the group has been already created),, than a deletedTill value should be added in user's doc so that he can see the chats after he has joined(not the previous one)
+    //REMOVE:> when a user is removed than first he will be removed from the group collection,, and than the exitAt date will me added to group connection 
+    // GROUP has basicalaly three actions,, 
+    // accept; which means user accespts to be in group,, [avaiallabe in req list]
+    // delete; means the user exits the group... [this is avaiallabe in both connection and req list]
+    // clearChat; means the chat is cleared... [ avaialable in connection list only]
+    // Add/remove member: only admin can perfrom this action( let this action be displayed but throw a notifiction if anyone other than admin tries to perform these actions)
+
+    // first when a user is removed from group or he leaves himself than the chat should not disappear ,,as it should show the group but messaging should be disabled.... (if this is time taking than leave it).... [solution]this can be done by adding a key the users connection list of that group,,along with groupname and connection-id,, a key of exitAt should be added on removal of group of when leaving instead of deleting the group connection..by this key we will hide and show the text input  field on chat window.. if this key is there than hide the input as the user is no longer a member,,, and when user is added again,,it will be check if the user already has the group connection id(bcz there might be a case that user has cleared the chat),,,if yes than this key will be deleted and everything will be same as usual... also note that when this key is avaialbe than it  should not show the exit group button to user
+
+    // when there is exitAt key than show delete group button else show exit group,, delete group btn will delete the group connection from list,  even if user does not delete the group after exiting the group,, than when he is added again it should be checked if he has that group connection already than first the connection should be moved to req list,, second check if deletedTill is after the exitAt(to check if user has cleared that chats of group after exit),,  if yes than we will update the deletedTill( deletedTill here is refered to as the joining time) so that user sees the new msgs only and if no than we will let the deletedTill be as it is so the user will get to have his previous msgs
+    // CASE: we have to update the deletedTill(joining time) bcz there may be msgs in group between the period when user has left and when he is added again,,, and if we dont update the deletedTill than user can see the msgs from that period too(which is wrong)
+    // CASE: if a person is added in group and that person hasnt accepted the group req and the req is still in req list while he is removed from grooup,, then unlike being in connection list the group connection will be deleted from req list
+
+    // if user exit/removed from group and when he is added again then msgs are not showing in realtime,, if he reopens the chat than its working,, this may be bcz of the condiion if exitAT
 
 
 

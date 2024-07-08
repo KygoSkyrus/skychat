@@ -3,90 +3,65 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ArrowLeft, X, Check } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid';
 
-
 import SearchComponent from '../SearchComponent'
-import { getFirestore, collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, Timestamp, startAfter, } from "firebase/firestore";
-import { writeToDb } from '../../utils';
 import { FirebaseContext } from '../../firebaseContext';
+import { collection, query, where, doc, getDocs, getDoc, setDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { setToast, showAddMemberModal, showGroupModal, showLoader } from '../../redux/actionCreators';
+import { writeToDb } from '../../utils';
 
 const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo }) => {
 
     const dispatch = useDispatch();
-
     const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
     const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
     const isGroupModalVisible = useSelector((state) => state.ui.isGroupModalVisible);
     const isAddMemberModalVisible = useSelector((state) => state.ui.isAddMemberModalVisible);
 
-
     const [selectedUsersForGroup, setSelectedUsersForGroup] = useState([])
     const [firstPage, setFirstPage] = useState(type !== "add_member");
     const [groupName, setGroupName] = useState('');
 
 
-    // on creating group user can add any user by searcing the user name
-    // there will be modal.. first there will be a  text box to enter username then when user click on search to search,,, it is exactly like search on sidebar
-    // next below that there will be all the users in the connection list(maybe show req list or blocked connection too but then before adding them user has to unlock or approve his reuqest)
-    //you can also show the slected users on the top 
-
     const createGroup = async () => {
-
-        // let connectionId;
         if (groupName) {
             dispatch(showLoader(true));
 
-            let connectionId = uuidv4(); // creating a new connection id
+            let connectionId = uuidv4();
             const members = [];
 
             const userDocRef = doc(db, "users", userData.id);
-            // updating the user document with new connection in connection list
-            // initailly add past time like 1970 in deltedTill
             await updateDoc(userDocRef, {
                 connections: {
                     ...userData.connections,
                     [connectionId]: {
                         id: connectionId,
                         groupName,
-                        // members:selectedUsersForGroup,
-                        // isGroup:true,
                     },
                 }
             });
 
-            // getting receiver's doc
             let receiversDoc = [];
             for (let x of selectedUsersForGroup) {
-                // selectedUsersForGroup.map(async x=>{
                 let q = query(collection(db, "users"), where("username", "==", x));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
-                    // console.log("RECIEVEER'S DOC => ", doc.data());
-                    let temp;
-                    temp = doc.data()
-                    temp.id = doc.id;
+                    let temp = { ...doc.data(), id: doc.id }
                     receiversDoc.push(temp)
-                    console.log('tempp', temp)
                     members.push({ name: temp.username, avatar: temp.avatar })
                 });
-                // })
             }
-            console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
             for (let i = 0; i < receiversDoc?.length; i++) {
-                // for (let x of receiversDoc) {
-                console.log("x", receiversDoc[i])
-                const receiverDocRef = doc(db, "users", receiversDoc[i].id);
+                const receiverDocRef = doc(db, "users", receiversDoc[i]?.id);
                 await updateDoc(receiverDocRef, {
                     requests: {
-                        ...receiversDoc.requests,
+                        ...receiversDoc[i]?.requests,
                         [connectionId]: {
                             id: connectionId,
                             groupName,
                             deletedTill: serverTimestamp(),
-                            // members:selectedUsersForGroup,
                         },
                     }
                 });
@@ -116,7 +91,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
 
             setGroupName(''); // resetting input text field
             dispatch(showGroupModal(false))// hiding modal
-            handleSelectedUserToChat(connectionId, true);
+            handleSelectedUserToChat(connectionId, groupName);
             dispatch(showLoader(false));
         }
     }
@@ -159,63 +134,27 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
     }
 
 
-
-    const handleContinue = (e) => {
-        e.preventDefault();
-        setFirstPage(false)
-    }
-
-
-
     const addMember = async () => {
-        // here you add the selected users to the group collection
-        // and add the group to users' request list (just like what we did when we created the group)
-
         if (selectedUsersForGroup) {
             dispatch(showLoader(true));
-            // let connectionId = uuidv4(); // creating a new connection id
             const members = [];// array of objects of member and their avatar
 
-            // ADDING GROUP TO USER'S REQ LIST-------
-            // getting receiver's doc
             let receiversDoc = [];
             for (let x of selectedUsersForGroup) {
                 let q = query(collection(db, "users"), where("username", "==", x));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
-                    let temp;
-                    temp = doc.data()
-                    temp.id = doc.id;
+                    let temp = { ...doc.data(), id: doc.id }
                     receiversDoc.push(temp)
-                    // console.log('tempp', temp)
                     members.push({ name: temp.username, avatar: temp.avatar })
                 });
             }
-            // console.log('receiversDoc', receiversDoc)
 
             //updating the receiver document request list
             for (let x of receiversDoc) {
-                console.log("x", receiversDoc.connections)
                 const receiverDocRef = doc(db, "users", x.id);
 
-                /* group will always be deleted on exit so no need of below code
-                // if the user still has the group connection (IN CASE: he hasn't deleted the group)
-                if (x.connections.hasOwnProperty(groupInfo?.id)) {
-                    delete x.connections[groupInfo?.id]; // deleting group from connection list and moving to req list with new timestamp
-                    // await updateDoc(receiverDocRef, {
-                    //     connections: {
-                    //         ...x.connections,
-                    //         [groupInfo?.id]: {
-                    //             id: groupInfo?.id,
-                    //             groupName: groupInfo?.groupName,
-                    //             deletedTill: serverTimestamp(),
-                    //         },
-                    //     }
-                    // });
-                }
-                    */
                 await updateDoc(receiverDocRef, {
-                    // connections: { ...x.connections },
                     requests: {
                         ...x.requests,
                         [groupInfo?.id]: {
@@ -225,7 +164,6 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                         },
                     }
                 });
-                // }
 
                 // SENDING NOTIFICATION (USER ADDED)
                 const msgData = {
@@ -238,8 +176,6 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                 };
                 await writeToDb(db, msgData);
             }
-            // ADDING GROUP TO USER'S REQ LIST-------
-
 
             // UPDATING GROUP TO WITH NEW MEMBERS
             const docRef = doc(db, "group", groupInfo?.id);
@@ -249,14 +185,17 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                 let newMemberList = [...data.members, ...members]
                 data.members = newMemberList;
 
-                console.log('data when meners added', data)
-
-                await updateDoc(docRef, data);// updating document
+                await updateDoc(docRef, data);
                 setGroupInfo(data);
-                dispatch(showAddMemberModal(false)); // closing addmember modal
+                dispatch(showAddMemberModal(false));
             }
             dispatch(showLoader(false));
         }
+    }
+
+    const handleContinue = (e) => {
+        e.preventDefault();
+        setFirstPage(false)
     }
 
     if (type === "add_member" && !isAddMemberModalVisible) return null;
@@ -293,7 +232,6 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
                                 )
                                 }
                             </div>
-
 
                             <SearchComponent
                                 id={"userSearchDropdownGroup"}

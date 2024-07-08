@@ -129,6 +129,12 @@ body {
 /* BASICS */
 
 
+.copyright{
+  position: absolute;
+  bottom: 2px;
+  color: rgb(83, 83, 83);
+}
+
 /* join page/ signin */
 .outer-join {
   width: 90vw;
@@ -172,20 +178,19 @@ body {
   height: fit-content;
   position: absolute;
   bottom: -50px;
-  width: 100%;
+  width: 90%;
   transition: var(--transition);
   display: flex;
   justify-content: center;
 }
 .toast{
   /* display: none; */
-  /* width: 180px; */
   position: relative;
   color: #fff;
   background: var(--violet);
   text-align: center;
   border-radius: 4px;
-  padding: 4px;
+  padding: 7px 36px;
   opacity: 1 !important;
 }
 .toast::before{
@@ -318,6 +323,7 @@ body {
   align-items: center;
   justify-content: center;
   margin-left: 5px;
+  line-height: 1px;
 }
 
 /*chat page*/
@@ -1650,49 +1656,83 @@ popup animation
     height: 65%;
   }
 
-
+   /* ACTIONS */
   .deleteConnection,
   .blockConnection,
   .acceptReq,
   .declineReq,
-  .blockReq {
-    position: absolute;
+  .blockReq,
+  .unblock_overlay {
+    height: 46.67px;
+    top: 42%;
     right: 0px;
-    top: 50%;
     margin: 4px;
     border-radius: 4px;
+    background: #9a9a9a2e;
   }
+  /* right most button */
   .chat_list .list .blockConnection,
   .member_list .list .blockConnection,
   .request_list .list .blockReq {
-    right: 1px;
+    right: 0;
   }
+  .chat_list .list:hover .blockConnection,
+  .member_list .list:hover .blockConnection,
+  .request_list .list:hover .blockReq {
+    right: 0;
+  }
+  /* middle button */
   .chat_list .list .deleteConnection,
   .request_list .list .declineReq {
-    right: 40px;
+    right: 43px;
     color: #dc3545a1;
   }
+  .chat_list .list:hover .deleteConnection, 
+  .request_list .list:hover .declineReq {
+    right: 43px;
+    background-color: #9a9a9a2e;
+  }
+
+  /* left most button */
   .request_list .list .acceptReq {
-    right: 79px;
-    color: #5ef35e91;
+    right: 87px;
+    color: #1b7d1bf5;
+  }
+  .request_list .list:hover .acceptReq {
+    right: 87px;
+    background-color: #9a9a9a2e;
   }
   
+  /* for group req btn */
   .request_list .list .overrideClrGreen{
-    right: 39px;
-    color: #5ef35e91;
+    right: 43px;
+    color: #1b7d1bf5;
   }
   .request_list .list .overrideClrRed{
     right: 0px;
     color: #dc3545a1;
   }
-
+  /* for block btn */
   .unblock_overlay{
-    background: linear-gradient(267deg, #32d53273, transparent);
-    -webkit-backdrop-filter: blur(10px) brightness(150%);
-    backdrop-filter: blur(0px) brightness(100%);
+    width: 40px;
+    right: 0;
+    top: 0;
+    opacity: 1;
+    color: #1b7d1bf5;
+    border-bottom: none;
   }
 
+
+  /* toast */
+  .toast{
+    width: fit-content;
+  }
+  .toast_animation{
+    bottom: min(3%, 20px) !important;  
+  }
 }
+
+
 @media (max-width:480px) {
   .outer-top{
     width: 100vw;

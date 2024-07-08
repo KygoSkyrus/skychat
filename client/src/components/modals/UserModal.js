@@ -1,10 +1,11 @@
-import { ArrowLeft, Edit, X } from 'lucide-react'
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { ArrowLeft, Edit } from 'lucide-react'
+import { doc, updateDoc } from 'firebase/firestore'
+
+import ThemeModal from './ThemeModal'
 import EditAvatarModal from './EditAvatarModal'
 import BlockedConnectionsModal from './BlockedConnectionsModal'
-import ThemeModal from './ThemeModal'
-import { doc, updateDoc } from 'firebase/firestore'
 import { FirebaseContext } from '../../firebaseContext'
 import { setToast, showBlockedConnectionsModal, showConfirmationModal, showEditAvatarModal, showLoader, showThemeModal, showUserModal } from '../../redux/actionCreators'
 
@@ -14,8 +15,6 @@ const UserModal = () => {
     const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo)
     const isUserModalVisible = useSelector((state) => state.ui.isUserModalVisible);
-
-    console.log('``````````usermodal')
 
 
     const handleTogglePrivacy = async (e) => {
@@ -46,12 +45,9 @@ const UserModal = () => {
                         <span className='text-secondary fs-12'>Settings</span>
                     </div>
 
-
                     <div className="d-flex align-items-center justify-content-center flex-column text-light h-100">
                         <div className='uImg'>
-                            <img src={userData?.avatar} className="pointer" alt=""
-                            //  onClick={()=>changeAvatar(true)} 
-                            />
+                            <img src={userData?.avatar} className="pointer" alt=""/>
                             <div className='avatar_edit_btn' onClick={() => dispatch(showEditAvatarModal(true))}>
                                 <Edit />
                             </div>
@@ -71,13 +67,11 @@ const UserModal = () => {
                                 </span>
                             </li>
                         </ul>
-
                     </div>
 
                 </div>
             </div>
             <div className="overlay pointer zIndex4" onClick={() => dispatch(showUserModal(false))}></div>
-
 
             <EditAvatarModal />
             <BlockedConnectionsModal />

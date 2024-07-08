@@ -1,10 +1,11 @@
-import { X } from 'lucide-react'
 import React, { useContext, useState } from 'react'
-import { getPatternUrl } from '../../utils'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoader, showThemeModal } from '../../redux/actionCreators'
-import { doc, updateDoc } from 'firebase/firestore'
+import { X } from 'lucide-react'
+
 import { FirebaseContext } from '../../firebaseContext'
+import { doc, updateDoc } from 'firebase/firestore'
+import { showLoader, showThemeModal } from '../../redux/actionCreators'
+import { getPatternUrl } from '../../utils'
 
 
 const ThemeModal = () => {
@@ -13,13 +14,11 @@ const ThemeModal = () => {
     const { db } = useContext(FirebaseContext);
     const userData = useSelector(state => state.user.userInfo);
     const isThemeModalVisible = useSelector((state) => state.ui.isThemeModalVisible);
-    
+
     const [selectedPattern, setSelectedPattern] = useState('');
 
     async function setPattern(img) {
         dispatch(showLoader(true));
-        // const body = document.querySelector('body');
-        // body.style.backgroundImage = `url('${img}')`;
         setSelectedPattern(img);
         if (userData?.theme !== img) {
             const docRef = doc(db, "users", userData?.id);
@@ -40,10 +39,9 @@ const ThemeModal = () => {
                     <X size="20" className='btn-close' onClick={() => dispatch(showThemeModal(false))} />
 
                     <div className='avatar_grid'>
-                        {Array.from(Array(40).keys()).map((x, i) => {
-                            return <img src={getPatternUrl(i + 1)} key={i} alt='skychat' onClick={e => setPattern(e.target.src)}
-                                className={`${getPatternUrl(i + 1) === selectedPattern ? 'selectedPattern' : ''}`} loading="lazy" />
-                        })}
+                        {Array.from(Array(40).keys()).map((x, i) =>
+                            <img src={getPatternUrl(i + 1)} key={i} alt='skychat' onClick={e => setPattern(e.target.src)} className={`${getPatternUrl(i + 1) === selectedPattern ? 'selectedPattern' : ''}`} loading="lazy" />
+                        )}
                     </div>
 
                 </div>
