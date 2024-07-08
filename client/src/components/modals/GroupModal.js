@@ -267,7 +267,7 @@ const GroupModal = ({ handleSelectedUserToChat, type, groupInfo, setGroupInfo })
             <div className="zIndex6" id="groupModal" >
                 <div className="m-dialog bg-dark">
 
-                    <div className='d-flex align-items-center justify-content-between bg-dark p-3 text-white'>
+                    <div className='d-flex align-items-center justify-content-between bg-dark p-3 text-white br-12'>
                         <ArrowLeft size="20" className='text-secondary pointer' onClick={() => type === "add_member" ? dispatch(showAddMemberModal(false)) : dispatch(showGroupModal(false))} />
                         <span className={`text-secondary fs-12`} >{type === "add_member" ? 'Add Member' : 'Create Group'}</span>
                         {/* <X size="20" className='btn-close' onClick={() => setShowGroupModal(false)} /> */}

@@ -56,12 +56,12 @@ const BlockedConnectionsModal = () => {
             <div className="" id="blockedConnModal" >
                 <div className="m-dialog">
 
-                    <div className='d-flex align-items-center justify-content-between bg-dark p-3'>
+                    <div className='d-flex align-items-center justify-content-between bg-dark p-3 brt-12'>
                         <ArrowLeft size="20" className='text-secondary pointer' onClick={() => dispatch(showBlockedConnectionsModal(false))} />
                         <span className='text-secondary fs-12'>Blocked connections</span>
                     </div>
 
-                    <div className="block_list">
+                    <div className="block_list brb-12">
                         {Object.keys(userData?.blockList)?.length > 0 ?
                             Object.keys(userData?.blockList).map((x, i) => {
                                 return (

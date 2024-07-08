@@ -397,7 +397,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                                 {/* show notifications */}
                                 {msgData?.isNotification ?
                                     <div className="text-center date">
-                                        <span className="fs-12 px-2" style={{ background: "var(--violet)" }}>
+                                        <span className="fs-12 px-2" style={{ background: "var(--blue)" }}>
                                             {getFormattedNotification(msgData, userData?.username)}
                                         </span>
                                     </div>

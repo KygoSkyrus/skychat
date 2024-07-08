@@ -6,6 +6,7 @@
   --black1: #1b1f22;
   --violet: rgb(112.520718, 44.062154, 249.437846);
   --green: rgb(60, 235, 44);
+  --blue: rgb(0 106 157);
 }
 
 body {
@@ -81,6 +82,15 @@ body {
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
+}
+.br-12{
+  border-radius: 12px !important;
+}
+.brt-12{
+  border-radius: 12px 12px 0 0 !important;
+}
+.brb-12{
+  border-radius: 0 0 12px 12px !important;
 }
 .br-16{
   border-radius: 16px !important;
@@ -1629,7 +1639,6 @@ popup animation
     min-width: unset;
   }
 
-
   #userModal,
   #entityInfoModal,
   #groupModal,
@@ -1639,6 +1648,58 @@ popup animation
   #blockedConnModal {
     width: 90%;
     height: 65%;
+  }
+
+
+  .deleteConnection,
+  .blockConnection,
+  .acceptReq,
+  .declineReq,
+  .blockReq {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    margin: 4px;
+    border-radius: 4px;
+  }
+  .chat_list .list .blockConnection,
+  .member_list .list .blockConnection,
+  .request_list .list .blockReq {
+    right: 1px;
+  }
+  .chat_list .list .deleteConnection,
+  .request_list .list .declineReq {
+    right: 40px;
+    color: #dc3545a1;
+  }
+  .request_list .list .acceptReq {
+    right: 79px;
+    color: #5ef35e91;
+  }
+  
+  .request_list .list .overrideClrGreen{
+    right: 39px;
+    color: #5ef35e91;
+  }
+  .request_list .list .overrideClrRed{
+    right: 0px;
+    color: #dc3545a1;
+  }
+
+  .unblock_overlay{
+    background: linear-gradient(267deg, #32d53273, transparent);
+    -webkit-backdrop-filter: blur(10px) brightness(150%);
+    backdrop-filter: blur(0px) brightness(100%);
+  }
+
+}
+@media (max-width:480px) {
+  .outer-top{
+    width: 100vw;
+    height: 100dvh;
+  }
+  .outer{
+    border-radius: 0;
   }
 }
 

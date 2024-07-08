@@ -99,10 +99,11 @@ http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 -[need testing] on server only allow requests from the own skychat client
 - uncommemt user search code for dynamic data
 - add a feedback account named "skychat" by default in chat
-[done]
-- change vh to dvh
-- change api call to live server api
 
+- increase height of toast ,, move it up a little,,
+- try changing yhe violet color to blue
+- gruppname doesnt show on chatheader when created 
+- add description in index
 
 **Style**
 - [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one

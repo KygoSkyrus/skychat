@@ -42,7 +42,7 @@ const UserModal = () => {
 
                     <div className='d-flex align-items-center justify-content-between p-3' style={{ position: 'absolute', width: '100%' }}>
                         {/* <X size="20" className='btn-close' onClick={() => dispatch(showUserModal(false))} /> */}
-                        <ArrowLeft size="16" className='text-secondary ' onClick={() => dispatch(showUserModal(false))} />
+                        <ArrowLeft size="16" className='text-secondary pointer' onClick={() => dispatch(showUserModal(false))} />
                         <span className='text-secondary fs-12'>Settings</span>
                     </div>
 
