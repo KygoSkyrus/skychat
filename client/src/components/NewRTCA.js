@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
 import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info } from 'lucide-react';
-import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc } from "firebase/firestore";
+import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc, getDoc } from "firebase/firestore";
 
 import hamburger from "./../assets/menu.png";
 import Loader from "./Loader";
@@ -14,9 +14,11 @@ import { FirebaseContext } from "../firebaseContext";
 import { RESET_USERS_LIST, SET_REQUEST_LIST } from "../redux/actionTypes";
 import { showConfirmationModal, showEntityInfoModal, showLoader, showSidebar } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, declineConnectionReq, exitGroup, acceptGroupReq } from "../utils";
+import { getAuth } from "firebase/auth";
 
 
 const NewRTCA = () => {
+  const auth = getAuth();
 
   const dispatch = useDispatch()
   const { db } = useContext(FirebaseContext);
@@ -31,8 +33,20 @@ const NewRTCA = () => {
   const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
 
   useEffect(() => {
+   g()
     if (userData) fetchData();
   }, [userData, connectionHeader]) // fetching req list whenever userData changes and connection header is toggled
+
+
+  async function g(){
+    const userId = auth?.currentUser?.uid;
+    console.log('cu',auth?.currentUser)
+    if(userId){
+    const userDocRef =doc(db, "users", userId);
+    const docSnap = await getDoc(userDocRef);
+    console.log('User data:', docSnap.data())
+    }
+  }
 
   async function fetchData() {
     // this function filters the requests which are recent(fresh ones and the one which has new msgs after deleted earlier)

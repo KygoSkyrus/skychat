@@ -23,6 +23,10 @@ admin.initializeApp({
 });
 const firestore = admin.firestore();
 
+app.get('/api/health', (req, res) => {
+  res.status(200).send('Ok');
+});
+
 app.post('/api/doesUserExist', (req, res) => {
   try {
     const { username, email } = req.body;

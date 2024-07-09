@@ -817,7 +817,8 @@ input[type="search"] {
   transform: translate(0, -50%);
   transition: var(--transition);
   cursor: pointer;
-  height: 100%;
+  height: 46.67px;
+  border-radius: 4px;
   width: 39px;
   background: #9898986b;
   color: #393636;
@@ -832,11 +833,11 @@ input[type="search"] {
 }
 .chat_list .list:hover .deleteConnection,
 .request_list .list:hover .declineReq {
-  right: 40px;
+  right: 44px;
   background-color: #dc3545a1;
 }
 .request_list .list:hover .acceptReq {
-  right: 79px;
+  right: 87px;
   background-color: #5ef35e91;
 }
 
