@@ -262,26 +262,6 @@ const SignInFormWithEmailPassword = ({ title, description, toggleText, signInOrS
     const toggleSignIn = (form) => {
         console.log('form', form)
         setCurrAuthMethod(form)
-
-        // let signin = document.querySelector('.signin-form')
-        // let signup = document.querySelector('.signup-form')
-        // if (form === 'signin') {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.add('d-none')
-        //         signin.classList.remove('d-none')
-        //     } else {
-        //         signup.style.left = '0'
-        //         signin.style.right = '0'
-        //     }
-        // } else {
-        //     if (window.outerWidth < 768) {
-        //         signup.classList.remove('d-none')
-        //         signin.classList.add('d-none')
-        //     } else {
-        //         signup.style.left = '50%'
-        //         signin.style.right = '50%'
-        //     }
-        // }
         setUserCredentials({ email: '', password: '', username: '' })
     }
 
@@ -289,7 +269,7 @@ const SignInFormWithEmailPassword = ({ title, description, toggleText, signInOrS
         const actionCodeSettings = {
             url: 'https://localhost:3000',
             handleCodeInApp: true,
-            // dynamicLinkDomain: 'https://skyrus-3416b.firebaseapp.com'
+            // dynamicLinkDomain: ''
         };
 
         sendSignInLinkToEmail(auth, userCredentials?.email, actionCodeSettings)

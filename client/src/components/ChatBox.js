@@ -1,18 +1,15 @@
-import React, { memo, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
+import EmojiPicker from 'emoji-picker-react';
+import { Send, SmilePlus } from 'lucide-react';
+import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc, onSnapshot, startAfter } from "firebase/firestore";
 
 import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
-import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, populateConnectionId, writeToDb, exitGroup, acceptGroupReq, getNotification, getFormattedNotification, defaultTheme } from '../utils';
-
-import { Send, SmilePlus } from 'lucide-react';
-import { collection, query, where, doc, orderBy, getDocs, getDoc, addDoc, setDoc, serverTimestamp, toDate, limit, updateDoc, onSnapshot, startAfter } from "firebase/firestore";
 import { FirebaseContext } from '../firebaseContext';
-
-import EmojiPicker from 'emoji-picker-react';
 import { showConfirmationModal } from '../redux/actionCreators';
-
+import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, writeToDb, exitGroup, acceptGroupReq, getFormattedNotification, defaultTheme, getConnectionId } from '../utils';
 
 
 const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected }) => {
@@ -28,83 +25,41 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
 
     const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
     const currentUser = useSelector(state => state.user.currentUser)
-    const requestList = useSelector(state => state.user.requestList)// has request list connections (connections to show)
+    const requestList = useSelector(state => state.user.requestList) // has request list connections (connections to show)
 
     const [loading, setLoading] = useState(false);
     const [messageList, setMessageList] = useState([]) //messages with the current user
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
 
-    console.log('rrrrrrrrrrr', requestList)
-
-
     useEffect(() => {
         if (selectedUserToChat) {
-            console.log('useEffect in chatbox--', selectedUserToChat)
             lastVisible.current = null; // clearing lastMsg ref for new selected user
             realtimeListener(selectedUserToChat)
-            retrieveTexts(selectedUserToChat,true);
+            retrieveTexts(selectedUserToChat, true);
         }
 
-        document.getElementById('theText')?.focus();// focus on input field
+        document.getElementById('theText')?.focus(); // focus on input field
     }, [selectedUserToChat])
 
 
-    // NOTE: [resolved (now also checking if the opened connection was a group, only then  proceed)]THIS is closing the chatbox whenever i searches for new user to chat
-    // added to handle closing of group chat window when user is removed 
     useEffect(() => {
-        console.log('new useefect')
         // to close the chat window for group if the user is removed by admin
         if (!userData?.connections?.hasOwnProperty(selectedUserToChat) && !userData?.requests?.hasOwnProperty(selectedUserToChat) && isGroupSelected) {
             setSelectedUserToChat(undefined);
         }
 
-        // setting theme
         const theme = userData?.theme || defaultTheme;
         chatBoxRef.current.style.backgroundImage = `url('${theme}')`;
     }, [userData])
 
-
-    function getConnectionId(userName) {
-        //checking if the user in connection list or request list
-        if (userData?.connections?.hasOwnProperty(userName)) {
-            return populateConnectionId(userData.connections[userName])
-        } else if (userData?.requests?.hasOwnProperty(userName)) {
-            return populateConnectionId(userData.requests[userName])
-        } else {
-            return populateConnectionId(null)
-        }
-    }
-
-    function notify(text, delay) {
-
-        let notificationElement = document.createElement('div')
-        notificationElement.innerHTML = text;
-        notificationElement.classList.add('nothing_to_load')
-
-        let section = document.createElement('section')
-        section.classList.add('msg-arrow')
-        notificationElement.appendChild(section)
-
-        chatBoxRef.current.insertBefore(notificationElement, chatBoxRef.current.firstChild);
-
-        setTimeout(() => {
-            notificationElement.remove()
-        }, delay);
-    }
-
-
     async function retrieveTexts(userToChat, isNewChat = false) {
-        console.log('__retrieveTexts', userData, userToChat)
-        const { connectionId, chatsTill, exitAt } = getConnectionId(userToChat)
-        getTexts(connectionId, chatsTill, exitAt,isNewChat)
+        const { connectionId, chatsTill, exitAt } = getConnectionId(userData,userToChat)
+        getTexts(connectionId, chatsTill, exitAt, isNewChat)
     }
 
     async function getTexts(connectionId, chatsTill, exitAt, isNewChat) {
-        console.log('__gettexts', connectionId, selectedUserToChat, userData, chatsTill)
-
         if (connectionId) {
-
             const newMessages = [];
             const messagesRef = collection(db, 'v2');
             let queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), limit(10));
@@ -137,25 +92,18 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
 
             if (newMessages.length === 0) {
                 notify('no previous messages', 2000);
-                if(isNewChat) setMessageList([]); // to reset the msglist for new chat
+                if (isNewChat) setMessageList([]); // to reset the msglist for new chat
             } else {
-
                 newMessages.reverse()
-                if(isNewChat){
-                    setMessageList(newMessages);// no previous msgs are there when new user is seleted to chat
-                }else{
-                    setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
-                }
+                if (isNewChat) setMessageList(newMessages); // no previous msgs are there when new user is seleted to chat
+                else setMessageList((prevMessages) => [...newMessages, ...prevMessages]);
 
-                // if(!loadMoreTexts){
-                dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
-                // }
+                dummy.current?.scrollIntoView({ behaviour: 'smooth' });
 
                 // Update the reference to the last visible document(for loading more texts)
                 const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
                 lastVisible.current = lastDoc;
             }
-
         } else {
             setMessageList([])
         }
@@ -163,28 +111,18 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
 
     let isRealTimeUpdate = true;
     function realtimeListener(selectedUser, id) {
-        console.log('isRealtimeListener running')
-
         isRealTimeUpdate = false;
-
         let cId; // connection ID
         if (id) {
             cId = id;
         } else {
-            const { connectionId, chatsTill } = getConnectionId(selectedUser)
+            const { connectionId } = getConnectionId(userData,selectedUser)
             cId = connectionId;
         }
 
-        console.log('__realtimeListener--g-g-g- isRealTimeUpdate', selectedUser, isRealTimeUpdate)
         if (cId) {
-
             const messagesRef = collection(db, 'v2');
-
-
-            // NOTE:::: THIS ISSUE [2] is happenong bcz for a new chat,, the connection id is created on send text,, and maybe this snapshot does not has connection id,s o maybe thats why its is needed to be refreshed in order to have  a connection id
-
             let queryRef = query(messagesRef, where("connectionId", "==", cId), orderBy("time", "desc"), limit(1));
-            //chatsTill may not be needed as its real-time
 
             onSnapshot(queryRef, (snapshot) => {
 
@@ -195,17 +133,6 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
 
                 //only updates when the onsnapshot is triggered oragnically and not by useEffct (only code inside onSnapshot block will run)
                 if (isRealTimeUpdate) {
-                    console.log('isRealTimeUpdate ---newMessage', snapshot, newMessage)
-
-                    // setMessageList((prevArray) => {
-                    //     const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
-                    //     if (snapshot.metadata.hasPendingWrites) { //(tells if the doc has been written at server)
-                    //         const time = new Date().toISOString()
-                    //         newMessage.time = time;
-                    //     }
-                    //     return isDuplicate ? prevArray : [...prevArray, newMessage];
-                    // })
-                    // updated to get realtime update for deleted msgs
                     setMessageList((prevArray) => {
                         const isDuplicate = prevArray.some((existingObject) => existingObject.id === newMessage.id);
                         if (snapshot.metadata.hasPendingWrites) { //(tells if the doc has been written at server)
@@ -215,10 +142,10 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                         return isDuplicate ? prevArray : [...prevArray, newMessage];
                     })
 
-                    // only play this audio when msg is from other user, dont play it for yourself
+                    // only play this audio when msg is from other user
                     if (newMessage?.author !== userData.username) {
                         const audio = new Audio(notification);
-                        audio.play(); // this is playing twice [fixed]
+                        audio.play();
                     }
 
                     // Update the reference to the last visible document(for loading more texts, [when there is new message after chats deleted])
@@ -226,18 +153,13 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                         const lastDoc = snapshot.docs[snapshot.docs.length - 1];
                         lastVisible.current = lastDoc;
                     }
-
                     dummy.current?.scrollIntoView({ behaviour: 'smooth' })//maybe just runn it on snapshot
                 }
-
                 isRealTimeUpdate = true;
             })
-
         }
     }
 
-
-    //when messages are loaded than cache all the msgs so that when user opens that chat again , all those msgs will be displayed and he wont have to load them again n again, 
     const loadMoreTexts = async (target) => {
         setLoading(true);
         const { scrollHeight } = target;
@@ -246,32 +168,19 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         try {
             retrieveTexts(selectedUserToChat)
         } catch (error) {
-            console.error('Error fetching messages:', error);
         } finally {
             setLoading(false);
-
             setTimeout(() => {
-                // console.log('scroll back to current position - ', prevheight, chatBoxRef.current.scrollHeight)
                 chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight - prevheight
             }, 500);
         }
     };
 
     const handleScroll = (e) => {
-        const { scrollTop, clientHeight, scrollHeight } = e.target;
+        const { scrollTop } = e.target;
         // Checks if the user has scrolled to the top
-        if (scrollTop === 0 && !loading && messageList.length > 0) {
-            loadMoreTexts(e.target);
-        }
+        if (scrollTop === 0 && !loading && messageList.length > 0) loadMoreTexts(e.target);
     };
-
-    const showChatDate = (currDate) => {
-        if (prevDate !== currDate) {
-            prevDate = currDate;
-            return true;
-        }
-        return false;
-    }
 
     async function sendText() {
         if (inputRef?.current?.value !== "") {
@@ -297,10 +206,9 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                     }
                 });
             } else {
-                connectionId = uuidv4(); // creating a new connection id
+                connectionId = uuidv4();
                 const userDocRef = doc(db, "users", userData.id);
                 // updating the user document with new connection in connection list
-                // initailly add past time like 1970 in deltedTill
                 await updateDoc(userDocRef, {
                     connections: {
                         ...userData.connections,
@@ -315,9 +223,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 let q = query(collection(db, "users"), where("username", "==", selectedUserToChat));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
-                    // console.log("RECIEVEER'S DOC => ", doc.data());
-                    receiverDoc = doc.data()
-                    receiverDoc.id = doc.id;
+                    receiverDoc = {...doc.data(), id: doc.id}
                     return;
                 });
 
@@ -345,9 +251,33 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             };
 
             writeToDb(db, msgData);
-            inputRef.current.value = ''; // reset input field
-            if(showEmojiPicker) setShowEmojiPicker(false); // hide emoji-picker
+            inputRef.current.value = ''; 
+            if (showEmojiPicker) setShowEmojiPicker(false);
         }
+    }
+
+    function notify(text, delay) {
+        let notificationElement = document.createElement('div')
+        notificationElement.innerHTML = text;
+        notificationElement.classList.add('nothing_to_load')
+
+        let section = document.createElement('section')
+        section.classList.add('msg-arrow')
+        notificationElement.appendChild(section)
+
+        chatBoxRef.current.insertBefore(notificationElement, chatBoxRef.current.firstChild);
+
+        setTimeout(() => {
+            notificationElement.remove()
+        }, delay);
+    }
+
+    const showChatDate = (currDate) => {
+        if (prevDate !== currDate) {
+            prevDate = currDate;
+            return true;
+        }
+        return false;
     }
 
     const onEmojiClick = (event) => {
@@ -356,17 +286,10 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         sym.forEach((el) => codesArray.push("0x" + el));
         let emoji = String.fromCodePoint(...codesArray);
         inputRef.current.value += emoji;
-    };
-
-
-    console.log('messageLIST', messageList)
-
-
-    console.log('------->>>>>>>>-----------chat box ends------------------------')
+    }
 
     return (
         <div className="chat-body" id="chatBody">
-            {/* <div className='layer'></div> */}
             <div className="chat-box zIndex1" id="chatBox" onScroll={handleScroll} ref={chatBoxRef} >
                 <div className='bg-layer'></div>
                 {showEmojiPicker &&
@@ -378,8 +301,6 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                             <span className="sr-only"></span>
                         </div>
                     </div>
-                    // :
-                    // <div className="text-center load_more"><span>load more</span></div>
                 }
 
                 {messageList?.length > 0 ?
@@ -403,10 +324,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                                     </div>
                                     :
                                     // dont show if the msg is deleted by me but i am not its author (for v3)
-                                    // (!(msgData?.deletedBy?.includes(userData?.username) && msgData?.author !== userData?.username) && 
-                                    <MessageWrapper msgData={msgData} myself={currentUser?.displayName}
-                                        isGroupSelected={isGroupSelected} setMessageList={setMessageList} />
-                                    // )
+                                    <MessageWrapper msgData={msgData} myself={currentUser?.displayName} isGroupSelected={isGroupSelected} setMessageList={setMessageList} />
                                 }
                             </div>
                         )
@@ -417,21 +335,17 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                 <div ref={dummy}></div>
             </div>
 
-            {requestList?.includes(selectedUserToChat) ?// only show these action for reqList connections
+            {requestList?.includes(selectedUserToChat) ?
                 // when request chat is opened
                 (<div className="req_btn zIndex1">
                     <section className="enq_btn accept" onClick={() => userData?.requests[selectedUserToChat]?.groupName ? acceptGroupReq(db, userData, selectedUserToChat, dispatch) : acceptConnectionReq(db, userData, selectedUserToChat, dispatch)} >Accept</section>
                     <div className="d-flex gap-1">
                         {userData?.requests[selectedUserToChat]?.groupName ?
-                            <section className="enq_btn delete mt-1"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to leave this group?`, () => exitGroup(dispatch, db, userData, selectedUserToChat, setSelectedUserToChat, false)))}
-                            >Leave group</section>
+                            <section className="enq_btn delete mt-1" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to leave this group?`, () => exitGroup(dispatch, db, userData, selectedUserToChat, setSelectedUserToChat, false)))}>Leave group</section>
                             :
                             <>
                                 <section className="enq_btn delete mt-1" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}>Decline</section>
-                                <section className="enq_btn delete d2 mt-1"
-                                    onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}
-                                >Block</section>
+                                <section className="enq_btn delete d2 mt-1" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}>Block</section>
                             </>
                         }
                     </div>
@@ -443,14 +357,13 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                     :
                     <div className="msg-input form-control border-0 zIndex1">
                         <input
-                            type="text"
-                            ref={inputRef}
-                            name="msg"
                             id="theText"
+                            ref={inputRef}
+                            type="text" name="msg"
                             placeholder="...type"
+                            autoComplete="off"
                             className="my-1"
                             onKeyUp={(e) => e.key === "Enter" && sendText()}
-                            autoComplete="off"
                         />
                         <span className='emoji-picker pointer' onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
                             <SmilePlus />
@@ -465,7 +378,6 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
                                 previewConfig={{
                                     showPreview: false,
                                 }}
-                            // reactionsDefaultOpen={true}
                             />
                         </div>
                         <button onClick={() => sendText()} className="sendBtn"><Send /></button>

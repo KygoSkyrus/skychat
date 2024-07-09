@@ -1,76 +1,38 @@
 import React, { useState, useEffect, useContext } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
+import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info } from 'lucide-react';
+import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc } from "firebase/firestore";
 
 import hamburger from "./../assets/menu.png";
+import Loader from "./Loader";
 import Sidebar from "./Sidebar";
 import ChatBox from "./ChatBox";
+import EntityInfoModal from "./modals/EntityInfoModal";
+import ConfirmationModal from "./modals/ConfirmationModal";
+import { FirebaseContext } from "../firebaseContext";
 import { RESET_USERS_LIST, SET_REQUEST_LIST } from "../redux/actionTypes";
 import { showConfirmationModal, showEntityInfoModal, showLoader, showSidebar } from "../redux/actionCreators";
 import { acceptConnectionReq, blockConnection, declineConnectionReq, exitGroup, acceptGroupReq } from "../utils";
-import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info } from 'lucide-react';
-
-
-import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc } from "firebase/firestore";
-import EntityInfoModal from "./modals/EntityInfoModal";
-import { FirebaseContext } from "../firebaseContext";
-import ConfirmationModal from "./modals/ConfirmationModal";
-import Loader from "./Loader";
-import { Link } from "react-router-dom";
 
 
 const NewRTCA = () => {
 
   const dispatch = useDispatch()
   const { db } = useContext(FirebaseContext);
-
-
   const [selectedUserToChat, setSelectedUserToChat] = useState()
   const [isGroupSelected, setIsGroupSelected] = useState(false)
   const [selectedGroupName, setSelectedGroupName] = useState(undefined)
   const [connectionHeader, setConnectionHeader] = useState(true)
-  const [connectionsToShow, setConnectionsToShow] = useState([]);//connection request list to show
-
-
-
+  const [connectionsToShow, setConnectionsToShow] = useState([]); // request list to show
 
   const userData = useSelector(state => state.user.userInfo) // user info like connection list, email
   const usersList = useSelector(state => state.user.usersList); // all the existing users in the db
   const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
 
-  console.log('===============================================================================userData', userData, usersList)
-  // console.log('currentUser', currentUser)
-  // console.log('connectionsToShow-', connectionsToShow)
-
-
-  //NOTE:: try merging these two useeffects..Also try to optimize getAllUsersList function  
-//   useEffect(() => {
-// console.log('THE UEEEEEEEEEEEEEE',dbUsers)
-//     dispatch({ type: SET_USERS_LIST, payload: dbUsers });
-
-    //commented for testing
-    // MOVED TO APP.js
-    // const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-    //   console.log('+++++++++++++++++++++getAllUsersList',snapshot)
-    //   let userList = {};
-    //   snapshot.docs.forEach((doc) => {
-    //     // let data = {...doc.data(),id:doc.id};
-    //     userList[doc.data()?.username] = {...doc.data(),id:doc.id};
-    //   });
-    //   console.log('ul',userList)
-    //   dispatch({ type: SET_USERS_LIST, payload: userList });
-    // });
-
-    // return () => unsubscribe();
-  // }, [])
-
   useEffect(() => {
-    //setting connection req list
-    if (userData) {
-      console.log('calling fetchData')
-      fetchData();
-      // if (selectedUserToChat) retrieveTexts(selectedUserToChat) //added bcz without this onsnapshot wont work  // commented for issue #1
-    }
-  }, [userData, connectionHeader])// feetching req list whenever userData changes and connection header is toggled
+    if (userData) fetchData();
+  }, [userData, connectionHeader]) // fetching req list whenever userData changes and connection header is toggled
 
   async function fetchData() {
     // this function filters the requests which are recent(fresh ones and the one which has new msgs after deleted earlier)
@@ -80,7 +42,7 @@ const NewRTCA = () => {
       for (const uName of Object.keys(userData?.requests)) {
         const hasNewMessages = await getConnectionRequests(uName);
         if (hasNewMessages) {
-          connections.push(userData?.requests[uName]?.groupName ? userData?.requests[uName] : uName);// only put the entire request object if its a group otherwise just the name
+          connections.push(userData?.requests[uName]?.groupName ? userData?.requests[uName] : uName); // only put the entire request object if its a group otherwise just the name
           ids.push(uName); // for chatbox to hide show the chat input field
         }
       }
@@ -89,45 +51,25 @@ const NewRTCA = () => {
     dispatch({ type: SET_REQUEST_LIST, payload: ids })
   };
 
-  // removed this and appened the logic in above useefect where fetchData was called (updated depenedency array with connectionHeader)
-  // useEffect(() => {
-  //   if (!connectionHeader) fetchData(); // to load the request list when requests window is opened
-  // }, [connectionHeader])
-
-  console.log('connextions sto show', connectionsToShow)
-
-
   async function getConnectionRequests(uName, i) {
 
     let connectionId = userData?.requests?.[uName]?.id;
     let deletedTill = userData?.requests?.[uName]?.deletedTill;
-    // console.log('getConnectionRequests func_--------------------', uName)
 
     if (deletedTill) {
       let q = query(collection(db, "v2"), where("connectionId", "==", connectionId), where("time", ">", deletedTill), orderBy("time", "desc"), limit(1));
-
       const querySnapshot = await getDocs(q);
-      // querySnapshot.forEach((doc) => {
-      //   console.log("last msgs => ", doc.id, doc.data());
-      //   // newMessages.push(doc.data());// to show message preview (last msg)
-      // });
-
       const hasNewMessages = querySnapshot.size > 0;
       return hasNewMessages;
-
     } else {
       return true;
     }
   }
 
-  // NOTE:: CHNAGE the state selectedUserToChat to selectedEntityToChat.. this will represent both groups and individual user, this way we wont need selectedGroupToChat too, instead there will be a flag isGroupSelected,, this will tell if selected entity is a group or not
-
   function handleSelectedUserToChat(username, groupName) {
     dispatch(showSidebar(false))
-    dispatch({ type: RESET_USERS_LIST, payload: true })//clearing all records of search list
-    setSelectedUserToChat(username);//setting selected user
-    // document.querySelector('.toast_container').style.bottom='-500px';
-    console.log('handleSelectedUserToChat  clicked', username, groupName)
+    dispatch({ type: RESET_USERS_LIST, payload: true }); // clearing all search list records
+    setSelectedUserToChat(username);
     if (groupName) {
       setIsGroupSelected(true)
       setSelectedGroupName(groupName)
@@ -135,22 +77,13 @@ const NewRTCA = () => {
       setIsGroupSelected(false)
       setSelectedGroupName(undefined)
     }
-
-    // retrieveTexts(username);// it will be in useefct in chatbox compo and whenever selectedUsertoChat is changed than it will run this function
   }
 
-
   async function clearChat(id) {
-
-    //connection is moved to req list after deleting msgs
-    console.log('clearChat', id)
     if (userData?.connections?.hasOwnProperty(id)) {
       dispatch(showLoader(true));
-
-      // let connectionId = userData.connections[id]?.id;
       userData.connections[id].deletedTill = serverTimestamp();
 
-      //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         connections: userData.connections,
@@ -163,15 +96,11 @@ const NewRTCA = () => {
   }
 
   async function deleteConnection(id) {
-
-    //connection is moved to req list after deleting msgs
-    console.log('deleteConnection', id)
     if (userData?.connections?.hasOwnProperty(id)) {
       dispatch(showLoader(true));
       let connectionId = userData.connections[id]?.id;
       delete userData.connections[id];
 
-      //deleting connection req from req list 
       const docRef = doc(db, "users", userData?.id);
       await updateDoc(docRef, {
         connections: userData.connections,
@@ -190,19 +119,12 @@ const NewRTCA = () => {
     }
   }
 
-  console.log('coneection header---------------------', connectionHeader)
-
-
-
   return (
     <>
       <div className="outer-top">
         <div className="outer">
 
-          {/***** SIDEBAR STARTS ******/}
           <Sidebar handleSelectedUserToChat={handleSelectedUserToChat} />
-          {/***** SIDEBAR ENDS ******/}
-
 
           {/***** CHAT HEADER STARTS ******/}
           <div className="chat-head zIndex2">
@@ -240,9 +162,7 @@ const NewRTCA = () => {
                         :
                         <>
                           <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to delete connection with <code>${selectedUserToChat}</code>?`, () => deleteConnection(selectedUserToChat)))}>Delete connection</li>
-                          <li className="dropdown-item pointer"
-                            onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}
-                          >Block connection</li>
+                          <li className="dropdown-item pointer" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${selectedUserToChat}</code>?`, () => blockConnection(db, userData, selectedUserToChat, setSelectedUserToChat, dispatch)))}>Block connection</li>
                         </>
                       }
                     </ul>
@@ -276,17 +196,14 @@ const NewRTCA = () => {
           {/***** CHAT BODY STARTS ******/}
           {selectedUserToChat ?
             <ChatBox
-              // firebaseApp={firebaseApp}
               selectedUserToChat={selectedUserToChat}
               setSelectedUserToChat={setSelectedUserToChat}
               isGroupSelected={isGroupSelected}
             />
             :
             connectionHeader ?
-              // can be converted to a component
               (userData?.connections ?
                 Object.keys(userData?.connections)?.length > 0 ?
-
                   <div className="chat_list">{
                     Object.keys(userData?.connections).map((x, i) => {
                       return (
@@ -312,9 +229,7 @@ const NewRTCA = () => {
                               <section className="deleteConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to delete connection with <code>${x}</code>?`, () => deleteConnection(x)))} title="Delete connection">
                                 <UserRoundX size={18} />
                               </section>
-                              <section className="blockConnection"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${x}</code>?`, () => blockConnection(db, userData, x, setSelectedUserToChat, dispatch)))}
-                                title="Block connection">
+                              <section className="blockConnection" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${x}</code>?`, () => blockConnection(db, userData, x, setSelectedUserToChat, dispatch)))} title="Block connection">
                                 <Ban size={18} />
                               </section>
                             </>
@@ -337,7 +252,6 @@ const NewRTCA = () => {
                     {connectionsToShow?.map((uName, i) => {
                       // uname has just the username for one to one connection,, but it is an object for groups
                       let id = uName?.id || uName;
-                      console.log('````````````````', uName)
                       return (
                         <div className="list" key={i}>
                           <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(id, uName?.groupName || false)}>
@@ -363,13 +277,9 @@ const NewRTCA = () => {
                             :
                             <>
                               <section className="blockReq declineReq" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to decline this connection request?`, () => declineConnectionReq(db, userData, id, setSelectedUserToChat, dispatch)))} title="Decline connection">
-                                {/* <Trash size={18} /> */}
                                 <UserRoundX size={18} />
                               </section>
-                              <section className="blockReq"
-                                onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${uName}</code>?`, () => blockConnection(db, userData, id, setSelectedUserToChat, dispatch)))}
-                                title="Block connection">
-                                {/* <UserRoundX size={18} /> */}
+                              <section className="blockReq" onClick={() => dispatch(showConfirmationModal(`Are you sure you want to block <code>${uName}</code>?`, () => blockConnection(db, userData, id, setSelectedUserToChat, dispatch)))} title="Block connection">
                                 <Ban size={18} />
                               </section>
                             </>
@@ -378,14 +288,6 @@ const NewRTCA = () => {
                       )
                     }
                     )}
-                    {/* {Object.keys(userData?.requests).map((uName, i) => (
-                    <section key={i} className="request_list_item" onClick={() => handleSelectedUserToChat(uName)}>
-                      {uName}
-                      {newMessagesInfo[uName] && (
-                        <div className="msg_preview">{newMessagesInfo[uName]?.message}</div>
-                      )}
-                    </section>
-                  ))} */}
                   </div>
                   :
                   <div className="noOneToChat">
@@ -395,7 +297,6 @@ const NewRTCA = () => {
                 <div className="noOneToChat">Loading...</div>)
           }
           {/***** CHAT BODY ENDS ******/}
-
 
 
           {/* only needed for group */}
@@ -412,12 +313,13 @@ const NewRTCA = () => {
           <ConfirmationModal />
 
         </div>
-        {/* <Toast /> */}
         <Loader />
       </div>
+
       <Link to={'/about'} className="info">
         <Info />
       </Link>
+
       <section className="copyright fs-12">© 2024 All Rights Reserved, Skychat <i className="">by</i> Dheeraj Gupta</section>
     </>
   )

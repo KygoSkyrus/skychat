@@ -1,4 +1,4 @@
-import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO, SET_REQUEST_LIST, SET_THEME } from "./../actionTypes";
+import { SET_CURRENT_USER, SET_USERS_LIST, SET_USER_INFO, SET_REQUEST_LIST } from "./../actionTypes";
 
 const initialState = {
   currentUser: null,
@@ -38,4 +38,3 @@ export const userReducer = (state = initialState, action) => {
       return state;
   }
 };
-

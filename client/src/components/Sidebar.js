@@ -1,31 +1,29 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
-import { getAuth } from 'firebase/auth'
 import { Cog, LogOut, Plus, Tally1, Users2 } from 'lucide-react'
+import { getAuth } from 'firebase/auth'
 
 import UserModal from './modals/UserModal'
 import GroupModal from './modals/GroupModal'
 import SearchComponent from './SearchComponent'
-import { RESET_USERS_LIST, SET_SIDEBAR } from '../redux/actionTypes'
-import { showConfirmationModal, showGroupModal, showSidebar, showUserModal } from '../redux/actionCreators'
+import { RESET_USERS_LIST } from '../redux/actionTypes'
+import { setToast, showConfirmationModal, showGroupModal, showSidebar, showUserModal } from '../redux/actionCreators'
+
 
 const Sidebar = ({ handleSelectedUserToChat }) => {
-    console.log('sidebarrrrrrr')
 
     const auth = getAuth();
     const dispatch = useDispatch();
     const currentUser = useSelector(state => state.user.currentUser)
     const userData = useSelector(state => state.user.userInfo)
-
     const isSidebarVisible = useSelector(state => state.ui.isSidebarVisible);
     const isGroupModalVisible = useSelector((state) => state.ui.isGroupModalVisible);
-
 
     const signOut = () => {
         auth.signOut()
             .catch((error) => {
                 console.error(error);
+                dispatch(setToast('Something went wrong, Try again!',true))
             });
     };
 

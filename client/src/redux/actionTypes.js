@@ -1,5 +1,3 @@
-// Actions
-
 // user actions
 export const SET_CURRENT_USER = "SET/CURRENT_USER";
 export const SET_USER_INFO = "SET/USER_INFO";

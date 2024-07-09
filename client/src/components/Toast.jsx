@@ -18,12 +18,7 @@ const Toast = React.memo(() => {
   };
 
   function showToast() {
-    console.log("showtoast", toastContainer?.current?.classList);
-    if (isError) {
-      toastContainer?.current?.classList.add("d-flex", "toast_animation", "error");
-    } else {
-      toastContainer?.current?.classList.add("d-flex", "toast_animation");
-    }
+    toastContainer?.current?.classList.add("d-flex", "toast_animation", isError && "error");
     timer = setTimeout(() => {
       hideToast();
     }, 4000);

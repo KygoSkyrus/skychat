@@ -97,11 +97,11 @@
 http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
 -[need testing] on server only allow requests from the own skychat client
-- uncommemt user search code for dynamic data
+-[need testing] for firebase db
 - add a feedback account named "skychat" by default in chat
 
 - add description in index
-- maybe addmember or create group has common code,,, leave if its time raking and complex
+
 
 **Style**
 - [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -157,6 +157,7 @@ https://css-tricks.com/methods-contrasting-text-backgrounds/
 # Things to implement in version #3
 - add a single snapshot to get the msgs and to handle realtime changes, this will also help with the delete msg(for both participant). currently we just have a snapshot for single msg as it dont listen to every document in the collection, so the feature(delete for both) is not available in this version
 - use localstoreage or some othr place to store msg,, later u can update those msgs with db,, this way you wont have to query db on evry msgs,,,u can use redis,,,also can use a job here to run after every certain hours to backup the chats to db
+- when messages are loaded than cache all the msgs so that when user opens that chat again , all those msgs will be displayed and he wont have to load them again n again, 
 
 
 ## Components

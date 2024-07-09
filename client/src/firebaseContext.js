@@ -4,7 +4,6 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from "firebase/firestore";
 import { firebaseConfig } from "./firebaseConfig";
 
-
 export const FirebaseContext = createContext();
 
 export const FirebaseProvider = ({ children }) => {

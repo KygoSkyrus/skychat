@@ -5,7 +5,6 @@ function SplashMessage() {
   return (
     <div className='splash'>
       <div className="mainlogo absolute-centered mainlogo text-center text-light">
-        {/* <span className='fs-2'><b>SKYCHAT</b></span> */}
         <img src={logo1} width={200} alt='' />
         <p className="by fs-3">
           <i className='text-light fs-12'>by</i> dheeraj gupta
@@ -30,7 +29,7 @@ const withSplashScreen = (WrappedComponent) => {
           setLoading(false);
         }
       };
-
+      
       fetchData();
     }, []);
 

@@ -1,22 +1,16 @@
 import React, { useContext } from 'react'
 import { useSelector } from 'react-redux';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Trash } from 'lucide-react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { FirebaseContext } from '../firebaseContext';
-import { getExactTimeStr } from '../utils';
+import { deriveDate, getExactTimeStr } from '../utils';
+
 
 const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessageList }) => {
 
-  const userData = useSelector(state => state.user.userInfo)
   const { db } = useContext(FirebaseContext);
-
-
-  const deriveDate = (d) => {
-    let date = new Date(d);
-    return getExactTimeStr(date);
-  }
-  console.log('isGroupSelected', isGroupSelected)
+  const userData = useSelector(state => state.user.userInfo)
 
   async function deleteMessage(id) {
     try {
@@ -46,10 +40,7 @@ const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessag
   return (
     <>
       <div key={msgData.id} className={myself === msgData.author ? "msg-block me" : "msg-block other"} >
-
-        {/* {msgData?.deletedBy?.includes(msgData?.author) ? (for v3) */}
         {msgData?.deletedBy?.includes(myself) ?
-          // <span className='fs-12 deleted-msg'>Message deleted by you</span>
           <span className='fs-12 deleted-msg'><small>You deleted this message</small></span>
           :
           <>
@@ -69,7 +60,6 @@ const MessageWrapper = React.memo(({ msgData, myself, isGroupSelected, setMessag
         }
       </div>
 
-      {/* we can remove the sender reciever name for one to one chat */}
       {isGroupSelected && myself !== msgData.author &&
         <section className="authorName other">{msgData.author}</section>
       }
