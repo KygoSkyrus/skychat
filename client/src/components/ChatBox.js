@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
+import validator from 'validator';
 import { v4 as uuidv4 } from 'uuid';
 import EmojiPicker from 'emoji-picker-react';
 import { Send, SmilePlus } from 'lucide-react';
@@ -8,7 +9,7 @@ import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit
 import MessageWrapper from './MessageWrapper';
 import notification from "./../assets/discord.mp3";
 import { FirebaseContext } from '../firebaseContext';
-import { showConfirmationModal } from '../redux/actionCreators';
+import { setToast, showConfirmationModal } from '../redux/actionCreators';
 import { acceptConnectionReq, blockConnection, declineConnectionReq, getLocalDateStr, writeToDb, exitGroup, acceptGroupReq, getFormattedNotification, defaultTheme, getConnectionId } from '../utils';
 
 
@@ -54,7 +55,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
     }, [userData])
 
     async function retrieveTexts(userToChat, isNewChat = false) {
-        const { connectionId, chatsTill, exitAt } = getConnectionId(userData,userToChat)
+        const { connectionId, chatsTill, exitAt } = getConnectionId(userData, userToChat)
         getTexts(connectionId, chatsTill, exitAt, isNewChat)
     }
 
@@ -75,7 +76,6 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             }
 
             if (lastVisible.current) {
-                console.log('lastVisible.current', lastVisible.current)
                 queryRef = query(messagesRef, where("connectionId", "==", connectionId), orderBy("time", "desc"), startAfter(lastVisible.current), limit(10));
 
                 //to prevent loading msgs before chatsTill
@@ -116,7 +116,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         if (id) {
             cId = id;
         } else {
-            const { connectionId } = getConnectionId(userData,selectedUser)
+            const { connectionId } = getConnectionId(userData, selectedUser)
             cId = connectionId;
         }
 
@@ -183,77 +183,85 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
     };
 
     async function sendText() {
-        if (inputRef?.current?.value !== "") {
-            let connectionId;
-
-            // check if userdata has the connection already and if not than add the connection in user collection
-            if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
-                connectionId = userData?.connections[selectedUserToChat]?.id;
-            } else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
-                connectionId = userData?.requests[selectedUserToChat]?.id;
-                // NOTE:::: when a msg is sent and selected user is from request list than it means it is one of the removed connection, so we have to move this connection from req list to connection
-                delete userData.requests[selectedUserToChat];
-                const userDocRef = doc(db, "users", userData.id);
-                await updateDoc(userDocRef, {
-                    connections: {
-                        ...userData.connections,
-                        [selectedUserToChat]: {
-                            id: connectionId,
-                        },
-                    },
-                    requests: {
-                        ...userData.requests
-                    }
-                });
-            } else {
-                connectionId = uuidv4();
-                const userDocRef = doc(db, "users", userData.id);
-                // updating the user document with new connection in connection list
-                await updateDoc(userDocRef, {
-                    connections: {
-                        ...userData.connections,
-                        [selectedUserToChat]: {
-                            id: connectionId,
-                        },
-                    }
-                });
-
-                // getting receiver's doc
-                let receiverDoc;
-                let q = query(collection(db, "users"), where("username", "==", selectedUserToChat));
-                const querySnapshot = await getDocs(q);
-                querySnapshot.forEach((doc) => {
-                    receiverDoc = {...doc.data(), id: doc.id}
-                    return;
-                });
-
-                //updating the receiver document request list
-                const receiverDocRef = doc(db, "users", receiverDoc.id);
-                await updateDoc(receiverDocRef, {
-                    requests: {
-                        ...receiverDoc.requests,
-                        [currentUser.displayName]: {
-                            id: connectionId,
-                        },
-                    }
-                });
-
-                // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
-                if (messageList.length === 0) realtimeListener(selectedUserToChat, connectionId)
-            }
-
-            const msgData = {
-                connectionId: connectionId,
-                author: currentUser.displayName,
-                message: inputRef?.current?.value,
-                time: serverTimestamp(),
-                deletedBy: [],
-            };
-
-            writeToDb(db, msgData);
-            inputRef.current.value = ''; 
-            if (showEmojiPicker) setShowEmojiPicker(false);
+        // Validate and sanitize message
+        if (validator.isEmpty(inputRef?.current?.value.trim())) {
+            return;
         }
+        if (inputRef?.current?.value?.length > 500) {
+            dispatch(setToast('Message length exceeded', true))
+            return;
+        }
+        const sanitizedMessage = validator.escape(inputRef?.current?.value);
+        let connectionId;
+
+        // check if userdata has the connection already and if not than add the connection in user collection
+        if (userData?.connections?.hasOwnProperty(selectedUserToChat)) {
+            connectionId = userData?.connections[selectedUserToChat]?.id;
+        } else if (userData?.requests?.hasOwnProperty(selectedUserToChat)) {
+            connectionId = userData?.requests[selectedUserToChat]?.id;
+            // NOTE:::: when a msg is sent and selected user is from request list than it means it is one of the removed connection, so we have to move this connection from req list to connection
+            delete userData.requests[selectedUserToChat];
+            const userDocRef = doc(db, "users", userData.id);
+            await updateDoc(userDocRef, {
+                connections: {
+                    ...userData.connections,
+                    [selectedUserToChat]: {
+                        id: connectionId,
+                    },
+                },
+                requests: {
+                    ...userData.requests
+                }
+            });
+        } else {
+            connectionId = uuidv4();
+            const userDocRef = doc(db, "users", userData.id);
+            // updating the user document with new connection in connection list
+            await updateDoc(userDocRef, {
+                connections: {
+                    ...userData.connections,
+                    [selectedUserToChat]: {
+                        id: connectionId,
+                    },
+                }
+            });
+
+            // getting receiver's doc
+            let receiverDoc;
+            let q = query(collection(db, "users"), where("username", "==", selectedUserToChat));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                receiverDoc = { ...doc.data(), id: doc.id }
+                return;
+            });
+
+            //updating the receiver document request list
+            const receiverDocRef = doc(db, "users", receiverDoc.id);
+            await updateDoc(receiverDocRef, {
+                requests: {
+                    ...receiverDoc.requests,
+                    [currentUser.displayName]: {
+                        id: connectionId,
+                    },
+                }
+            });
+
+            // calling the realtimeListener for initial msg, bcz for first msg when user is selected to chat up untill then there is no connection id, so onsnapshot does not work when msg is sent and needs a refresh
+            if (messageList.length === 0) realtimeListener(selectedUserToChat, connectionId)
+        }
+
+        const msgData = {
+            connectionId: connectionId,
+            author: currentUser.displayName,
+            message: sanitizedMessage,
+            time: serverTimestamp(),
+            deletedBy: [],
+        };
+
+        writeToDb(db, msgData);
+        inputRef.current.value = '';
+        if (showEmojiPicker) setShowEmojiPicker(false);
+
     }
 
     function notify(text, delay) {

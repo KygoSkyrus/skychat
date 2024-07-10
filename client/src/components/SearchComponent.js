@@ -39,7 +39,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
     }
 
     async function searchUser(e) {
-        let result = Object.keys(usersList).filter(user => user.includes(e.target.value?.toLowerCase()) && user !== userData.username)//excludes self
+        let result = Object.keys(usersList).filter(user => user.includes(e.target?.value?.toLowerCase()) && user !== userData.username)//excludes self
 
         let userSearchDropdown = document.getElementById(id)
         let noResult = userSearchDropdown.querySelector('.no-user')

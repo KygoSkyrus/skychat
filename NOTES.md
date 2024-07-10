@@ -101,9 +101,11 @@ http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - add a feedback account named "skychat" by default in chat
 
 - on signin in there is a stilll issue its not redirecting and needs a refresh
-- add description in index
 - if collections cannnot be restrictced, than encrypt msgs
-- do input sanitizationq
+- change the doesuserexit api to live server
+- remove localhost from server (cors)
+- add skydial reference
+- add description in index
 
 **Style**
 - [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one

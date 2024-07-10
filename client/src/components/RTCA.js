@@ -17,7 +17,7 @@ import { acceptConnectionReq, blockConnection, declineConnectionReq, exitGroup, 
 import { getAuth } from "firebase/auth";
 
 
-const NewRTCA = () => {
+const RTCA = () => {
   const auth = getAuth();
 
   const dispatch = useDispatch()
@@ -33,18 +33,18 @@ const NewRTCA = () => {
   const isEntityInfoModalVisible = useSelector((state) => state.ui.isEntityInfoModalVisible);
 
   useEffect(() => {
-   g()
+    g()
     if (userData) fetchData();
   }, [userData, connectionHeader]) // fetching req list whenever userData changes and connection header is toggled
 
 
-  async function g(){
+  async function g() {
     const userId = auth?.currentUser?.uid;
-    console.log('cu',auth?.currentUser)
-    if(userId){
-    const userDocRef =doc(db, "users", userId);
-    const docSnap = await getDoc(userDocRef);
-    console.log('User data:', docSnap.data())
+    console.log('cu', auth?.currentUser)
+    if (userId) {
+      const userDocRef = doc(db, "users", userId);
+      const docSnap = await getDoc(userDocRef);
+      console.log('User data:', docSnap.data())
     }
   }
 
@@ -334,9 +334,11 @@ const NewRTCA = () => {
         <Info />
       </Link>
 
-      <section className="copyright fs-12">© 2024 All Rights Reserved, Skychat <i className="">by</i> Dheeraj Gupta</section>
+      <section className="copyright fs-12">
+        © {new Date().getFullYear()} All Rights Reserved, Skychat <i className="">by</i> Dheeraj Gupta
+      </section>
     </>
   )
 }
 
-export default NewRTCA
+export default RTCA

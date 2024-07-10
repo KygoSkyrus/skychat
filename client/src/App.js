@@ -2,14 +2,14 @@ import React, { useContext, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getAuth } from "firebase/auth";
-import { collection, doc, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 
 import { FirebaseContext } from "./firebaseContext";
 import { setUserData } from "./redux/thunk/userDataThunk";
 import { SET_CURRENT_USER, SET_USERS_LIST } from "./redux/actionTypes";
 
 import "./App.css";
-import NewRTCA from "./components/NewRTCA";
+import RTCA from "./components/RTCA";
 import Authenticate from "./components/Authenticate";
 import About from "./components/About";
 import Toast from "./components/Toast";
@@ -35,17 +35,6 @@ function App() {
       console.log('ul', userList)
       dispatch({ type: SET_USERS_LIST, payload: userList });
     });
-
-// console.log('cu',auth.currentUser)
-//     const userId = auth.currentUser.uid;
-//     const userDocRef =doc(db, "users", userId);
-//     userDocRef.get().then((doc) => {
-//       if (doc.exists) {
-//         console.log("User data:", doc.data());
-//       } else {
-//         console.log("No such document!");
-//       }
-//     })
 
       return () => unsubscribe();
     }, [])
@@ -78,7 +67,7 @@ function App() {
         <>
           <Routes>
             <Route exact path="/" element={<Authenticate />} />
-            <Route exact path="/chat" element={<NewRTCA />} />
+            <Route exact path="/chat" element={<RTCA />} />
             <Route exact path="/about" element={<About />} />
             <Route exact path="*" element={<Error />} />
           </Routes>
