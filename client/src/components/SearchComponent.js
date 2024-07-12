@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { LockIcon, Search } from 'lucide-react'
+import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 
-import { setToast } from '../redux/actionCreators';
 import { debounce } from '../utils'
+import { setToast } from '../redux/actionCreators';
+import { FirebaseContext } from '../firebaseContext';
 
 
 const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, id }) => {
 
     const dispatch = useDispatch();
     const searchInputRef = useRef();
-    const usersList = useSelector(state => state.user.usersList); // all the existing users in db
+    const { db } = useContext(FirebaseContext);
+    // const usersList = useSelector(state => state.user.usersList); // all the existing users in db
     const userData = useSelector(state => state.user.userInfo)
     const resetUserSearchList = useSelector(state => state.ui.resetUserSearchList)
     const [searchedUserList, setSearchedUserList] = useState(undefined) // queries user list
@@ -39,18 +42,41 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
     }
 
     async function searchUser(e) {
-        let result = Object.keys(usersList).filter(user => user.includes(e.target?.value?.toLowerCase()) && user !== userData.username)//excludes self
-
         let userSearchDropdown = document.getElementById(id)
-        let noResult = userSearchDropdown.querySelector('.no-user')
-        userSearchDropdown.querySelector('.custom-loader')?.classList.add('d-none') // show loader while typing
+        try {
+            // let result = Object.keys(usersList)?.filter(user => user.includes(e.target?.value?.toLowerCase()) && user !== userData.username)//excludes self
+            let result = {};
+            let q = query(collection(db, "users"),
+                where("username", ">=", e.target?.value?.toLowerCase()),
+                where("username", "<=", e.target?.value?.toLowerCase() + "\uf8ff"),
+                where("username", "!=", userData?.username),
+                limit(15));
+            const querySnapshot = await getDocs(q);
+            console.log('querySnapshot', querySnapshot)
+            for (const doc of querySnapshot?.docs) {
+                const data = doc.data();
+                result[data?.username] = {
+                    avatar: data?.avatar,
+                    privacy: data?.privacy,
+                };
+            }
 
-        if (result.length === 0) {
-            noResult?.classList.remove('d-none')
+            let noResult = userSearchDropdown.querySelector('.no-user')
+            userSearchDropdown.querySelector('.custom-loader')?.classList.add('d-none') // show loader while typing
+
+            if (Object.keys(result)?.length === 0) {
+                console.log('res 0')
+                noResult?.classList.remove('d-none')
+                setSearchedUserList(undefined);
+            } else {
+                noResult?.classList.add('d-none')
+                setSearchedUserList(result)
+            }
+        } catch (error) {
+            console.log('error searching user', error)
             setSearchedUserList(undefined);
-        } else {
-            noResult?.classList.add('d-none')
-            setSearchedUserList(result)
+            userSearchDropdown.querySelector('.custom-loader')?.classList.add('d-none');
+            searchInputRef.current.value = "";
         }
     }
 
@@ -70,17 +96,19 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
             </div>
 
             <div className="d-none" id={id}>
-                {searchedUserList?.map(x =>
-                    <section className="dropdown-item pointer p-1 px-2 d-flex align-items-center justify-content-between" key={x} onClick={() => handleSelect(x, usersList[x]?.privacy)}>
-                        <span>
-                            <img src={usersList[x]?.avatar} className='me-2 rounded-circle' alt="" />
-                            <span>{x}</span>
-                        </span>
-                        {usersList[x]?.privacy &&
-                            <LockIcon size={16} />
-                        }
-                    </section>
-                )}
+                {searchedUserList &&
+                    Object.keys(searchedUserList)?.map(x =>
+                        <section className="dropdown-item pointer p-1 px-2 d-flex align-items-center justify-content-between" key={x} onClick={() => handleSelect(x, searchedUserList[x]?.privacy)}>
+                            <span>
+                                <img src={searchedUserList[x]?.avatar} className='me-2 rounded-circle' alt="" />
+                                <span>{x}</span>
+                            </span>
+                            {searchedUserList[x]?.privacy &&
+                                <LockIcon size={16} />
+                            }
+                        </section>
+                    )
+                }
                 <div className="no-user d-none text-center">No user found</div>
                 <div className="custom-loader d-none"></div>
             </div>

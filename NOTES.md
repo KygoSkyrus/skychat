@@ -96,16 +96,15 @@
 
 http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
 - in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
--[need testing] on server only allow requests from the own skychat client
--[need testing] for firebase db
+
 - add a feedback account named "skychat" by default in chat
 
-- on signin in there is a stilll issue its not redirecting and needs a refresh
+
 - if collections cannnot be restrictced, than encrypt msgs
+- add description in index
 - change the doesuserexit api to live server
 - remove localhost from server (cors)
-- add skydial reference
-- add description in index
+
 
 **Style**
 - [done]u can try a techy UI with matt or sharp balck clr , can combinate it with red or yellow  or purple like the old one
@@ -248,6 +247,7 @@ https://css-tricks.com/methods-contrasting-text-backgrounds/
     - user himself?// cant have user texting himself,, as it would try to send a request to himself
   - all of them.. why? test one by one to check why not
   - dont let user search the person who are in the request list, and which has a deletedTill (this is why bcz if we dont do this than on search it will show that the request thing with accept and decline button even if the user has declined him earlier,, so better not show it)
+  - search bar uses debouncing and gets the matched docs from db, no snapshot is used
   
 - # Settings
  setting consists of the following actions

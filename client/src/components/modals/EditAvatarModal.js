@@ -23,7 +23,7 @@ const EditAvatarModal = () => {
     const [uploadAvatar, setUploadAvatar] = useState()
 
 
-    async function changeAvatar(e) {
+    async function changeAvatar() {
         if (selectedAvatar === userData?.avatar) {
             dispatch(setToast(`Select different avatar or upload new`, true))
             return;
@@ -62,6 +62,7 @@ const EditAvatarModal = () => {
             }
         }
         dispatch(showLoader(false));
+        dispatch(showEditAvatarModal(false))
         dispatch(setToast(`Profile updated`, false))
     }
 

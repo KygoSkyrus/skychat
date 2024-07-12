@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
+import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { ArrowLeft, Edit } from 'lucide-react'
+import { ArrowLeft, Edit, Info } from 'lucide-react'
 import { doc, updateDoc } from 'firebase/firestore'
 
 import ThemeModal from './ThemeModal'
@@ -47,7 +48,7 @@ const UserModal = () => {
 
                     <div className="d-flex align-items-center justify-content-center flex-column text-light h-100">
                         <div className='uImg'>
-                            <img src={userData?.avatar} className="pointer" alt=""/>
+                            <img src={userData?.avatar} className="pointer" alt="" />
                             <div className='avatar_edit_btn' onClick={() => dispatch(showEditAvatarModal(true))}>
                                 <Edit />
                             </div>
@@ -67,6 +68,7 @@ const UserModal = () => {
                                 </span>
                             </li>
                         </ul>
+                        <Link to={'/about'} className='fs-12 text-secondary'><Info size={12} style={{marginRight:"3px"}} />skychat</Link>
                     </div>
 
                 </div>

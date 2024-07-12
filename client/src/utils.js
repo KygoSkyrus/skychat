@@ -1,4 +1,4 @@
-import { Timestamp, addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore"
+import { Timestamp, addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc } from "firebase/firestore"
 import { setToast, showLoader } from "./redux/actionCreators";
 
 export function getDateStr(date) {
@@ -207,6 +207,20 @@ export const exitGroup = async (dispatch, db, userData, id, setSelectedUserToCha
 }
 
 
+export async function getUsersList(db) {
+    let userList = {};
+    let q = query(collection(db, "users"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        userList[data?.username] = {
+            avatar: data?.avatar,
+            privacy: data?.privacy,
+        };
+    });
+    return userList;
+}
+
 export function getConnectionId(userData, userName) {
     if (userData?.connections?.hasOwnProperty(userName)) {
         return populateConnectionId(userData.connections[userName])
@@ -237,7 +251,7 @@ export function getFormattedNotification(msgData, myName) {
 export async function doesUserExistApi(username, email) {
     try {
         let res = await fetch(`/api/doesUserExist`, {
-        // let res = await fetch(`https://skychat-dg.onrender.com/api/doesUserExist`, {
+            // let res = await fetch(`https://skychat-dg.onrender.com/api/doesUserExist`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

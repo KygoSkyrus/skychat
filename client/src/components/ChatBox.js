@@ -191,7 +191,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
             dispatch(setToast('Message length exceeded', true))
             return;
         }
-        const sanitizedMessage = validator.escape(inputRef?.current?.value);
+        // const sanitizedMessage = validator.escape(inputRef?.current?.value);
         let connectionId;
 
         // check if userdata has the connection already and if not than add the connection in user collection
@@ -253,7 +253,7 @@ const ChatBox = ({ selectedUserToChat, setSelectedUserToChat, isGroupSelected })
         const msgData = {
             connectionId: connectionId,
             author: currentUser.displayName,
-            message: sanitizedMessage,
+            message: inputRef?.current?.value,
             time: serverTimestamp(),
             deletedBy: [],
         };

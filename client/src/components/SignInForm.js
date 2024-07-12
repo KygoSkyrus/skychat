@@ -129,7 +129,7 @@ const SignInForm = () => {
 
     return (
         <>
-            <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: '#ff000029' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleUsernameField(false); dispatch(showLoader(false)); }}></div>
+            <div className='overlay d-none' style={{ position: 'fixed', left: 0, backdropFilter: 'none', background: 'transparent' }} ref={overlayRef} onClick={() => { overlayRef.current.classList.add('d-none'); toggleUsernameField(false); dispatch(showLoader(false)); }}></div>
 
             <h5 className='text-dark text-center fw-bold'>Login to your account</h5>
 
