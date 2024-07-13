@@ -119,6 +119,14 @@ const RTCA = () => {
     }
   }
 
+  const handleSetHeader = (header) => {
+    const isChecked = document.getElementById('filter');
+    if ((header === 'Connections' && !isChecked?.checked) || (header === 'Requests' && isChecked?.checked)) {
+      isChecked.checked= !isChecked.checked;
+    }
+    setConnectionHeader(header === 'Connections');
+  };
+
   return (
     <>
       <div className="outer-top">
@@ -179,8 +187,8 @@ const RTCA = () => {
           {!selectedUserToChat &&
             <label htmlFor="filter" className="switch" aria-label="Toggle Filter">
               <input type="checkbox" id="filter" />
-              <span onClick={() => setConnectionHeader(true)} >Connections</span>
-              <span onClick={() => setConnectionHeader(false)} className="d-flex align-items-center">Requests
+              <span onClick={() => handleSetHeader('Connections')} >Connections</span>
+              <span onClick={() => handleSetHeader('Requests')} className="d-flex align-items-center">Requests
                 {/* just to check total requests */}
                 {/* {userData?.requests && Object.keys(userData?.requests)?.length}- */}
                 {connectionsToShow?.length > 0 &&

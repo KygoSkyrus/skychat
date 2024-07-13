@@ -1,14 +1,15 @@
 import React, { useContext, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { v4 as uuid } from 'uuid'
+import { collection, addDoc, serverTimestamp, doc, query, where, updateDoc, getDocs, limit } from "firebase/firestore";
 import { getAuth, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 import { FirebaseContext } from '../firebaseContext';
 import { SET_CURRENT_USER } from '../redux/actionTypes';
 import { setToast, showLoader } from '../redux/actionCreators';
 import { setUserData } from '../redux/thunk/userDataThunk';
-import { defaultAvatar, doesUserExistApi, toggleUsernameField } from '../utils';
+import { defaultAvatar, doesUserExistApi, toggleUsernameField, writeToDb } from '../utils';
 
 
 const SignInForm = () => {
@@ -23,6 +24,7 @@ const SignInForm = () => {
 
 
     const handleGoogleLogin = async () => {
+        dispatch(showLoader(true));
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider)
             .then(async (result) => {
@@ -31,6 +33,7 @@ const SignInForm = () => {
                 if (token) {
                     const data = await doesUserExistApi(undefined, result?.user?.email); // checks if email already exists or not
                     if (data) {
+                        dispatch(showLoader(false));
                         if (data.userFound) { //login
                             dispatch({ type: SET_CURRENT_USER, payload: auth.currentUser })
                             navigate('/chat')
@@ -97,7 +100,12 @@ const SignInForm = () => {
 
         const validUsername = name.match(/^(?![0-9]*$)[a-z0-9]+$/);
         if (validUsername == null) {
-            dispatch(setToast(`Invalid username. Only characters a-z and numbers are  acceptable.`, true))
+            dispatch(setToast(`Invalid username. Only characters a-z and numbers are acceptable.`, true))
+            return false;
+        }
+
+        if (validUsername === "skychat" || validUsername?.includes('skychat')) {
+            dispatch(setToast(`Users are not authorized to create account with username 'skychat'`, true))
             return false;
         }
 
@@ -112,19 +120,56 @@ const SignInForm = () => {
     }
 
     async function registerUserInDB(email, username, avatar) {
-        const userData = {
-            username: username,
-            email: email,
-            avatar: avatar || defaultAvatar,
-            connections: {},
-            requests: {},
-            blockList: {},
-            theme: '',
-            privacy: true,
-            time: serverTimestamp(),
-        };
-        await addDoc(collection(db, "users"), userData);
-        return true;
+        try {
+            const id = uuid();
+            const userData = {
+                username: username,
+                email: email,
+                avatar: avatar || defaultAvatar,
+                connections: {
+                    "skychat": {
+                        id,
+                    },
+                },
+                requests: {},
+                blockList: {},
+                theme: '',
+                privacy: true,
+                time: serverTimestamp(),
+            };
+            await addDoc(collection(db, "users"), userData);
+
+            // adding current user in skychat's list
+            let q = query(collection(db, "users"), where("username", "==", 'skychat'), limit(1));
+            const querySnapshot = await getDocs(q);
+            let skychatDoc = {};
+            querySnapshot.forEach((doc) => {
+                skychatDoc = { ...doc.data(), id: doc.id }
+                return;
+            });
+            const userDocRef = doc(db, "users", skychatDoc?.id);
+            await updateDoc(userDocRef, {
+                connections: {
+                    ...skychatDoc?.connections,
+                    [username]: {
+                        id
+                    },
+                }
+            });
+
+            const msgData = {
+                connectionId: id,
+                author: 'skychat',
+                message: 'Help us improve by sharing your overall experience with skychat',
+                time: serverTimestamp(),
+                deletedBy: [],
+            };
+            writeToDb(db, msgData); // sending msg on behalf of skychat
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false
+        }
     }
 
     return (

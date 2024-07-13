@@ -52,7 +52,6 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
                 where("username", "!=", userData?.username),
                 limit(15));
             const querySnapshot = await getDocs(q);
-            console.log('querySnapshot', querySnapshot)
             for (const doc of querySnapshot?.docs) {
                 const data = doc.data();
                 result[data?.username] = {
@@ -99,7 +98,7 @@ const SearchComponent = ({ handleSelectedUserToChat, handleSelectedGroupMember, 
                 {searchedUserList &&
                     Object.keys(searchedUserList)?.map(x =>
                         <section className="dropdown-item pointer p-1 px-2 d-flex align-items-center justify-content-between" key={x} onClick={() => handleSelect(x, searchedUserList[x]?.privacy)}>
-                            <span>
+                            <span className='d-flex align-items-center'>
                                 <img src={searchedUserList[x]?.avatar} className='me-2 rounded-circle' alt="" />
                                 <span>{x}</span>
                             </span>

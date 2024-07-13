@@ -246,9 +246,8 @@ body {
 .dropdown-item:hover {
   color: #1e2125;
   background-color: rgb(39 38 39);
-  background-color: var(--violet);
+  background-color: #f4f4f4;
   border-radius: 4px;
-  color: #fff;
 }
 .list-icon{
   position: absolute;
