@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const port = process.env.PORT || 5000;
 
 const corsOptions = {
-  origin: ['https://skychat-dg.web.app','http://localhost:3000'],
+  origin: ['https://skychat-dg.web.app'],
   optionsSuccessStatus: 200 // For legacy browser support
 };
 app.use(cors(corsOptions));

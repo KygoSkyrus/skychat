@@ -324,8 +324,8 @@ const RTCA = () => {
         <Loader />
       </div>
 
-      <Link to={'/about'} className="info">
-        <Info />
+      <Link to={'/about'} className="info text-secondary">
+        <Info size={18} />
       </Link>
 
       <section className="copyright fs-12">

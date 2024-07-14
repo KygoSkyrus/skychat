@@ -250,8 +250,8 @@ export function getFormattedNotification(msgData, myName) {
 
 export async function doesUserExistApi(username, email) {
     try {
-        let res = await fetch(`/api/doesUserExist`, {
-            // let res = await fetch(`https://skychat-dg.onrender.com/api/doesUserExist`, {
+        // let res = await fetch(`/api/doesUserExist`, {
+        let res = await fetch(process.env.REACT_APP_SERVER_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

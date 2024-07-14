@@ -3,6 +3,7 @@ import React from 'react'
 import Loader from './Loader';
 import SignInForm from './SignInForm';
 import logo1 from './../assets/logo/logo (1).png'
+import { Link } from 'react-router-dom';
 
 const Authenticate = () => {
     return (
@@ -22,6 +23,9 @@ const Authenticate = () => {
                 </div>
                 <Loader cName='absolute-centered' />
             </div>
+            <section className="copyright fs-12">
+                © {new Date().getFullYear()} All Rights Reserved, <Link to={'about'} style={{ color: "#858585" }}>Skychat</Link> <i className="">by</i> Dheeraj Gupta
+            </section>
         </>
     )
 }

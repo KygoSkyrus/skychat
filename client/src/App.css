@@ -131,6 +131,36 @@ body {
   color: rgb(83, 83, 83);
 }
 
+/* about page */
+.about{
+  width: 100vw;
+  height: 100dvh;
+  overflow: auto;
+  background-color: #fff;
+}
+.accordion-header{
+  margin: 0;
+}
+.accordion-button:focus {
+  box-shadow: inset 0px -1px 9px 0.2rem rgb(219 219 219 / 25%);
+}
+.accordion-button:not(.collapsed) {
+  color: unset;
+  background: linear-gradient(178deg, #6cdef6, #54a2e5);
+}
+.about::-webkit-scrollbar {
+  width: 6px;
+  z-index: 1 !important;
+}
+.about::-webkit-scrollbar-thumb {
+  background-color: rgb(174, 174, 174);
+}
+@media (min-width: 1200px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl {
+    max-width: 960px !important;
+  }
+}
+
 /* join page/ signin */
 .outer-join {
   width: 90vw;
