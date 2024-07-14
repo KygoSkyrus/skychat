@@ -94,16 +94,6 @@
 - [done]add a layer or loader on loading action
 - [done]add a fallback component on error,,,, 
 
-http://www.geero.net/2017/05/how-to-encrypt-a-google-firebase-realtime-database/
-- in the info of the app (on the bottom right) add that to keep the account and secure we have made ur account private, you can change it anytime... your msgs are end to end encrypted, other info
-
-- add a feedback account named "skychat" by default in chat
-
-
-- if collections cannnot be restrictced, than encrypt msgs
-- add description in index
-- change the doesuserexit api to live server
-- remove localhost from server (cors)
 
 
 **Style**
