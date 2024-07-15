@@ -1544,6 +1544,11 @@ input[type="search"] {
     min-width: unset;
   }
 
+  #mySidebar{
+    width: 70%;
+    max-width: 330px;
+  }
+
   #userModal,
   #entityInfoModal,
   #groupModal,
@@ -1564,7 +1569,7 @@ input[type="search"] {
   .unblock_overlay {
     height: 46.67px;
     top: 42%;
-    right: 0px;
+    right: -49px;
     margin: 4px;
     border-radius: 4px;
     background: #9a9a9a2e;
@@ -1573,17 +1578,18 @@ input[type="search"] {
   .chat_list .list .blockConnection,
   .member_list .list .blockConnection,
   .request_list .list .blockReq {
-    right: 0;
+    /* right: 0; */
   }
   .chat_list .list:hover .blockConnection,
   .member_list .list:hover .blockConnection,
   .request_list .list:hover .blockReq {
     right: 0;
   }
+
   /* middle button */
   .chat_list .list .deleteConnection,
   .request_list .list .declineReq {
-    right: 43px;
+    /* right: 43px; */
     color: #dc3545a1;
   }
   .chat_list .list:hover .deleteConnection, 
@@ -1594,7 +1600,7 @@ input[type="search"] {
 
   /* left most button */
   .request_list .list .acceptReq {
-    right: 87px;
+    /* right: 87px; */
     color: #1b7d1bf5;
   }
   .request_list .list:hover .acceptReq {
@@ -1619,6 +1625,16 @@ input[type="search"] {
     opacity: 1;
     color: #1b7d1bf5;
     border-bottom: none;
+  }
+
+
+  /* More actions */
+  .moreIcon{
+    display: block !important;
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translate(0, -50%);
   }
 
 

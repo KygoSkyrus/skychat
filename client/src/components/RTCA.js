@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
-import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info } from 'lucide-react';
+import { ChevronLeft, LogOut, Users, UserRoundX, UserCheck2, Ban, List, Info, MoreVertical } from 'lucide-react';
 import { collection, query, where, doc, orderBy, getDocs, serverTimestamp, limit, updateDoc } from "firebase/firestore";
 
 import hamburger from "./../assets/menu.png";
@@ -186,7 +186,7 @@ const RTCA = () => {
           {/* connection/request button */}
           {!selectedUserToChat &&
             <label htmlFor="filter" className="switch" aria-label="Toggle Filter">
-              <input type="checkbox" id="filter" />
+              <input type="checkbox" id="filter" checked={!connectionHeader} onChange={()=>console.log('')} />
               <span onClick={() => handleSetHeader('Connections')} >Connections</span>
               <span onClick={() => handleSetHeader('Requests')} className="d-flex align-items-center">Requests
                 {/* just to check total requests */}
@@ -225,6 +225,10 @@ const RTCA = () => {
                               <img src={usersList?.[x]?.avatar} className="me-2" alt="" />
                             }
                             <span>{userData?.connections[x].groupName || x}</span>
+                          </section>
+
+                          <section className="moreIcon text-secondary d-none">
+                            <MoreVertical/>
                           </section>
 
                           {/* ACTIONS */}
