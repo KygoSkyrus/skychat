@@ -277,6 +277,10 @@ const RTCA = () => {
                             <span>{uName?.groupName || uName}</span>
                           </section>
 
+                          <section className="moreIcon text-secondary d-none">
+                            <MoreVertical/>
+                          </section>
+
                           {/* ACTIONS */}
                           <section className={`acceptReq ${uName?.groupName && ' overrideClrGreen'}`} onClick={() =>
                             uName?.groupName ? acceptGroupReq(db, userData, id, dispatch) : acceptConnectionReq(db, userData, id, dispatch)} title="Accept connection">

@@ -332,7 +332,7 @@ body {
   z-index: 1;
 }
 .req_badge {
-  background: #2f6b8d;
+  background: rgb(47 107 141);
   width: 14px;
   font-size: 9px;
   height: 14px;
@@ -858,16 +858,16 @@ input[type="search"] {
 .chat_list .list:hover .blockConnection,
 .member_list .list:hover .blockConnection,
 .request_list .list:hover .blockReq {
-  right: 1px;
+  right: 4px;
 }
 .chat_list .list:hover .deleteConnection,
 .request_list .list:hover .declineReq {
-  right: 44px;
+  right: 47px;
   background-color: #dc3545a1;
 }
 .request_list .list:hover .acceptReq {
-  right: 87px;
-  background-color: #5ef35e91;
+  right: 90px;
+  background-color: #17b5177a;
 }
 
 .chat_list .list .blockConnection:hover svg,
@@ -1369,7 +1369,7 @@ input[type="search"] {
   --_switch-bg-clr: #70a9c5;
   --_switch-padding: 4px; /* padding around button*/
   --_slider-bg-clr: rgba(12, 74, 110, 0.65); /* slider color unchecked */
-  --_slider-bg-clr-on: rgba(12, 74, 110, 1); /* slider color checked */
+  --_slider-bg-clr-on: rgba(12, 74, 110, 0.65); /* slider color checked */
   --_slider-txt-clr: #ffffff;
   --_label-padding: 1rem 2rem; /* padding around the labels -  this gives the swith it's global width and height */
   --_switch-easing: cubic-bezier(
@@ -1450,6 +1450,9 @@ input[type="search"] {
 }
 .switch > input:checked ~ span:last-of-type {
   opacity: 1;
+}
+.switch > input:checked ~ span:last-of-type > span{
+  background-color: #70a9c5;
 }
 
 /* PRIVACY SWITCH */
@@ -1575,15 +1578,19 @@ input[type="search"] {
     background: #9a9a9a2e;
   }
   /* right most button */
-  .chat_list .list .blockConnection,
-  .member_list .list .blockConnection,
-  .request_list .list .blockReq {
-    /* right: 0; */
+  .member_list .list .blockConnection{
+    right: 0;
   }
   .chat_list .list:hover .blockConnection,
   .member_list .list:hover .blockConnection,
   .request_list .list:hover .blockReq {
     right: 0;
+  }
+
+  .chat_list .list:hover .moreIcon,
+  .member_list .list:hover .moreIcon,
+  .request_list .list:hover .moreIcon {
+    opacity: 0;
   }
 
   /* middle button */
@@ -1609,11 +1616,11 @@ input[type="search"] {
   }
   
   /* for group req btn */
-  .request_list .list .overrideClrGreen{
+  .request_list .list:hover .overrideClrGreen{
     right: 43px;
     color: #1b7d1bf5;
   }
-  .request_list .list .overrideClrRed{
+  .request_list .list:hover .overrideClrRed{
     right: 0px;
     color: #dc3545a1;
   }
@@ -1635,6 +1642,7 @@ input[type="search"] {
     right: 4px;
     top: 50%;
     transform: translate(0, -50%);
+    transition: var(--transition);
   }
 
 
