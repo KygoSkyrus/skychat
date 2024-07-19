@@ -18,7 +18,7 @@ const About = () => {
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#aboutAccordion">
                             <div class="accordion-body">
-                                SkyChat is a versatile chat application available for both web and mobile platforms. It offers a simple and elegant design to ensure a user-friendly experience. Users can easily create an account or log in using their Google account. A unique username is required for each user, which will be visible to others and used for searching users.
+                                SkyChat is a versatile chat application available for both web and mobile platforms. It offers a simple and elegant design to ensure a user-friendly experience. Users can easily create an account or log in using their Google account.
                             </div>
                         </div>
                     </div>
